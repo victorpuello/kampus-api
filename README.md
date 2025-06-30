@@ -1,61 +1,333 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🎓 Kampus API - Sistema de Gestión Académica
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+[![Laravel](https://img.shields.io/badge/Laravel-12.x-red.svg)](https://laravel.com)
+[![React](https://img.shields.io/badge/React-18.x-blue.svg)](https://reactjs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](https://www.typescriptlang.org)
+[![PHP](https://img.shields.io/badge/PHP-8.2+-purple.svg)](https://php.net)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-## About Laravel
+Sistema completo de gestión académica desarrollado con **Laravel 12** para el backend API y **React 18** con **TypeScript** para el frontend. Diseñado para instituciones educativas que necesitan gestionar estudiantes, docentes, asignaturas, calificaciones y más.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🚀 Características Principales
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### 📚 Gestión Académica
+- **Estudiantes**: Registro completo con información personal y académica
+- **Docentes**: Gestión de profesores y sus asignaciones
+- **Asignaturas**: Organización por áreas y grados académicos
+- **Grupos**: Clasificación de estudiantes por grupos de clase
+- **Calificaciones**: Sistema completo de notas y evaluaciones
+- **Horarios**: Gestión de franjas horarias y asignaciones
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 🏫 Gestión Institucional
+- **Instituciones**: Soporte multi-institucional
+- **Años Académicos**: Gestión de períodos escolares
+- **Grados**: Organización por niveles educativos
+- **Áreas**: Categorización de asignaturas por áreas de conocimiento
 
-## Learning Laravel
+### 🔐 Seguridad y Autenticación
+- **Laravel Sanctum**: Autenticación API con tokens
+- **Roles y Permisos**: Sistema granular de autorización
+- **Acudientes**: Gestión de responsables de estudiantes
+- **Usuarios**: Control de acceso por roles
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 📱 Frontend Moderno
+- **React 18** con **TypeScript** para type safety
+- **React Router** para navegación SPA
+- **Tailwind CSS** para diseño responsive
+- **Zustand** para gestión de estado
+- **Axios** para comunicación con API
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## 🛠️ Tecnologías Utilizadas
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Backend (Laravel 12)
+- **PHP 8.2+** - Lenguaje de programación
+- **Laravel Framework 12** - Framework PHP
+- **Laravel Sanctum** - Autenticación API
+- **MySQL/PostgreSQL** - Base de datos
+- **Eloquent ORM** - Mapeo objeto-relacional
+- **Laravel Migrations** - Control de versiones de BD
+- **Laravel Seeders** - Datos de prueba
+- **PHPUnit** - Testing
 
-## Laravel Sponsors
+### Frontend (React 18)
+- **React 18** - Biblioteca de UI
+- **TypeScript 5** - Tipado estático
+- **React Router DOM** - Enrutamiento
+- **Tailwind CSS** - Framework CSS
+- **Zustand** - Gestión de estado
+- **Axios** - Cliente HTTP
+- **Vite** - Build tool
+- **ESLint** - Linting
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## 📋 Requisitos del Sistema
 
-### Premium Partners
+### Backend
+- PHP >= 8.2
+- Composer
+- MySQL >= 8.0 o PostgreSQL >= 13
+- Node.js >= 18 (para compilar assets)
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### Frontend
+- Node.js >= 18
+- npm o yarn
 
-## Contributing
+## 🚀 Instalación y Configuración
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 1. Clonar el Repositorio
+```bash
+git clone https://github.com/victorpuello/kampus-api.git
+cd kampus-api
+```
 
-## Code of Conduct
+### 2. Configurar Backend (Laravel)
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+#### Instalar Dependencias PHP
+```bash
+composer install
+```
 
-## Security Vulnerabilities
+#### Configurar Variables de Entorno
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Editar `.env` con la configuración de tu base de datos:
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=kampus_api
+DB_USERNAME=tu_usuario
+DB_PASSWORD=tu_password
+```
 
-## License
+#### Ejecutar Migraciones y Seeders
+```bash
+php artisan migrate
+php artisan db:seed
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+#### Instalar Dependencias de Desarrollo
+```bash
+npm install
+```
+
+### 3. Configurar Frontend (React)
+
+#### Navegar al Directorio Frontend
+```bash
+cd kampus-frontend
+```
+
+#### Instalar Dependencias
+```bash
+npm install
+```
+
+#### Configurar Variables de Entorno
+Crear archivo `.env` en `kampus-frontend/`:
+```env
+VITE_API_URL=http://localhost:8000/api/v1
+```
+
+### 4. Ejecutar el Proyecto
+
+#### Backend (Terminal 1)
+```bash
+# En el directorio raíz
+php artisan serve
+```
+
+#### Frontend (Terminal 2)
+```bash
+# En el directorio kampus-frontend
+npm run dev
+```
+
+## 📚 API Endpoints
+
+### Autenticación
+- `POST /api/v1/login` - Iniciar sesión
+- `POST /api/v1/logout` - Cerrar sesión
+
+### Gestión de Usuarios
+- `GET /api/v1/users` - Listar usuarios
+- `POST /api/v1/users` - Crear usuario
+- `GET /api/v1/users/{id}` - Ver usuario
+- `PUT /api/v1/users/{id}` - Actualizar usuario
+- `DELETE /api/v1/users/{id}` - Eliminar usuario
+
+### Gestión de Estudiantes
+- `GET /api/v1/estudiantes` - Listar estudiantes
+- `POST /api/v1/estudiantes` - Crear estudiante
+- `GET /api/v1/estudiantes/{id}` - Ver estudiante
+- `PUT /api/v1/estudiantes/{id}` - Actualizar estudiante
+- `DELETE /api/v1/estudiantes/{id}` - Eliminar estudiante
+
+### Gestión de Docentes
+- `GET /api/v1/docentes` - Listar docentes
+- `POST /api/v1/docentes` - Crear docente
+- `GET /api/v1/docentes/{id}` - Ver docente
+- `PUT /api/v1/docentes/{id}` - Actualizar docente
+- `DELETE /api/v1/docentes/{id}` - Eliminar docente
+
+### Gestión Académica
+- `GET /api/v1/instituciones` - Gestión de instituciones
+- `GET /api/v1/anios` - Gestión de años académicos
+- `GET /api/v1/grados` - Gestión de grados
+- `GET /api/v1/areas` - Gestión de áreas
+- `GET /api/v1/asignaturas` - Gestión de asignaturas
+- `GET /api/v1/grupos` - Gestión de grupos
+- `GET /api/v1/acudientes` - Gestión de acudientes
+- `GET /api/v1/aulas` - Gestión de aulas
+- `GET /api/v1/franjas-horarias` - Gestión de horarios
+- `GET /api/v1/asignaciones` - Gestión de asignaciones
+
+## 🗄️ Estructura de Base de Datos
+
+El sistema incluye más de **30 tablas** que cubren:
+
+### Entidades Principales
+- **users** - Usuarios del sistema
+- **estudiantes** - Información de estudiantes
+- **docentes** - Información de docentes
+- **acudientes** - Responsables de estudiantes
+- **instituciones** - Centros educativos
+
+### Gestión Académica
+- **anios** - Años académicos
+- **periodos** - Períodos escolares
+- **grados** - Niveles educativos
+- **areas** - Áreas de conocimiento
+- **asignaturas** - Materias académicas
+- **grupos** - Grupos de clase
+- **aulas** - Espacios físicos
+
+### Calificaciones y Evaluaciones
+- **notas** - Calificaciones de estudiantes
+- **definitivas_asignatura** - Promedios por asignatura
+- **definitivas_periodo** - Promedios por período
+- **definitivas_finales** - Promedios finales
+- **inasistencias** - Control de asistencia
+
+### Horarios y Asignaciones
+- **franjas_horarias** - Bloques de tiempo
+- **asignaciones** - Docentes asignados a grupos/asignaturas
+- **horarios** - Programación de clases
+
+## 🧪 Testing
+
+### Ejecutar Tests del Backend
+```bash
+php artisan test
+```
+
+### Ejecutar Tests Específicos
+```bash
+php artisan test --filter=StudentControllerTest
+```
+
+## 📦 Comandos Útiles
+
+### Backend
+```bash
+# Limpiar caché
+php artisan cache:clear
+php artisan config:clear
+php artisan route:clear
+
+# Generar documentación API
+php artisan l5-swagger:generate
+
+# Ejecutar seeders específicos
+php artisan db:seed --class=UserSeeder
+php artisan db:seed --class=TestingDatabaseSeeder
+```
+
+### Frontend
+```bash
+# Construir para producción
+npm run build
+
+# Preview de producción
+npm run preview
+
+# Linting
+npm run lint
+```
+
+## 🔧 Configuración de Desarrollo
+
+### Variables de Entorno Backend (.env)
+```env
+APP_NAME="Kampus API"
+APP_ENV=local
+APP_DEBUG=true
+APP_URL=http://localhost:8000
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=kampus_api
+DB_USERNAME=root
+DB_PASSWORD=
+
+CORS_ALLOWED_ORIGINS=http://localhost:5173
+```
+
+### Variables de Entorno Frontend (.env)
+```env
+VITE_API_URL=http://localhost:8000/api/v1
+VITE_APP_NAME="Kampus"
+```
+
+## 📱 Características del Frontend
+
+### Páginas Implementadas
+- **Login** - Autenticación de usuarios
+- **Dashboard** - Panel principal
+- **Estudiantes** - Lista, creación, edición y detalle
+- **Layout Responsive** - Diseño adaptable
+
+### Componentes Principales
+- **DashboardLayout** - Layout principal con navegación
+- **StudentForm** - Formulario de estudiantes
+- **ProtectedRoute** - Rutas protegidas
+- **AuthStore** - Gestión de estado de autenticación
+
+## 🔐 Seguridad
+
+- **Laravel Sanctum** para autenticación API
+- **CORS** configurado para desarrollo
+- **Validación** de datos en requests
+- **Autorización** basada en roles y permisos
+- **Sanitización** de inputs
+
+## 🤝 Contribución
+
+1. Fork el proyecto
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
+
+## 📄 Licencia
+
+Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) para detalles.
+
+## 👨‍💻 Autor
+
+**Victor Puello**
+- GitHub: [@victorpuello](https://github.com/victorpuello)
+
+## 🙏 Agradecimientos
+
+- [Laravel](https://laravel.com) - Framework PHP
+- [React](https://reactjs.org) - Biblioteca de UI
+- [Tailwind CSS](https://tailwindcss.com) - Framework CSS
+- [Vite](https://vitejs.dev) - Build tool
+
+---
+
+⭐ Si este proyecto te ayuda, ¡dale una estrella en GitHub!
