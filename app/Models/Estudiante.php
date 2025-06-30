@@ -109,4 +109,9 @@ class Estudiante extends Model
     {
         return $this->hasMany(Inasistencia::class);
     }
+
+    public function institucion()
+    {
+        return $this->belongsTo(Institucion::class, 'institucion_id');
+    }
 }

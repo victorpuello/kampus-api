@@ -6,13 +6,8 @@ import StudentsListPage from '../pages/StudentsListPage'
 import StudentDetailPage from '../pages/StudentDetailPage'
 import CreateStudentPage from '../pages/CreateStudentPage'
 import EditStudentPage from '../pages/EditStudentPage'
-
-// Página temporal del dashboard
-const DashboardPage = () => (
-  <div className="p-4">
-    <h1 className="text-2xl font-bold">Dashboard</h1>
-  </div>
-)
+import TeachersListPage from '../pages/TeachersListPage'
+import DashboardPage from '../pages/DashboardPage'
 
 export const router = createBrowserRouter([
   {
@@ -21,31 +16,35 @@ export const router = createBrowserRouter([
   },
   {
     path: '/',
-    element: <DashboardLayout><Outlet /></DashboardLayout>,
+    element: <ProtectedRoute />,
     children: [
       {
         index: true,
-        element: <DashboardPage />
+        element: <DashboardLayout><DashboardPage /></DashboardLayout>
       },
       {
         path: 'dashboard',
-        element: <DashboardPage />
+        element: <DashboardLayout><DashboardPage /></DashboardLayout>
       },
       {
         path: 'estudiantes',
-        element: <StudentsListPage />
+        element: <DashboardLayout><StudentsListPage /></DashboardLayout>
       },
       {
         path: 'estudiantes/crear',
-        element: <CreateStudentPage />
+        element: <DashboardLayout><CreateStudentPage /></DashboardLayout>
       },
       {
         path: 'estudiantes/:id',
-        element: <StudentDetailPage />
+        element: <DashboardLayout><StudentDetailPage /></DashboardLayout>
       },
       {
         path: 'estudiantes/:id/editar',
-        element: <EditStudentPage />
+        element: <DashboardLayout><EditStudentPage /></DashboardLayout>
+      },
+      {
+        path: 'docentes',
+        element: <DashboardLayout><TeachersListPage /></DashboardLayout>
       }
     ],
   }

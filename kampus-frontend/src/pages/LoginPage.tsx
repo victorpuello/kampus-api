@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuthStore } from '../store/authStore'
+import { useAuth } from '../hooks/useAuth'
 import { Button } from '../components/ui/Button'
 import { Input } from '../components/ui/Input'
 import { Card, CardHeader, CardBody } from '../components/ui/Card'
@@ -12,17 +12,25 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false)
   
   const navigate = useNavigate()
-  const login = useAuthStore((state) => state.login)
+  const { login } = useAuth()
+  
+  // Log del estado inicial
+  console.log('LoginPage - Estado inicial:', { email, password, error, loading })
+  console.log('LoginPage - Función login disponible:', !!login)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
     setLoading(true)
 
+    console.log('Iniciando login desde LoginPage con:', { email, password })
+
     try {
       await login(email, password)
+      console.log('Login exitoso, navegando a dashboard')
       navigate('/dashboard')
     } catch (err: any) {
+      console.error('Error en login desde LoginPage:', err)
       setError(err.message || 'Credenciales inválidas')
     } finally {
       setLoading(false)

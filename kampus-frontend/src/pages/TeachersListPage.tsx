@@ -5,15 +5,17 @@ import { Button } from '../components/ui/Button';
 import { DataTable } from '../components/ui/DataTable';
 import type { Column, ActionButton } from '../components/ui/DataTable';
 
-interface Student {
+interface Teacher {
   id: number;
   user: {
     nombre: string;
     apellido: string;
-    email: string;
     tipo_documento: string;
     numero_documento: string;
+    email: string;
   };
+  telefono: string;
+  especialidad: string;
   estado: string;
   institucion: {
     id: number;
@@ -21,75 +23,76 @@ interface Student {
   };
 }
 
-const StudentsListPage = () => {
+const TeachersListPage = () => {
   const navigate = useNavigate();
-  const [students, setStudents] = useState<Student[]>([]);
+  const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchStudents = async () => {
+  const fetchTeachers = async () => {
     try {
       setLoading(true);
-      const response = await axiosClient.get('/estudiantes');
-      setStudents(response.data.data);
+      const response = await axiosClient.get('/docentes');
+      setTeachers(response.data.data);
       setError(null);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al cargar los estudiantes');
+      setError(err.response?.data?.message || 'Error al cargar los docentes');
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchStudents();
+    fetchTeachers();
   }, []);
 
-  const handleDelete = async (student: Student) => {
-    if (!window.confirm('¿Estás seguro de que deseas eliminar este estudiante?')) {
+  const handleDelete = async (teacher: Teacher) => {
+    if (!window.confirm('¿Estás seguro de que deseas eliminar este docente?')) {
       return;
     }
 
     try {
-      await axiosClient.delete(`/estudiantes/${student.id}`);
-      fetchStudents();
+      await axiosClient.delete(`/docentes/${teacher.id}`);
+      fetchTeachers();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al eliminar el estudiante');
+      setError(err.response?.data?.message || 'Error al eliminar el docente');
     }
   };
 
-  const handleBulkDelete = async (selectedStudents: Student[]) => {
-    if (!window.confirm(`¿Estás seguro de que deseas eliminar ${selectedStudents.length} estudiantes?`)) {
+  const handleBulkDelete = async (selectedTeachers: Teacher[]) => {
+    if (!window.confirm(`¿Estás seguro de que deseas eliminar ${selectedTeachers.length} docentes?`)) {
       return;
     }
 
     try {
-      await Promise.all(selectedStudents.map(student => 
-        axiosClient.delete(`/estudiantes/${student.id}`)
+      await Promise.all(selectedTeachers.map(teacher => 
+        axiosClient.delete(`/docentes/${teacher.id}`)
       ));
-      fetchStudents();
+      fetchTeachers();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al eliminar los estudiantes');
+      setError(err.response?.data?.message || 'Error al eliminar los docentes');
     }
   };
 
   // Definir las columnas de la tabla
-  const columns: Column<Student>[] = [
+  const columns: Column<Teacher>[] = [
     {
       key: 'nombre',
-      header: 'Estudiante',
-      accessor: (student) => (
+      header: 'Docente',
+      accessor: (teacher) => (
         <div className="flex items-center">
           <div className="flex-shrink-0 h-10 w-10">
-            <div className="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center">
-              <span className="text-sm font-medium text-primary-700">
-                {(student.user?.nombre?.charAt(0) ?? '')}{(student.user?.apellido?.charAt(0) ?? '')}
+            <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+              <span className="text-sm font-medium text-blue-700">
+                {(teacher.user?.nombre?.charAt(0) ?? '')}{(teacher.user?.apellido?.charAt(0) ?? '')}
               </span>
             </div>
           </div>
           <div className="ml-4">
             <div className="text-sm font-medium text-gray-900">
-              {student.user?.nombre} {student.user?.apellido}
+              {teacher.user?.nombre} {teacher.user?.apellido}
             </div>
+            <div className="text-sm text-gray-500">{teacher.especialidad}</div>
           </div>
         </div>
       ),
@@ -98,9 +101,9 @@ const StudentsListPage = () => {
     {
       key: 'documento',
       header: 'Documento',
-      accessor: (student) => (
+      accessor: (teacher) => (
         <span className="text-sm text-gray-500">
-          {student.user?.tipo_documento} {student.user?.numero_documento}
+          {teacher.user?.tipo_documento} {teacher.user?.numero_documento}
         </span>
       ),
       sortable: true,
@@ -108,31 +111,39 @@ const StudentsListPage = () => {
     {
       key: 'email',
       header: 'Email',
-      accessor: (student) => (
-        <span className="text-sm text-gray-500">{student.user?.email}</span>
+      accessor: (teacher) => (
+        <span className="text-sm text-gray-500">{teacher.user?.email}</span>
+      ),
+      sortable: true,
+    },
+    {
+      key: 'telefono',
+      header: 'Teléfono',
+      accessor: (teacher) => (
+        <span className="text-sm text-gray-500">{teacher.telefono}</span>
       ),
       sortable: true,
     },
     {
       key: 'institucion',
       header: 'Institución',
-      accessor: (student) => (
-        <span className="text-sm text-gray-500">{student.institucion?.nombre}</span>
+      accessor: (teacher) => (
+        <span className="text-sm text-gray-500">{teacher.institucion?.nombre}</span>
       ),
       sortable: true,
     },
     {
       key: 'estado',
       header: 'Estado',
-      accessor: (student) => (
+      accessor: (teacher) => (
         <span
           className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
-            student.estado === 'activo'
+            teacher.estado === 'activo'
               ? 'bg-green-100 text-green-800'
               : 'bg-red-100 text-red-800'
           }`}
         >
-          {student.estado}
+          {teacher.estado}
         </span>
       ),
       sortable: true,
@@ -141,12 +152,12 @@ const StudentsListPage = () => {
   ];
 
   // Definir las acciones de la tabla
-  const actions: ActionButton<Student>[] = [
+  const actions: ActionButton<Teacher>[] = [
     {
       label: 'Ver',
       variant: 'ghost',
       size: 'sm',
-      onClick: (student) => navigate(`/estudiantes/${student.id}`),
+      onClick: (teacher) => navigate(`/docentes/${teacher.id}`),
       icon: (
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -158,7 +169,7 @@ const StudentsListPage = () => {
       label: 'Editar',
       variant: 'ghost',
       size: 'sm',
-      onClick: (student) => navigate(`/estudiantes/${student.id}/editar`),
+      onClick: (teacher) => navigate(`/docentes/${teacher.id}/editar`),
       icon: (
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -179,7 +190,7 @@ const StudentsListPage = () => {
   ];
 
   // Acciones en lote
-  const bulkActions: ActionButton<Student[]>[] = [
+  const bulkActions: ActionButton<Teacher[]>[] = [
     {
       label: 'Eliminar Seleccionados',
       variant: 'danger',
@@ -198,9 +209,9 @@ const StudentsListPage = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Estudiantes</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Docentes</h1>
           <p className="text-gray-600 mt-1">
-            Gestiona todos los estudiantes registrados en el sistema
+            Gestiona todos los docentes registrados en el sistema
           </p>
         </div>
         <Button
@@ -211,36 +222,36 @@ const StudentsListPage = () => {
             </svg>
           }
         >
-          <Link to="/estudiantes/crear">Agregar Estudiante</Link>
+          <Link to="/docentes/crear">Agregar Docente</Link>
         </Button>
       </div>
 
       {/* DataTable */}
       <DataTable
-        data={students}
+        data={teachers}
         columns={columns}
         actions={actions}
         loading={loading}
         error={error}
         searchable={true}
-        searchPlaceholder="Buscar estudiantes por nombre, documento o email..."
-        searchKeys={['user.nombre', 'user.apellido', 'user.email', 'user.numero_documento', 'institucion.nombre', 'estado']}
+        searchPlaceholder="Buscar docentes por nombre, documento o email..."
+        searchKeys={['user.nombre', 'user.apellido', 'user.email', 'user.numero_documento', 'telefono', 'especialidad', 'institucion.nombre', 'estado']}
         sortable={true}
         pagination={true}
         itemsPerPage={10}
         itemsPerPageOptions={[5, 10, 25, 50]}
-        emptyMessage="No hay estudiantes registrados"
+        emptyMessage="No hay docentes registrados"
         emptyIcon={
           <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
           </svg>
         }
         selectable={true}
         bulkActions={bulkActions}
-        onRowClick={(student) => navigate(`/estudiantes/${student.id}`)}
+        onRowClick={(teacher) => navigate(`/docentes/${teacher.id}`)}
       />
     </div>
   );
 };
 
-export default StudentsListPage; 
+export default TeachersListPage; 

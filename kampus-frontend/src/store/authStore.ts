@@ -33,18 +33,20 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       token: null,
       user: null,
       isAuthenticated: false,
 
       login: async (email: string, password: string) => {
+        console.log('Iniciando login con:', email)
         try {
           const response = await axiosClient.post('/login', {
             email,
             password,
           })
 
+          console.log('Respuesta del servidor:', response.data)
           const { token, user } = response.data
 
           set({
@@ -52,6 +54,8 @@ export const useAuthStore = create<AuthState>()(
             user,
             isAuthenticated: true,
           })
+          
+          console.log('Estado actualizado:', get())
         } catch (error: any) {
           console.error('Error en login:', error.response?.data || error.message)
           throw new Error(error.response?.data?.message || 'Error al iniciar sesión')
@@ -77,4 +81,7 @@ export const useAuthStore = create<AuthState>()(
       name: 'auth-storage',
     }
   )
-) 
+)
+
+// Log del estado inicial después de la persistencia
+console.log('Estado inicial del store (después de persist):', useAuthStore.getState()) 

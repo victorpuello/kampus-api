@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Login Store</title>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <h1>Test Login Store</h1>
+    <button onclick="testLogin()">Probar Login</button>
+    <div id="result"></div>
+
+    <script>
+        // Simular el store de Zustand
+        let authState = {
+            token: null,
+            user: null,
+            isAuthenticated: false
+        };
+
+        const axiosClient = axios.create({
+            baseURL: 'http://kampus.test/api/v1',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+            withCredentials: true
+        });
+
+        async function testLogin() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Probando login...';
+            
+            try {
+                console.log('Iniciando login...');
+                
+                const response = await axiosClient.post('/login', {
+                    email: 'admin@example.com',
+                    password: 'password'
+                });
+                
+                console.log('Respuesta del servidor:', response.data);
+                
+                const { token, user } = response.data;
+                
+                // Actualizar estado
+                authState = {
+                    token,
+                    user,
+                    isAuthenticated: true
+                };
+                
+                console.log('Estado actualizado:', authState);
+                
+                resultDiv.innerHTML = `
+                    <h3>✅ Login exitoso</h3>
+                    <p><strong>Token:</strong> ${token ? 'Recibido' : 'No recibido'}</p>
+                    <p><strong>Usuario:</strong> ${user ? user.nombre + ' ' + user.apellido : 'No recibido'}</p>
+                    <p><strong>Autenticado:</strong> ${authState.isAuthenticated}</p>
+                    <pre>${JSON.stringify(authState, null, 2)}</pre>
+                `;
+                
+            } catch (error) {
+                console.error('Error en login:', error);
+                
+                resultDiv.innerHTML = `
+                    <h3>❌ Error en login</h3>
+                    <p><strong>Error:</strong> ${error.message}</p>
+                    <p><strong>Response:</strong> ${error.response?.data?.message || 'Sin respuesta'}</p>
+                    <pre>${JSON.stringify(error.response?.data, null, 2)}</pre>
+                `;
+            }
+        }
+    </script>
+</body>
+</html> 

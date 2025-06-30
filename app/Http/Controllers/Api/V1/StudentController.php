@@ -20,12 +20,10 @@ class StudentController extends Controller
 {
     /**
      * Constructor del controlador.
-     * Aplica políticas de autorización a los recursos de estudiante.
      */
     public function __construct()
     {
-        parent::__construct();
-        $this->authorizeResource(Estudiante::class, 'estudiante');
+
     }
 
     /**

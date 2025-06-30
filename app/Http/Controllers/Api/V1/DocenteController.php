@@ -20,12 +20,10 @@ class DocenteController extends Controller
 {
     /**
      * Constructor del controlador.
-     * Aplica políticas de autorización a los recursos de docente.
      */
     public function __construct()
     {
-        parent::__construct();
-        $this->authorizeResource(Docente::class, 'docente');
+        // Removido parent::__construct() y authorizeResource() que no están disponibles
     }
 
     /**

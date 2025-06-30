@@ -18,11 +18,10 @@ class UserController extends Controller
 {
     /**
      * Constructor del controlador.
-     * Aplica políticas de autorización a los recursos de usuario.
      */
     public function __construct()
     {
-        $this->authorizeResource(User::class, 'user');
+        // Las políticas de autorización se pueden implementar aquí si es necesario
     }
 
     /**

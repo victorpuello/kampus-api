@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Limpiar Storage y Probar Login</title>
+</head>
+<body>
+    <h1>Limpiar Storage y Probar Login</h1>
+    <button onclick="clearStorage()">Limpiar Storage</button>
+    <button onclick="testLogin()">Probar Login</button>
+    <div id="result"></div>
+
+    <script>
+        function clearStorage() {
+            localStorage.clear();
+            sessionStorage.clear();
+            console.log('Storage limpiado');
+            document.getElementById('result').innerHTML = '<p>✅ Storage limpiado</p>';
+        }
+
+        async function testLogin() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Probando login...';
+            
+            try {
+                const response = await fetch('http://kampus.test/api/v1/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'admin@example.com',
+                        password: 'password'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <h3>✅ Login exitoso</h3>
+                        <p><strong>Token:</strong> ${data.token ? 'Recibido' : 'No recibido'}</p>
+                        <p><strong>Usuario:</strong> ${data.user ? data.user.nombre + ' ' + data.user.apellido : 'No recibido'}</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <h3>❌ Error en login</h3>
+                        <p><strong>Status:</strong> ${response.status}</p>
+                        <p><strong>Error:</strong> ${data.message || 'Error desconocido'}</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <h3>❌ Error de conexión</h3>
+                    <p><strong>Error:</strong> ${error.message}</p>
+                `;
+            }
+        }
+
+        // Mostrar estado actual del storage
+        console.log('Estado actual del localStorage:', localStorage);
+        console.log('Estado actual del sessionStorage:', sessionStorage);
+    </script>
+</body>
+</html> 
