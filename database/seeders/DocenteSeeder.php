@@ -38,7 +38,7 @@ class DocenteSeeder extends Seeder
                 'apellido' => $docenteData['apellido'],
                 'username' => $docenteData['username'],
                 'email' => $docenteData['email'],
-                'password_hash' => bcrypt('password'),
+                'password' => bcrypt('password'),
                 'institucion_id' => 1,
                 'estado' => 'activo',
             ]);

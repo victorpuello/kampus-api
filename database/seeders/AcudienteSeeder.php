@@ -37,22 +37,16 @@ class AcudienteSeeder extends Seeder
             'apellido' => 'Pérez',
             'username' => 'jperez',
             'email' => 'juan.perez@example.com',
-            'password_hash' => Hash::make('password123'),
+            'password' => Hash::make('password123'),
             'estado' => 'activo',
             'institucion_id' => $institucion->id
         ]);
 
         Acudiente::create([
             'user_id' => $user1->id,
-            'nombre' => 'Juan',
-            'apellido' => 'Pérez',
-            'tipo_documento' => 'CC',
-            'numero_documento' => '1234567890',
-            'direccion' => 'Calle 123 # 45-67',
+            'nombre' => 'Juan Pérez',
             'telefono' => '3001234567',
             'email' => 'juan.perez@example.com',
-            'parentesco' => 'Padre',
-            'estado' => 'activo'
         ]);
 
         // Usuario y acudiente 2
@@ -61,22 +55,16 @@ class AcudienteSeeder extends Seeder
             'apellido' => 'González',
             'username' => 'mgonzalez',
             'email' => 'maria.gonzalez@example.com',
-            'password_hash' => Hash::make('password123'),
+            'password' => Hash::make('password123'),
             'estado' => 'activo',
             'institucion_id' => $institucion->id
         ]);
 
         Acudiente::create([
             'user_id' => $user2->id,
-            'nombre' => 'María',
-            'apellido' => 'González',
-            'tipo_documento' => 'CC',
-            'numero_documento' => '0987654321',
-            'direccion' => 'Calle 789 # 12-34',
+            'nombre' => 'María González',
             'telefono' => '3007654321',
             'email' => 'maria.gonzalez@example.com',
-            'parentesco' => 'Madre',
-            'estado' => 'activo'
         ]);
 
         // Crear acudientes adicionales
@@ -113,7 +101,7 @@ class AcudienteSeeder extends Seeder
                 'apellido' => $acudienteData['apellido'],
                 'username' => $acudienteData['username'],
                 'email' => $acudienteData['email'],
-                'password_hash' => bcrypt('password'),
+                'password' => bcrypt('password'),
                 'institucion_id' => $institucion->id,
                 'estado' => 'activo',
             ]);

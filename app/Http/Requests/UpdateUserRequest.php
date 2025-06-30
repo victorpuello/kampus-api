@@ -4,6 +4,8 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+use Illuminate\Support\Facades\Hash;
+
 /**
  * @OA\Schema(
  *     schema="UpdateUserRequest",
@@ -26,6 +28,18 @@ class UpdateUserRequest extends FormRequest
     public function authorize(): bool
     {
         return true;
+    }
+
+    /**
+     * Prepara los datos para la validación.
+     */
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('password')) {
+            $this->merge([
+                'password' => Hash::make($this->password),
+            ]);
+        }
     }
 
     /**

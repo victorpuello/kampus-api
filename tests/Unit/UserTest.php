@@ -7,6 +7,7 @@ use App\Models\Institucion;
 use App\Models\Role;
 use App\Models\Permission;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 /**
@@ -29,6 +30,33 @@ class UserTest extends TestCase
         $this->assertDatabaseHas('users', [
             'id' => $user->id,
         ]);
+    }
+
+    /**
+     * Prueba que la contraseña del usuario se hashea automáticamente al crearse.
+     */
+    public function test_user_password_is_hashed_on_creation()
+    {
+        $password = 'secretpassword';
+        $user = User::factory()->create([
+            'password' => $password,
+        ]);
+
+        $this->assertTrue(Hash::check($password, $user->password));
+    }
+
+    /**
+     * Prueba que un usuario puede ser autenticado con la contraseña hasheada.
+     */
+    public function test_user_can_be_authenticated_with_hashed_password()
+    {
+        $password = 'secretpassword';
+        $user = User::factory()->create([
+            'password' => $password,
+        ]);
+
+        $this->assertTrue(Hash::check($password, $user->password));
+        $this->assertTrue(auth()->attempt(['email' => $user->email, 'password' => $password]));
     }
 
     /**

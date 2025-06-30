@@ -4,6 +4,8 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+use Illuminate\Support\Facades\Hash;
+
 /**
  * @OA\Schema(
  *     schema="StoreUserRequest",
@@ -30,6 +32,18 @@ class StoreUserRequest extends FormRequest
     public function authorize(): bool
     {
         return $this->user()->can('users.create');
+    }
+
+    /**
+     * Prepara los datos para la validación.
+     */
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('password')) {
+            $this->merge([
+                'password' => Hash::make($this->password),
+            ]);
+        }
     }
 
     /**

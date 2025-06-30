@@ -55,7 +55,7 @@ class EstudianteSeeder extends Seeder
                 'apellido' => $estudianteData['apellido'],
                 'username' => $estudianteData['username'],
                 'email' => $estudianteData['email'],
-                'password_hash' => bcrypt('password'),
+                'password' => bcrypt('password'),
                 'institucion_id' => 1,
                 'estado' => 'activo',
             ]);

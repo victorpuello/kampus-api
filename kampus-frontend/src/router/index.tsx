@@ -25,11 +25,11 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Navigate to="/estudiantes" replace />
+        element: <DashboardPage />
       },
       {
         path: 'dashboard',
-        element: <Navigate to="/estudiantes" replace />
+        element: <DashboardPage />
       },
       {
         path: 'estudiantes',
@@ -48,9 +48,5 @@ export const router = createBrowserRouter([
         element: <EditStudentPage />
       }
     ],
-  },
-  {
-    path: '/',
-    element: <LoginPage />,
-  },
+  }
 ]) 

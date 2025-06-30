@@ -17,7 +17,7 @@ class UserSeeder extends Seeder
             'apellido' => 'Sistema',
             'username' => 'admin',
             'email' => 'admin@example.com',
-            'password_hash' => 'password',
+            'password' => Hash::make('password'),
             'institucion_id' => 1,
             'estado' => 'activo',
         ]);
@@ -32,7 +32,7 @@ class UserSeeder extends Seeder
             'apellido' => 'Pérez',
             'username' => 'jperez',
             'email' => 'jperez@example.com',
-            'password_hash' => 'password',
+            'password' => Hash::make('password'),
             'institucion_id' => 1,
             'estado' => 'activo',
         ]);
@@ -47,7 +47,7 @@ class UserSeeder extends Seeder
             'apellido' => 'González',
             'username' => 'mgonzalez',
             'email' => 'mgonzalez@example.com',
-            'password_hash' => 'password',
+            'password' => Hash::make('password'),
             'institucion_id' => 1,
             'estado' => 'activo',
         ]);
@@ -62,7 +62,7 @@ class UserSeeder extends Seeder
             'apellido' => 'Rodríguez',
             'username' => 'crodriguez',
             'email' => 'crodriguez@example.com',
-            'password_hash' => 'password',
+            'password' => Hash::make('password'),
             'institucion_id' => 1,
             'estado' => 'activo',
         ]);

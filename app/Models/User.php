@@ -19,7 +19,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  * @property string $apellido
  * @property string $username
  * @property string $email
- * @property string $password_hash
+ * @property string $password
  * @property int $institucion_id
  * @property string $estado
  * @property \Illuminate\Support\Carbon|null $deleted_at
@@ -61,7 +61,7 @@ class User extends Authenticatable
         'apellido',
         'username',
         'email',
-        'password_hash',
+        'password',
         'institucion_id',
         'estado',
     ];
@@ -72,7 +72,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $hidden = [
-        'password_hash',
+        'password',
     ];
 
     /**
@@ -93,10 +93,10 @@ class User extends Authenticatable
      * @param string $value
      * @return void
      */
-    public function setPasswordHashAttribute($value)
+    public function setPasswordAttribute($value)
     {
         if ($value) {
-            $this->attributes['password_hash'] = Hash::make($value);
+            $this->attributes['password'] = Hash::make($value);
         }
     }
 

@@ -14,7 +14,7 @@ return new class extends Migration
             $table->string('apellido', 255);
             $table->string('username', 255)->unique();
             $table->string('email', 255)->unique();
-            $table->string('password_hash', 255);
+            $table->string('password', 255);
             $table->unsignedBigInteger('institucion_id');
             $table->string('estado', 50)->default('activo');
             $table->softDeletes();

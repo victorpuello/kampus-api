@@ -58,12 +58,19 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
-      logout: () => {
-        set({
-          token: null,
-          user: null,
-          isAuthenticated: false,
-        })
+      logout: async () => {
+        try {
+          await axiosClient.post('/logout')
+        } catch (error) {
+          console.error('Error al cerrar sesión en el backend:', error)
+          // Aunque haya un error en el backend, limpiamos el estado local para evitar inconsistencias
+        } finally {
+          set({
+            token: null,
+            user: null,
+            isAuthenticated: false,
+          })
+        }
       },
     }),
     {

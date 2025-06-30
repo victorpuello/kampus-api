@@ -18,7 +18,7 @@ class UserFactory extends Factory
             'apellido' => $this->faker->lastName,
             'username' => $this->faker->unique()->userName,
             'email' => $this->faker->unique()->safeEmail,
-            'password_hash' => bcrypt('password'),
+            'password' => bcrypt('password'),
             'institucion_id' => Institucion::factory(),
             'estado' => $this->faker->randomElement(['activo', 'inactivo']),
         ];
