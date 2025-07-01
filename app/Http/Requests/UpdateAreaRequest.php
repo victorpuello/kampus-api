@@ -29,8 +29,10 @@ class UpdateAreaRequest extends FormRequest
      */
     public function rules(): array
     {
+        $areaId = $this->area?->id;
+        
         return [
-            'nombre' => 'sometimes|string|max:255|unique:areas,nombre,' . $this->area->id,
+            'nombre' => 'sometimes|string|max:255|unique:areas,nombre,' . $areaId,
             'institucion_id' => 'sometimes|integer|exists:instituciones,id',
         ];
     }

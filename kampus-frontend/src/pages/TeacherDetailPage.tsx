@@ -4,6 +4,9 @@ import axiosClient from '../api/axiosClient';
 import { Button } from '../components/ui/Button';
 import { Card, CardHeader, CardBody } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
+import { useAlertContext } from '../contexts/AlertContext';
+import { useConfirm } from '../hooks/useConfirm';
+import ConfirmDialog from '../components/ui/ConfirmDialog';
 
 interface Teacher {
   id: number;
@@ -29,6 +32,8 @@ interface Teacher {
 const TeacherDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { showSuccess, showError } = useAlertContext();
+  const { dialogState, confirm, setLoading: setConfirmLoading } = useConfirm();
   const [teacher, setTeacher] = useState<Teacher | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -50,21 +55,27 @@ const TeacherDetailPage = () => {
   }, [id]);
 
   const handleDelete = async () => {
-    if (!window.confirm(`¿Estás seguro de que deseas eliminar al docente ${teacher?.user.nombre} ${teacher?.user.apellido}? Esta acción no se puede deshacer.`)) {
-      return;
-    }
+    const confirmed = await confirm({
+      title: 'Eliminar Docente',
+      message: `¿Estás seguro de que deseas eliminar al docente ${teacher?.user.nombre} ${teacher?.user.apellido}? Esta acción no se puede deshacer.`,
+      confirmText: 'Eliminar',
+      cancelText: 'Cancelar',
+      variant: 'danger'
+    });
+
+    if (!confirmed) return;
 
     try {
-      setLoading(true);
+      setConfirmLoading(true);
       await axiosClient.delete(`/docentes/${id}`);
-      alert('Docente eliminado exitosamente');
+      showSuccess('Docente eliminado exitosamente', 'Éxito');
       navigate('/docentes');
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Error al eliminar el docente';
-      alert(`Error: ${errorMessage}`);
+      showError(errorMessage, 'Error');
       setError(errorMessage);
     } finally {
-      setLoading(false);
+      setConfirmLoading(false);
     }
   };
 
@@ -258,6 +269,19 @@ const TeacherDetailPage = () => {
           </div>
         </CardBody>
       </Card>
+
+      {/* ConfirmDialog */}
+      <ConfirmDialog
+        isOpen={dialogState.isOpen}
+        title={dialogState.title || 'Confirmar acción'}
+        message={dialogState.message}
+        confirmText={dialogState.confirmText || 'Confirmar'}
+        cancelText={dialogState.cancelText || 'Cancelar'}
+        variant={dialogState.variant || 'danger'}
+        onConfirm={dialogState.onConfirm}
+        onCancel={dialogState.onCancel}
+        loading={dialogState.loading}
+      />
     </div>
   );
 };

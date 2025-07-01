@@ -57,6 +57,7 @@ class Estudiante extends Model
         'telefono',
         'estado',
         'institucion_id',
+        'acudiente_id',
     ];
 
     /**

@@ -42,15 +42,20 @@ class UpdateStudentRequest extends FormRequest
      */
     public function rules(): array
     {
+        // Obtener el estudiante del parámetro de ruta
+        $estudiante = $this->route('estudiante');
+        $studentId = $estudiante?->id;
+        $userId = $estudiante?->user_id;
+        
         return [
             'nombre' => 'sometimes|string|max:255',
             'apellido' => 'sometimes|string|max:255',
             'tipo_documento' => 'sometimes|string|in:CC,TI,CE',
             'numero_documento' => 'sometimes|string|max:20',
-            'email' => 'sometimes|string|email|max:255|unique:users,email,' . $this->student->user_id,
-            'username' => 'sometimes|string|max:255|unique:users,username,' . $this->student->user_id,
+            'email' => 'sometimes|string|email|max:255|unique:users,email,' . $userId,
+            'username' => 'sometimes|string|max:255|unique:users,username,' . $userId,
             'password' => 'sometimes|string|min:8',
-            'codigo_estudiantil' => 'sometimes|string|max:50|unique:estudiantes,codigo_estudiantil,' . $this->student->id,
+            'codigo_estudiantil' => 'sometimes|string|max:50|unique:estudiantes,codigo_estudiantil,' . $studentId,
             'fecha_nacimiento' => 'sometimes|date',
             'genero' => 'sometimes|string|in:M,F,O',
             'direccion' => 'sometimes|string|max:255',

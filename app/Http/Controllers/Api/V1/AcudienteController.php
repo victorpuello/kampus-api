@@ -23,8 +23,7 @@ class AcudienteController extends Controller
      */
     public function __construct()
     {
-        parent::__construct();
-        $this->authorizeResource(Acudiente::class, 'acudiente');
+        // Removido parent::__construct() que no está disponible en el controlador base
     }
 
     /**

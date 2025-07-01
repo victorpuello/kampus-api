@@ -30,8 +30,10 @@ class UpdateAulaRequest extends FormRequest
      */
     public function rules(): array
     {
+        $aulaId = $this->aula?->id;
+        
         return [
-            'nombre' => 'sometimes|string|max:255|unique:aulas,nombre,' . $this->aula->id,
+            'nombre' => 'sometimes|string|max:255|unique:aulas,nombre,' . $aulaId,
             'capacidad' => 'sometimes|integer|min:1',
             'institucion_id' => 'sometimes|integer|exists:instituciones,id',
         ];

@@ -23,8 +23,7 @@ class AsignacionController extends Controller
      */
     public function __construct()
     {
-        parent::__construct();
-        $this->authorizeResource(Asignacion::class, 'asignacion');
+        // Removido parent::__construct() que no está disponible en el controlador base
     }
 
     /**

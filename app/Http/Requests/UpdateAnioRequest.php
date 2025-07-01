@@ -32,8 +32,10 @@ class UpdateAnioRequest extends FormRequest
      */
     public function rules(): array
     {
+        $anioId = $this->anio?->id;
+        
         return [
-            'nombre' => 'sometimes|string|max:255|unique:anios,nombre,' . $this->anio->id,
+            'nombre' => 'sometimes|string|max:255|unique:anios,nombre,' . $anioId,
             'fecha_inicio' => 'sometimes|date',
             'fecha_fin' => 'sometimes|date|after:fecha_inicio',
             'institucion_id' => 'sometimes|integer|exists:instituciones,id',

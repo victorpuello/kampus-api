@@ -23,8 +23,7 @@ class InstitucionController extends Controller
      */
     public function __construct()
     {
-        parent::__construct();
-        $this->authorizeResource(Institucion::class, 'institucion');
+        // Removido parent::__construct() que no está disponible en el controlador base
     }
 
     /**

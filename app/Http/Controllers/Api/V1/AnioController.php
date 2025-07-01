@@ -23,8 +23,7 @@ class AnioController extends Controller
      */
     public function __construct()
     {
-        parent::__construct();
-        $this->authorizeResource(Anio::class, 'anio');
+        // Removido parent::__construct() que no está disponible en el controlador base
     }
 
     /**

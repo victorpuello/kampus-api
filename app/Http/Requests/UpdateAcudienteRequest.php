@@ -31,10 +31,12 @@ class UpdateAcudienteRequest extends FormRequest
      */
     public function rules(): array
     {
+        $acudienteId = $this->acudiente?->id;
+        
         return [
             'nombre' => 'sometimes|string|max:255',
             'telefono' => 'sometimes|nullable|string|max:50',
-            'email' => 'sometimes|nullable|string|email|max:255|unique:acudientes,email,' . $this->acudiente->id,
+            'email' => 'sometimes|nullable|string|email|max:255|unique:acudientes,email,' . $acudienteId,
             'user_id' => 'sometimes|nullable|integer|exists:users,id',
         ];
     }

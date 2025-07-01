@@ -4,6 +4,7 @@ import axiosClient from '../api/axiosClient';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Card, CardHeader, CardBody } from '../components/ui/Card';
+import { useAlertContext } from '../contexts/AlertContext';
 
 interface Institution {
   id: number;
@@ -31,6 +32,7 @@ interface Teacher {
 const EditTeacherPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { showSuccess, showError } = useAlertContext();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [institutions, setInstitutions] = useState<Institution[]>([]);
@@ -89,12 +91,12 @@ const EditTeacherPage = () => {
 
     try {
       await axiosClient.put(`/docentes/${id}`, formData);
-      alert('Docente actualizado exitosamente');
+      showSuccess('Docente actualizado exitosamente', 'Éxito');
       navigate('/docentes');
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Error al actualizar el docente';
       setError(errorMessage);
-      alert(`Error: ${errorMessage}`);
+      showError(errorMessage, 'Error');
     } finally {
       setLoading(false);
     }

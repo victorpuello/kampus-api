@@ -23,8 +23,7 @@ class AreaController extends Controller
      */
     public function __construct()
     {
-        parent::__construct();
-        $this->authorizeResource(Area::class, 'area');
+        // Removido parent::__construct() que no está disponible en el controlador base
     }
 
     /**

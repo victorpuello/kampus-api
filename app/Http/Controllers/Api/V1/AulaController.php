@@ -23,8 +23,7 @@ class AulaController extends Controller
      */
     public function __construct()
     {
-        parent::__construct();
-        $this->authorizeResource(Aula::class, 'aula');
+        // Removido parent::__construct() que no está disponible en el controlador base
     }
 
     /**

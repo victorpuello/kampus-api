@@ -52,7 +52,7 @@ class StoreStudentRequest extends FormRequest
             'tipo_documento' => 'required|string|in:CC,TI,CE',
             'numero_documento' => 'required|string|max:20',
             'email' => 'required|string|email|max:255|unique:users',
-            'username' => 'required|string|max:255|unique:users',
+            'username' => 'nullable|string|max:255|unique:users',
             'password' => 'required|string|min:8',
             'codigo_estudiantil' => 'required|string|max:50|unique:estudiantes',
             'fecha_nacimiento' => 'required|date',

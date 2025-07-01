@@ -34,11 +34,15 @@ class UpdateDocenteRequest extends FormRequest
      */
     public function rules(): array
     {
+        // Obtener el docente del parámetro de ruta
+        $docente = $this->route('docente');
+        $userId = $docente?->user_id;
+        
         return [
             'nombre' => 'sometimes|string|max:255',
             'apellido' => 'sometimes|string|max:255',
-            'email' => 'sometimes|string|email|max:255|unique:users,email,' . $this->docente->user_id,
-            'username' => 'sometimes|string|max:255|unique:users,username,' . $this->docente->user_id,
+            'email' => 'sometimes|string|email|max:255|unique:users,email,' . $userId,
+            'username' => 'sometimes|string|max:255|unique:users,username,' . $userId,
             'password' => 'sometimes|string|min:8',
             'institucion_id' => 'sometimes|integer|exists:instituciones,id',
             'estado' => 'sometimes|string|in:activo,inactivo',

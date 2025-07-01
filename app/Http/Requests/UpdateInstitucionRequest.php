@@ -29,9 +29,11 @@ class UpdateInstitucionRequest extends FormRequest
      */
     public function rules(): array
     {
+        $institucionId = $this->institucion?->id;
+        
         return [
             'nombre' => 'sometimes|string|max:255',
-            'siglas' => 'sometimes|string|max:10|unique:instituciones,siglas,' . $this->institucion->id,
+            'siglas' => 'sometimes|string|max:10|unique:instituciones,siglas,' . $institucionId,
         ];
     }
 }

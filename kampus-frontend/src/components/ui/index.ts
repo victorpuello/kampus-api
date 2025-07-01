@@ -5,4 +5,6 @@ export { Badge, badgeVariants } from './Badge';
 export { LoadingSpinner, spinnerVariants } from './LoadingSpinner';
 export { DataTable } from './DataTable';
 export type { Column, ActionButton, DataTableProps } from './DataTable';
-export { default as ConfirmDialog } from './ConfirmDialog'; 
+export { default as ConfirmDialog } from './ConfirmDialog';
+export { Alert, alertVariants } from './Alert';
+export { default as AlertContainer } from './AlertContainer'; 

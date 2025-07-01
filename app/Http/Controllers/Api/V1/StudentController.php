@@ -128,6 +128,20 @@ class StudentController extends Controller
             'telefono', 'institucion_id', 'estado'
         ]));
         
+        // Generar username único si no se proporciona
+        if (empty($userData['username'])) {
+            $baseUsername = strtolower($userData['nombre'] . '.' . $userData['apellido']);
+            $username = $baseUsername;
+            $counter = 1;
+            
+            while (User::where('username', $username)->exists()) {
+                $username = $baseUsername . $counter;
+                $counter++;
+            }
+            
+            $userData['username'] = $username;
+        }
+        
         // Crear el usuario asociado al estudiante
         $user = User::create($userData);
         

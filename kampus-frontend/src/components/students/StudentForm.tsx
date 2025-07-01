@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosClient from '../../api/axiosClient';
+import { useAlertContext } from '../../contexts/AlertContext';
 
 interface Institution {
   id: number;
@@ -19,6 +20,7 @@ interface StudentFormProps {
 
 const StudentForm = ({ studentId }: StudentFormProps) => {
   const navigate = useNavigate();
+  const { showSuccess, showError } = useAlertContext();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [institutions, setInstitutions] = useState<Institution[]>([]);
@@ -93,23 +95,22 @@ const StudentForm = ({ studentId }: StudentFormProps) => {
       // Preparar los datos para enviar
       const submitData = {
         ...formData,
-        username: formData.email.split('@')[0], // Generar username automáticamente
         codigo_estudiantil: formData.numero_documento, // Usar número de documento como código
         password: formData.password || 'password123', // Contraseña por defecto si no se proporciona
       };
 
       if (studentId) {
         await axiosClient.put(`/estudiantes/${studentId}`, submitData);
-        alert('Estudiante actualizado exitosamente');
+        showSuccess('Estudiante actualizado exitosamente', 'Éxito');
       } else {
         await axiosClient.post('/estudiantes', submitData);
-        alert('Estudiante creado exitosamente');
+        showSuccess('Estudiante creado exitosamente', 'Éxito');
       }
       navigate('/estudiantes');
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Error al guardar el estudiante';
       setError(errorMessage);
-      alert(`Error: ${errorMessage}`);
+      showError(errorMessage, 'Error');
     } finally {
       setLoading(false);
     }

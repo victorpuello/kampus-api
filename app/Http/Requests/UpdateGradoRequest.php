@@ -30,8 +30,10 @@ class UpdateGradoRequest extends FormRequest
      */
     public function rules(): array
     {
+        $gradoId = $this->grado?->id;
+        
         return [
-            'nombre' => 'sometimes|string|max:255|unique:grados,nombre,' . $this->grado->id,
+            'nombre' => 'sometimes|string|max:255|unique:grados,nombre,' . $gradoId,
             'nivel' => 'sometimes|integer',
             'institucion_id' => 'sometimes|integer|exists:instituciones,id',
         ];

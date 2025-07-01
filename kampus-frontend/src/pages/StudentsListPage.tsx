@@ -4,6 +4,9 @@ import axiosClient from '../api/axiosClient';
 import { Button } from '../components/ui/Button';
 import { DataTable } from '../components/ui/DataTable';
 import type { Column, ActionButton } from '../components/ui/DataTable';
+import { useAlertContext } from '../contexts/AlertContext';
+import { useConfirm } from '../hooks/useConfirm';
+import ConfirmDialog from '../components/ui/ConfirmDialog';
 
 interface Student {
   id: number;
@@ -23,6 +26,8 @@ interface Student {
 
 const StudentsListPage = () => {
   const navigate = useNavigate();
+  const { showSuccess, showError } = useAlertContext();
+  const { dialogState, confirm, setLoading: setConfirmLoading } = useConfirm();
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -45,44 +50,54 @@ const StudentsListPage = () => {
   }, []);
 
   const handleDelete = async (student: Student) => {
-    if (!window.confirm(`¿Estás seguro de que deseas eliminar al estudiante ${student.user.nombre} ${student.user.apellido}? Esta acción no se puede deshacer.`)) {
-      return;
-    }
+    const confirmed = await confirm({
+      title: 'Eliminar Estudiante',
+      message: `¿Estás seguro de que deseas eliminar al estudiante ${student.user.nombre} ${student.user.apellido}? Esta acción no se puede deshacer.`,
+      confirmText: 'Eliminar',
+      cancelText: 'Cancelar',
+      variant: 'danger'
+    });
+
+    if (!confirmed) return;
 
     try {
-      setLoading(true);
+      setConfirmLoading(true);
       await axiosClient.delete(`/estudiantes/${student.id}`);
-      // Mostrar mensaje de éxito
-      alert('Estudiante eliminado exitosamente');
+      showSuccess('Estudiante eliminado exitosamente', 'Éxito');
       fetchStudents();
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Error al eliminar el estudiante';
-      alert(`Error: ${errorMessage}`);
+      showError(errorMessage, 'Error');
       setError(errorMessage);
     } finally {
-      setLoading(false);
+      setConfirmLoading(false);
     }
   };
 
   const handleBulkDelete = async (selectedStudents: Student[]) => {
-    if (!window.confirm(`¿Estás seguro de que deseas eliminar ${selectedStudents.length} estudiantes? Esta acción no se puede deshacer.`)) {
-      return;
-    }
+    const confirmed = await confirm({
+      title: 'Eliminar Estudiantes',
+      message: `¿Estás seguro de que deseas eliminar ${selectedStudents.length} estudiantes? Esta acción no se puede deshacer.`,
+      confirmText: 'Eliminar',
+      cancelText: 'Cancelar',
+      variant: 'danger'
+    });
+
+    if (!confirmed) return;
 
     try {
-      setLoading(true);
+      setConfirmLoading(true);
       await Promise.all(selectedStudents.map(student => 
         axiosClient.delete(`/estudiantes/${student.id}`)
       ));
-      // Mostrar mensaje de éxito
-      alert(`${selectedStudents.length} estudiantes eliminados exitosamente`);
+      showSuccess(`${selectedStudents.length} estudiantes eliminados exitosamente`, 'Éxito');
       fetchStudents();
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Error al eliminar los estudiantes';
-      alert(`Error: ${errorMessage}`);
+      showError(errorMessage, 'Error');
       setError(errorMessage);
     } finally {
-      setLoading(false);
+      setConfirmLoading(false);
     }
   };
 
@@ -252,6 +267,19 @@ const StudentsListPage = () => {
         selectable={true}
         bulkActions={bulkActions}
         onRowClick={(student) => navigate(`/estudiantes/${student.id}`)}
+      />
+
+      {/* ConfirmDialog */}
+      <ConfirmDialog
+        isOpen={dialogState.isOpen}
+        title={dialogState.title || 'Confirmar acción'}
+        message={dialogState.message}
+        confirmText={dialogState.confirmText || 'Confirmar'}
+        cancelText={dialogState.cancelText || 'Cancelar'}
+        variant={dialogState.variant || 'danger'}
+        onConfirm={dialogState.onConfirm}
+        onCancel={dialogState.onCancel}
+        loading={dialogState.loading}
       />
     </div>
   );

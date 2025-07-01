@@ -4,6 +4,7 @@ import axiosClient from '../api/axiosClient';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Card, CardHeader, CardBody } from '../components/ui/Card';
+import { useAlertContext } from '../contexts/AlertContext';
 
 interface Institution {
   id: number;
@@ -12,6 +13,7 @@ interface Institution {
 
 const CreateTeacherPage = () => {
   const navigate = useNavigate();
+  const { showSuccess, showError } = useAlertContext();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [institutions, setInstitutions] = useState<Institution[]>([]);
@@ -50,12 +52,12 @@ const CreateTeacherPage = () => {
 
     try {
       await axiosClient.post('/docentes', formData);
-      alert('Docente creado exitosamente');
+      showSuccess('Docente creado exitosamente', 'Éxito');
       navigate('/docentes');
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Error al crear el docente';
       setError(errorMessage);
-      alert(`Error: ${errorMessage}`);
+      showError(errorMessage, 'Error');
     } finally {
       setLoading(false);
     }

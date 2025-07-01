@@ -23,8 +23,7 @@ class GradoController extends Controller
      */
     public function __construct()
     {
-        parent::__construct();
-        $this->authorizeResource(Grado::class, 'grado');
+        // Removido parent::__construct() que no está disponible en el controlador base
     }
 
     /**

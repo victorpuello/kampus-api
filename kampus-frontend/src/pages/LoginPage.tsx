@@ -4,6 +4,7 @@ import { useAuth } from '../hooks/useAuth'
 import { Button } from '../components/ui/Button'
 import { Input } from '../components/ui/Input'
 import { Card, CardHeader, CardBody } from '../components/ui/Card'
+import { useAlertContext } from '../contexts/AlertContext'
 
 const LoginPage = () => {
   const [email, setEmail] = useState('')
@@ -13,6 +14,7 @@ const LoginPage = () => {
   
   const navigate = useNavigate()
   const { login } = useAuth()
+  const { showError } = useAlertContext()
   
   // Log del estado inicial
   console.log('LoginPage - Estado inicial:', { email, password, error, loading })
@@ -31,7 +33,9 @@ const LoginPage = () => {
       navigate('/dashboard')
     } catch (err: any) {
       console.error('Error en login desde LoginPage:', err)
-      setError(err.message || 'Credenciales inválidas')
+      const errorMessage = err.message || 'Credenciales inválidas'
+      setError(errorMessage)
+      showError(errorMessage, 'Error de autenticación')
     } finally {
       setLoading(false)
     }

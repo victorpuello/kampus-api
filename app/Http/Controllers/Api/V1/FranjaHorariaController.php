@@ -23,8 +23,7 @@ class FranjaHorariaController extends Controller
      */
     public function __construct()
     {
-        parent::__construct();
-        $this->authorizeResource(FranjaHoraria::class, 'franja_horaria');
+        // Removido parent::__construct() que no está disponible en el controlador base
     }
 
     /**
