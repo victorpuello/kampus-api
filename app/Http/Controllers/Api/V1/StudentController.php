@@ -115,10 +115,29 @@ class StudentController extends Controller
      */
     public function store(StoreStudentRequest $request)
     {
+        $validatedData = $request->validated();
+        
+        // Separar datos del usuario y del estudiante
+        $userData = array_intersect_key($validatedData, array_flip([
+            'nombre', 'apellido', 'tipo_documento', 'numero_documento', 
+            'email', 'username', 'password'
+        ]));
+        
+        $studentData = array_intersect_key($validatedData, array_flip([
+            'codigo_estudiantil', 'fecha_nacimiento', 'genero', 'direccion', 
+            'telefono', 'institucion_id', 'estado'
+        ]));
+        
         // Crear el usuario asociado al estudiante
-        $user = User::create($request->validated());
+        $user = User::create($userData);
+        
         // Crear el estudiante y asociarlo al usuario
-        $estudiante = $user->estudiante()->create($request->validated());
+        $estudiante = $user->estudiante()->create($studentData);
+        
+        // Manejar la relación con el acudiente si se proporciona
+        if (isset($validatedData['acudiente_id']) && $validatedData['acudiente_id']) {
+            $estudiante->acudientes()->attach($validatedData['acudiente_id']);
+        }
 
         return new StudentResource($estudiante->load(['user', 'institucion', 'acudientes', 'acudiente']));
     }
@@ -202,12 +221,41 @@ class StudentController extends Controller
      */
     public function update(UpdateStudentRequest $request, Estudiante $estudiante)
     {
+        $validatedData = $request->validated();
+        
+        // Separar datos del usuario y del estudiante
+        $userData = array_intersect_key($validatedData, array_flip([
+            'nombre', 'apellido', 'tipo_documento', 'numero_documento', 
+            'email', 'username', 'password'
+        ]));
+        
+        $studentData = array_intersect_key($validatedData, array_flip([
+            'codigo_estudiantil', 'fecha_nacimiento', 'genero', 'direccion', 
+            'telefono', 'institucion_id', 'estado'
+        ]));
+        
         // Actualizar los datos del usuario asociado al estudiante
-        $estudiante->user->update($request->validated());
+        if (!empty($userData)) {
+            $estudiante->user->update($userData);
+        }
+        
         // Actualizar los datos del estudiante
-        $estudiante->update($request->validated());
+        if (!empty($studentData)) {
+            $estudiante->update($studentData);
+        }
+        
+        // Manejar la relación con el acudiente si se proporciona
+        if (isset($validatedData['acudiente_id'])) {
+            if ($validatedData['acudiente_id']) {
+                // Agregar el acudiente si no existe
+                $estudiante->acudientes()->syncWithoutDetaching([$validatedData['acudiente_id']]);
+            } else {
+                // Remover todos los acudientes si se envía null
+                $estudiante->acudientes()->detach();
+            }
+        }
 
-        return new StudentResource($estudiante->load(['user', 'institucion', 'acudientes']));
+        return new StudentResource($estudiante->load(['user', 'institucion', 'acudientes', 'acudiente']));
     }
 
     /**

@@ -35,7 +35,8 @@ const StudentForm = ({ studentId }: StudentFormProps) => {
     email: '',
     estado: 'activo',
     institucion_id: '',
-    acudiente_id: ''
+    acudiente_id: '',
+    password: ''
   });
 
   useEffect(() => {
@@ -60,18 +61,19 @@ const StudentForm = ({ studentId }: StudentFormProps) => {
           const response = await axiosClient.get(`/estudiantes/${studentId}`);
           const student = response.data.data;
           setFormData({
-            nombre: student.nombre,
-            apellido: student.apellido,
-            tipo_documento: student.tipo_documento,
-            numero_documento: student.numero_documento,
-            fecha_nacimiento: student.fecha_nacimiento,
-            genero: student.genero,
-            direccion: student.direccion,
-            telefono: student.telefono,
-            email: student.email,
-            estado: student.estado,
-            institucion_id: student.institucion_id.toString(),
-            acudiente_id: student.acudiente_id?.toString() || ''
+            nombre: student.user?.nombre || '',
+            apellido: student.user?.apellido || '',
+            tipo_documento: student.user?.tipo_documento || 'CC',
+            numero_documento: student.user?.numero_documento || '',
+            fecha_nacimiento: student.fecha_nacimiento || '',
+            genero: student.genero || 'M',
+            direccion: student.direccion || '',
+            telefono: student.telefono || '',
+            email: student.user?.email || '',
+            estado: student.estado || 'activo',
+            institucion_id: student.institucion_id?.toString() || '',
+            acudiente_id: student.acudiente?.id?.toString() || '',
+            password: ''
           });
         } catch (err: any) {
           setError(err.response?.data?.message || 'Error al cargar el estudiante');
@@ -88,11 +90,19 @@ const StudentForm = ({ studentId }: StudentFormProps) => {
     setError(null);
 
     try {
+      // Preparar los datos para enviar
+      const submitData = {
+        ...formData,
+        username: formData.email.split('@')[0], // Generar username automáticamente
+        codigo_estudiantil: formData.numero_documento, // Usar número de documento como código
+        password: formData.password || 'password123', // Contraseña por defecto si no se proporciona
+      };
+
       if (studentId) {
-        await axiosClient.put(`/estudiantes/${studentId}`, formData);
+        await axiosClient.put(`/estudiantes/${studentId}`, submitData);
         alert('Estudiante actualizado exitosamente');
       } else {
-        await axiosClient.post('/estudiantes', formData);
+        await axiosClient.post('/estudiantes', submitData);
         alert('Estudiante creado exitosamente');
       }
       navigate('/estudiantes');
