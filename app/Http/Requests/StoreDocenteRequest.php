@@ -19,6 +19,11 @@ use Illuminate\Foundation\Http\FormRequest;
  *     @OA\Property(property="password", type="string", minLength=8, description="Contraseña para el usuario del docente"),
  *     @OA\Property(property="institucion_id", type="integer", description="ID de la institución a la que pertenece el docente"),
  *     @OA\Property(property="estado", type="string", enum={"activo", "inactivo"}, description="Estado del docente"),
+ *     @OA\Property(property="telefono", type="string", maxLength=20, nullable=true, description="Teléfono del docente"),
+ *     @OA\Property(property="especialidad", type="string", maxLength=255, nullable=true, description="Especialidad del docente"),
+ *     @OA\Property(property="fecha_contratacion", type="string", format="date", nullable=true, description="Fecha de contratación del docente"),
+ *     @OA\Property(property="salario", type="number", format="float", nullable=true, description="Salario del docente"),
+ *     @OA\Property(property="horario_trabajo", type="string", maxLength=255, nullable=true, description="Horario de trabajo del docente"),
  * )
  */
 class StoreDocenteRequest extends FormRequest
@@ -46,6 +51,11 @@ class StoreDocenteRequest extends FormRequest
             'password' => 'required|string|min:8',
             'institucion_id' => 'required|integer|exists:instituciones,id',
             'estado' => 'required|string|in:activo,inactivo',
+            'telefono' => 'nullable|string|max:20',
+            'especialidad' => 'nullable|string|max:255',
+            'fecha_contratacion' => 'nullable|date',
+            'salario' => 'nullable|numeric|min:0',
+            'horario_trabajo' => 'nullable|string|max:255',
         ];
     }
 }

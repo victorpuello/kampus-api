@@ -56,7 +56,6 @@ class Estudiante extends Model
         'direccion',
         'telefono',
         'estado',
-        'institucion_id',
         'acudiente_id',
     ];
 
@@ -125,8 +124,18 @@ class Estudiante extends Model
         return $this->hasMany(Inasistencia::class);
     }
 
+    /**
+     * Obtiene la institución del estudiante a través del usuario.
+     */
     public function institucion()
     {
-        return $this->belongsTo(Institucion::class, 'institucion_id');
+        return $this->hasOneThrough(
+            Institucion::class,
+            User::class,
+            'id', // Foreign key en users
+            'id', // Foreign key en instituciones
+            'user_id', // Local key en estudiantes
+            'institucion_id' // Local key en users
+        );
     }
 }

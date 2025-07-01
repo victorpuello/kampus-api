@@ -12,6 +12,11 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *     description="Representación de un docente en la API",
  *     @OA\Property(property="id", type="integer", description="ID del docente"),
  *     @OA\Property(property="user", type="object", ref="#/components/schemas/UserResource", description="Datos del usuario asociado al docente"),
+ *     @OA\Property(property="telefono", type="string", nullable=true, description="Teléfono del docente"),
+ *     @OA\Property(property="especialidad", type="string", nullable=true, description="Especialidad del docente"),
+ *     @OA\Property(property="fecha_contratacion", type="string", format="date", nullable=true, description="Fecha de contratación del docente"),
+ *     @OA\Property(property="salario", type="number", format="float", nullable=true, description="Salario del docente"),
+ *     @OA\Property(property="horario_trabajo", type="string", nullable=true, description="Horario de trabajo del docente"),
  * )
  */
 class DocenteResource extends JsonResource
@@ -26,6 +31,16 @@ class DocenteResource extends JsonResource
         return [
             'id' => $this->id,
             'user' => new UserResource($this->whenLoaded('user')),
+            'telefono' => $this->telefono,
+            'especialidad' => $this->especialidad,
+            'estado' => $this->user?->estado,
+            'institucion' => $this->user?->institucion ? [
+                'id' => $this->user->institucion->id,
+                'nombre' => $this->user->institucion->nombre,
+            ] : null,
+            'fecha_contratacion' => $this->fecha_contratacion,
+            'salario' => $this->salario,
+            'horario_trabajo' => $this->horario_trabajo,
         ];
     }
 }

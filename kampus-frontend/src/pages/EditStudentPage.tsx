@@ -1,20 +1,17 @@
 import { useParams } from 'react-router-dom';
 import StudentForm from '../components/students/StudentForm';
 import { Card, CardHeader, CardBody } from '../components/ui/Card';
+import { PageHeader } from '../components/ui';
 
 const EditStudentPage = () => {
   const { id } = useParams<{ id: string }>();
 
   return (
     <div className="space-y-6">
-      <div className="sm:flex sm:items-center">
-        <div className="sm:flex-auto">
-          <h1 className="text-xl font-semibold text-gray-900">Editar Estudiante</h1>
-          <p className="mt-2 text-sm text-gray-700">
-            Modifique la información del estudiante según sea necesario.
-          </p>
-        </div>
-      </div>
+      <PageHeader
+        title="Editar Estudiante"
+        description="Modifique la información del estudiante según sea necesario."
+      />
 
       <Card>
         <CardHeader>

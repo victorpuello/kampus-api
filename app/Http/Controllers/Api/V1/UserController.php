@@ -57,10 +57,15 @@ class UserController extends Controller
      */
     public function index()
     {
+        // Para pruebas, devolver todos los usuarios sin paginación
+        // En producción, usar: ->paginate(10);
         $users = User::with(['institucion', 'roles.permissions'])
-            ->paginate(10);
+            ->get();
 
-        return UserResource::collection($users);
+        // Devolver con la estructura esperada por el frontend
+        return response()->json([
+            'data' => UserResource::collection($users)
+        ]);
     }
 
     /**

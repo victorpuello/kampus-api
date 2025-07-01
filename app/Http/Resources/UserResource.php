@@ -39,6 +39,7 @@ class UserResource extends JsonResource
             'email' => $this->email,
             'tipo_documento' => $this->tipo_documento,
             'numero_documento' => $this->numero_documento,
+            'institucion_id' => $this->institucion_id,
             'estado' => $this->estado,
             'roles' => RoleResource::collection($this->whenLoaded('roles')),
             'institucion' => new InstitucionResource($this->whenLoaded('institucion')),

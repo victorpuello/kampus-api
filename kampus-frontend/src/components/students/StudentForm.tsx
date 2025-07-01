@@ -67,13 +67,13 @@ const StudentForm = ({ studentId }: StudentFormProps) => {
             apellido: student.user?.apellido || '',
             tipo_documento: student.user?.tipo_documento || 'CC',
             numero_documento: student.user?.numero_documento || '',
-            fecha_nacimiento: student.fecha_nacimiento || '',
+            fecha_nacimiento: student.fecha_nacimiento ? new Date(student.fecha_nacimiento).toISOString().split('T')[0] : '',
             genero: student.genero || 'M',
             direccion: student.direccion || '',
             telefono: student.telefono || '',
             email: student.user?.email || '',
-            estado: student.estado || 'activo',
-            institucion_id: student.institucion_id?.toString() || '',
+            estado: student.user?.estado || 'activo',
+            institucion_id: student.user?.institucion_id?.toString() || '',
             acudiente_id: student.acudiente?.id?.toString() || '',
             password: ''
           });

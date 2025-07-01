@@ -17,7 +17,7 @@ class UserSeeder extends Seeder
             'apellido' => 'Sistema',
             'username' => 'admin',
             'email' => 'admin@example.com',
-            'password' => Hash::make('password'),
+            'password' => Hash::make('123456'),
             'institucion_id' => 1,
             'estado' => 'activo',
         ]);

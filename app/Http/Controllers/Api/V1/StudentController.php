@@ -120,12 +120,12 @@ class StudentController extends Controller
         // Separar datos del usuario y del estudiante
         $userData = array_intersect_key($validatedData, array_flip([
             'nombre', 'apellido', 'tipo_documento', 'numero_documento', 
-            'email', 'username', 'password'
+            'email', 'username', 'password', 'institucion_id', 'estado'
         ]));
         
         $studentData = array_intersect_key($validatedData, array_flip([
             'codigo_estudiantil', 'fecha_nacimiento', 'genero', 'direccion', 
-            'telefono', 'institucion_id', 'estado'
+            'telefono'
         ]));
         
         // Generar username único si no se proporciona
@@ -240,12 +240,12 @@ class StudentController extends Controller
         // Separar datos del usuario y del estudiante
         $userData = array_intersect_key($validatedData, array_flip([
             'nombre', 'apellido', 'tipo_documento', 'numero_documento', 
-            'email', 'username', 'password'
+            'email', 'username', 'password', 'institucion_id', 'estado'
         ]));
         
         $studentData = array_intersect_key($validatedData, array_flip([
             'codigo_estudiantil', 'fecha_nacimiento', 'genero', 'direccion', 
-            'telefono', 'institucion_id', 'estado'
+            'telefono'
         ]));
         
         // Actualizar los datos del usuario asociado al estudiante

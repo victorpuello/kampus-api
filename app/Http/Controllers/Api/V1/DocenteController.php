@@ -67,7 +67,7 @@ class DocenteController extends Controller
     public function index(Request $request)
     {
         $query = Docente::query()
-            ->with(['user'])
+            ->with(['user.institucion'])
             ->when($request->search, function ($query, $search) {
                 $query->whereHas('user', function ($q) use ($search) {
                     $q->where('nombre', 'like', "%{$search}%")
@@ -112,12 +112,18 @@ class DocenteController extends Controller
      */
     public function store(StoreDocenteRequest $request)
     {
+        // Separar los datos del usuario y del docente
+        $userData = $request->only(['nombre', 'apellido', 'email', 'username', 'password', 'institucion_id', 'estado']);
+        $docenteData = $request->only(['telefono', 'especialidad', 'fecha_contratacion', 'salario', 'horario_trabajo']);
+        
         // Crear el usuario asociado al docente
-        $user = User::create($request->validated());
+        $user = User::create($userData);
+        
         // Crear el docente y asociarlo al usuario
-        $docente = $user->docente()->create($request->validated());
+        $docenteData['user_id'] = $user->id;
+        $docente = Docente::create($docenteData);
 
-        return new DocenteResource($docente->load('user'));
+        return new DocenteResource($docente->load(['user.institucion']));
     }
 
     /**
@@ -154,7 +160,7 @@ class DocenteController extends Controller
      */
     public function show(Docente $docente)
     {
-        return new DocenteResource($docente->load('user'));
+        return new DocenteResource($docente->load(['user.institucion']));
     }
 
     /**
@@ -199,12 +205,21 @@ class DocenteController extends Controller
      */
     public function update(UpdateDocenteRequest $request, Docente $docente)
     {
+        // Separar los datos del usuario y del docente
+        $userData = $request->only(['nombre', 'apellido', 'email', 'username', 'password', 'institucion_id', 'estado']);
+        $docenteData = $request->only(['telefono', 'especialidad', 'fecha_contratacion', 'salario', 'horario_trabajo']);
+        
         // Actualizar los datos del usuario asociado al docente
-        $docente->user->update($request->validated());
+        if (!empty($userData)) {
+            $docente->user->update($userData);
+        }
+        
         // Actualizar los datos del docente
-        $docente->update($request->validated());
+        if (!empty($docenteData)) {
+            $docente->update($docenteData);
+        }
 
-        return new DocenteResource($docente->load('user'));
+        return new DocenteResource($docente->load(['user.institucion']));
     }
 
     /**

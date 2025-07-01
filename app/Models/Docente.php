@@ -45,6 +45,11 @@ class Docente extends Model
      */
     protected $fillable = [
         'user_id',
+        'telefono',
+        'especialidad',
+        'fecha_contratacion',
+        'salario',
+        'horario_trabajo',
     ];
 
     /**
@@ -61,5 +66,20 @@ class Docente extends Model
     public function asignaciones()
     {
         return $this->hasMany(\App\Models\Asignacion::class);
+    }
+
+    /**
+     * Obtiene la institución del docente a través del usuario.
+     */
+    public function institucion()
+    {
+        return $this->hasOneThrough(
+            Institucion::class,
+            User::class,
+            'id', // Foreign key en users
+            'id', // Foreign key en instituciones
+            'user_id', // Local key en docentes
+            'institucion_id' // Local key en users
+        );
     }
 }
