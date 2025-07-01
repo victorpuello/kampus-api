@@ -1,77 +1,105 @@
-# 🎓 Kampus API - Sistema de Gestión Académica
+# 🎓 Kampus - Sistema de Gestión Académica
 
-[![Laravel](https://img.shields.io/badge/Laravel-12.x-red.svg)](https://laravel.com)
-[![React](https://img.shields.io/badge/React-18.x-blue.svg)](https://reactjs.org)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](https://www.typescriptlang.org)
-[![PHP](https://img.shields.io/badge/PHP-8.2+-purple.svg)](https://php.net)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+Un sistema completo de gestión académica desarrollado con **Laravel** (Backend API) y **React + TypeScript** (Frontend), diseñado para administrar estudiantes, docentes, instituciones y procesos académicos de manera eficiente.
 
-Sistema completo de gestión académica desarrollado con **Laravel 12** para el backend API y **React 18** con **TypeScript** para el frontend. Diseñado para instituciones educativas que necesitan gestionar estudiantes, docentes, asignaturas, calificaciones y más.
+## ✨ Características Principales
 
-## 🚀 Características Principales
+### 🔐 Sistema de Autenticación
+- **Autenticación JWT** con Laravel Sanctum
+- **Gestión de roles y permisos** (RBAC)
+- **Protección de rutas** y middleware de autenticación
+- **Persistencia de sesión** con Zustand
+- **Interceptores automáticos** para tokens en peticiones
 
-### 📚 Gestión Académica
-- **Estudiantes**: Registro completo con información personal y académica
-- **Docentes**: Gestión de profesores y sus asignaciones
-- **Asignaturas**: Organización por áreas y grados académicos
-- **Grupos**: Clasificación de estudiantes por grupos de clase
-- **Calificaciones**: Sistema completo de notas y evaluaciones
-- **Horarios**: Gestión de franjas horarias y asignaciones
+### 👥 Gestión de Usuarios
+- **Estudiantes**: Registro completo con información personal, académica y familiar
+- **Docentes**: Gestión de personal docente con especialidades y contratos
+- **Acudientes**: Sistema de acudientes vinculados a estudiantes
+- **Administradores**: Panel de administración con roles y permisos
 
 ### 🏫 Gestión Institucional
-- **Instituciones**: Soporte multi-institucional
-- **Años Académicos**: Gestión de períodos escolares
-- **Grados**: Organización por niveles educativos
-- **Áreas**: Categorización de asignaturas por áreas de conocimiento
+- **Instituciones**: Configuración de centros educativos
+- **Grados y Grupos**: Organización académica por niveles
+- **Asignaturas**: Gestión de materias y áreas de conocimiento
+- **Aulas**: Administración de espacios físicos
 
-### 🔐 Seguridad y Autenticación
-- **Laravel Sanctum**: Autenticación API con tokens
-- **Roles y Permisos**: Sistema granular de autorización
-- **Acudientes**: Gestión de responsables de estudiantes
-- **Usuarios**: Control de acceso por roles
+### 📊 Funcionalidades Académicas
+- **Notas y Calificaciones**: Sistema de evaluación por períodos
+- **Inasistencias**: Control de asistencia con justificaciones
+- **Observaciones**: Seguimiento conductual y académico
+- **Reportes**: Generación de informes académicos
 
-### 📱 Frontend Moderno
-- **React 18** con **TypeScript** para type safety
-- **React Router** para navegación SPA
-- **Tailwind CSS** para diseño responsive
-- **Zustand** para gestión de estado
-- **Axios** para comunicación con API
+### 🎨 Interfaz de Usuario
+- **Diseño Responsive**: Adaptable a dispositivos móviles y desktop
+- **Tema Moderno**: UI/UX con Tailwind CSS y componentes personalizados
+- **Tablas Avanzadas**: DataTable con búsqueda, ordenamiento y paginación
+- **Sistema de Alertas**: Notificaciones elegantes y personalizables
+- **Confirmaciones**: Diálogos de confirmación profesionales
 
 ## 🛠️ Tecnologías Utilizadas
 
-### Backend (Laravel 12)
-- **PHP 8.2+** - Lenguaje de programación
-- **Laravel Framework 12** - Framework PHP
+### Backend (Laravel)
+- **Laravel 10** - Framework PHP
 - **Laravel Sanctum** - Autenticación API
-- **MySQL/PostgreSQL** - Base de datos
+- **MySQL** - Base de datos
 - **Eloquent ORM** - Mapeo objeto-relacional
-- **Laravel Migrations** - Control de versiones de BD
-- **Laravel Seeders** - Datos de prueba
-- **PHPUnit** - Testing
+- **API Resources** - Transformación de datos
+- **Form Requests** - Validación de datos
+- **Migrations** - Control de versiones de BD
 
-### Frontend (React 18)
+### Frontend (React)
 - **React 18** - Biblioteca de UI
-- **TypeScript 5** - Tipado estático
-- **React Router DOM** - Enrutamiento
-- **Tailwind CSS** - Framework CSS
+- **TypeScript** - Tipado estático
+- **Vite** - Build tool y dev server
+- **React Router** - Navegación SPA
 - **Zustand** - Gestión de estado
 - **Axios** - Cliente HTTP
-- **Vite** - Build tool
-- **ESLint** - Linting
+- **Tailwind CSS** - Framework CSS
+- **Class Variance Authority** - Sistema de variantes
 
-## 📋 Requisitos del Sistema
+### Herramientas de Desarrollo
+- **ESLint** - Linting de código
+- **Prettier** - Formateo de código
+- **Git** - Control de versiones
+- **XAMPP** - Entorno de desarrollo local
 
-### Backend
-- PHP >= 8.2
-- Composer
-- MySQL >= 8.0 o PostgreSQL >= 13
-- Node.js >= 18 (para compilar assets)
+## 📁 Estructura del Proyecto
 
-### Frontend
-- Node.js >= 18
-- npm o yarn
+```
+kampus-api/
+├── app/
+│   ├── Http/
+│   │   ├── Controllers/Api/V1/    # Controladores API
+│   │   ├── Requests/              # Validación de formularios
+│   │   └── Resources/             # Transformación de datos
+│   ├── Models/                    # Modelos Eloquent
+│   └── Providers/                 # Proveedores de servicios
+├── database/
+│   ├── migrations/                # Migraciones de BD
+│   ├── seeders/                   # Datos de prueba
+│   └── factories/                 # Factories para testing
+├── routes/
+│   └── api.php                    # Rutas API
+└── kampus-frontend/               # Aplicación React
+    ├── src/
+    │   ├── components/            # Componentes reutilizables
+    │   ├── pages/                 # Páginas de la aplicación
+    │   ├── hooks/                 # Hooks personalizados
+    │   ├── contexts/              # Contextos de React
+    │   ├── api/                   # Cliente HTTP
+    │   ├── store/                 # Estado global (Zustand)
+    │   └── utils/                 # Utilidades
+    └── public/                    # Archivos estáticos
+```
 
 ## 🚀 Instalación y Configuración
+
+### Prerrequisitos
+- **PHP 8.1+**
+- **Composer**
+- **Node.js 18+**
+- **MySQL 8.0+**
+- **XAMPP** (recomendado para desarrollo local)
 
 ### 1. Clonar el Repositorio
 ```bash
@@ -79,14 +107,14 @@ git clone https://github.com/victorpuello/kampus-api.git
 cd kampus-api
 ```
 
-### 2. Configurar Backend (Laravel)
+### 2. Configurar el Backend (Laravel)
 
-#### Instalar Dependencias PHP
+#### Instalar dependencias
 ```bash
 composer install
 ```
 
-#### Configurar Variables de Entorno
+#### Configurar variables de entorno
 ```bash
 cp .env.example .env
 php artisan key:generate
@@ -97,237 +125,275 @@ Editar `.env` con la configuración de tu base de datos:
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=kampus_api
-DB_USERNAME=tu_usuario
-DB_PASSWORD=tu_password
+DB_DATABASE=kampus_db
+DB_USERNAME=root
+DB_PASSWORD=
 ```
 
-#### Ejecutar Migraciones y Seeders
+#### Ejecutar migraciones y seeders
 ```bash
 php artisan migrate
 php artisan db:seed
 ```
 
-#### Instalar Dependencias de Desarrollo
-```bash
-npm install
+#### Configurar CORS (para desarrollo)
+En `config/cors.php`:
+```php
+'allowed_origins' => ['http://localhost:5173'],
+'supports_credentials' => true,
 ```
 
-### 3. Configurar Frontend (React)
+#### Configurar Sanctum
+En `config/sanctum.php`:
+```php
+'stateful' => explode(',', env('SANCTUM_STATEFUL_DOMAINS', 'localhost:5173')),
+```
 
-#### Navegar al Directorio Frontend
+### 3. Configurar el Frontend (React)
+
+#### Navegar al directorio del frontend
 ```bash
 cd kampus-frontend
 ```
 
-#### Instalar Dependencias
+#### Instalar dependencias
 ```bash
 npm install
 ```
 
-#### Configurar Variables de Entorno
-Crear archivo `.env` en `kampus-frontend/`:
+#### Configurar variables de entorno
+Crear `.env`:
 ```env
-VITE_API_URL=http://localhost:8000/api/v1
+VITE_API_URL=http://kampus.test/api/v1
 ```
 
-### 4. Ejecutar el Proyecto
-
-#### Backend (Terminal 1)
+#### Iniciar el servidor de desarrollo
 ```bash
-# En el directorio raíz
-php artisan serve
-```
-
-#### Frontend (Terminal 2)
-```bash
-# En el directorio kampus-frontend
 npm run dev
 ```
 
-## 📚 API Endpoints
+### 4. Configurar el Host Virtual (Opcional)
 
-### Autenticación
-- `POST /api/v1/login` - Iniciar sesión
-- `POST /api/v1/logout` - Cerrar sesión
+Para desarrollo local, puedes configurar un host virtual:
 
-### Gestión de Usuarios
-- `GET /api/v1/users` - Listar usuarios
-- `POST /api/v1/users` - Crear usuario
-- `GET /api/v1/users/{id}` - Ver usuario
-- `PUT /api/v1/users/{id}` - Actualizar usuario
-- `DELETE /api/v1/users/{id}` - Eliminar usuario
-
-### Gestión de Estudiantes
-- `GET /api/v1/estudiantes` - Listar estudiantes
-- `POST /api/v1/estudiantes` - Crear estudiante
-- `GET /api/v1/estudiantes/{id}` - Ver estudiante
-- `PUT /api/v1/estudiantes/{id}` - Actualizar estudiante
-- `DELETE /api/v1/estudiantes/{id}` - Eliminar estudiante
-
-### Gestión de Docentes
-- `GET /api/v1/docentes` - Listar docentes
-- `POST /api/v1/docentes` - Crear docente
-- `GET /api/v1/docentes/{id}` - Ver docente
-- `PUT /api/v1/docentes/{id}` - Actualizar docente
-- `DELETE /api/v1/docentes/{id}` - Eliminar docente
-
-### Gestión Académica
-- `GET /api/v1/instituciones` - Gestión de instituciones
-- `GET /api/v1/anios` - Gestión de años académicos
-- `GET /api/v1/grados` - Gestión de grados
-- `GET /api/v1/areas` - Gestión de áreas
-- `GET /api/v1/asignaturas` - Gestión de asignaturas
-- `GET /api/v1/grupos` - Gestión de grupos
-- `GET /api/v1/acudientes` - Gestión de acudientes
-- `GET /api/v1/aulas` - Gestión de aulas
-- `GET /api/v1/franjas-horarias` - Gestión de horarios
-- `GET /api/v1/asignaciones` - Gestión de asignaciones
-
-## 🗄️ Estructura de Base de Datos
-
-El sistema incluye más de **30 tablas** que cubren:
-
-### Entidades Principales
-- **users** - Usuarios del sistema
-- **estudiantes** - Información de estudiantes
-- **docentes** - Información de docentes
-- **acudientes** - Responsables de estudiantes
-- **instituciones** - Centros educativos
-
-### Gestión Académica
-- **anios** - Años académicos
-- **periodos** - Períodos escolares
-- **grados** - Niveles educativos
-- **areas** - Áreas de conocimiento
-- **asignaturas** - Materias académicas
-- **grupos** - Grupos de clase
-- **aulas** - Espacios físicos
-
-### Calificaciones y Evaluaciones
-- **notas** - Calificaciones de estudiantes
-- **definitivas_asignatura** - Promedios por asignatura
-- **definitivas_periodo** - Promedios por período
-- **definitivas_finales** - Promedios finales
-- **inasistencias** - Control de asistencia
-
-### Horarios y Asignaciones
-- **franjas_horarias** - Bloques de tiempo
-- **asignaciones** - Docentes asignados a grupos/asignaturas
-- **horarios** - Programación de clases
-
-## 🧪 Testing
-
-### Ejecutar Tests del Backend
-```bash
-php artisan test
+1. Editar `C:\Windows\System32\drivers\etc\hosts`:
+```
+127.0.0.1 kampus.test
 ```
 
-### Ejecutar Tests Específicos
-```bash
-php artisan test --filter=StudentControllerTest
-```
+2. Configurar XAMPP para el dominio `kampus.test`
 
-## 📦 Comandos Útiles
+## 🔧 Configuración de Desarrollo
 
-### Backend
+### Credenciales por Defecto
+- **Email**: `admin@example.com`
+- **Contraseña**: `password`
+
+### Comandos Útiles
+
+#### Backend
 ```bash
 # Limpiar caché
-php artisan cache:clear
 php artisan config:clear
+php artisan cache:clear
 php artisan route:clear
 
-# Generar documentación API
-php artisan l5-swagger:generate
+# Ver rutas API
+php artisan route:list --path=api
 
-# Ejecutar seeders específicos
-php artisan db:seed --class=UserSeeder
-php artisan db:seed --class=TestingDatabaseSeeder
+# Ejecutar tests
+php artisan test
+
+# Crear migración
+php artisan make:migration nombre_migracion
+
+# Crear seeder
+php artisan make:seeder NombreSeeder
 ```
 
-### Frontend
+#### Frontend
 ```bash
 # Construir para producción
 npm run build
 
-# Preview de producción
-npm run preview
-
 # Linting
 npm run lint
+
+# Preview de producción
+npm run preview
 ```
 
-## 🔧 Configuración de Desarrollo
+## 📱 Uso del Sistema
 
-### Variables de Entorno Backend (.env)
-```env
-APP_NAME="Kampus API"
-APP_ENV=local
-APP_DEBUG=true
-APP_URL=http://localhost:8000
+### 1. Autenticación
+- Acceder a `http://localhost:5173/login`
+- Usar las credenciales por defecto
+- El sistema redirigirá automáticamente al dashboard
 
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=kampus_api
-DB_USERNAME=root
-DB_PASSWORD=
+### 2. Gestión de Estudiantes
+- **Listar**: Ver todos los estudiantes con filtros y búsqueda
+- **Crear**: Formulario completo con validación
+- **Editar**: Modificar información existente
+- **Eliminar**: Con confirmación de seguridad
+- **Ver Detalles**: Información completa del estudiante
 
-CORS_ALLOWED_ORIGINS=http://localhost:5173
+### 3. Gestión de Docentes
+- **Listar**: Tabla con información docente
+- **Crear**: Registro con datos profesionales
+- **Editar**: Actualización de información
+- **Eliminar**: Con confirmación
+- **Ver Detalles**: Perfil completo del docente
+
+### 4. Funcionalidades Avanzadas
+- **Búsqueda en tiempo real** en todas las tablas
+- **Ordenamiento** por cualquier columna
+- **Paginación** configurable
+- **Acciones en lote** para múltiples elementos
+- **Exportación** de datos (próximamente)
+
+## 🎨 Componentes del Sistema
+
+### Sistema de Alertas
+```tsx
+import { useAlertContext } from '../contexts/AlertContext';
+
+const { showSuccess, showError, showWarning, showInfo } = useAlertContext();
+
+// Uso
+showSuccess('Operación exitosa', 'Éxito');
+showError('Error en la operación', 'Error');
 ```
 
-### Variables de Entorno Frontend (.env)
-```env
-VITE_API_URL=http://localhost:8000/api/v1
-VITE_APP_NAME="Kampus"
+### Sistema de Confirmaciones
+```tsx
+import { useConfirm } from '../hooks/useConfirm';
+
+const { confirm } = useConfirm();
+
+// Uso
+const confirmed = await confirm({
+  title: 'Eliminar Elemento',
+  message: '¿Estás seguro?',
+  variant: 'danger'
+});
 ```
 
-## 📱 Características del Frontend
+### DataTable Reutilizable
+```tsx
+import { DataTable } from '../components/ui/DataTable';
 
-### Páginas Implementadas
-- **Login** - Autenticación de usuarios
-- **Dashboard** - Panel principal
-- **Estudiantes** - Lista, creación, edición y detalle
-- **Layout Responsive** - Diseño adaptable
+<DataTable
+  data={items}
+  columns={columns}
+  actions={actions}
+  searchable={true}
+  sortable={true}
+  pagination={true}
+  selectable={true}
+  bulkActions={bulkActions}
+/>
+```
 
-### Componentes Principales
-- **DashboardLayout** - Layout principal con navegación
-- **StudentForm** - Formulario de estudiantes
-- **ProtectedRoute** - Rutas protegidas
-- **AuthStore** - Gestión de estado de autenticación
+## 🔒 Seguridad
 
-## 🔐 Seguridad
+### Autenticación
+- **JWT Tokens** con Laravel Sanctum
+- **Expiración automática** de tokens
+- **Refresh tokens** para renovación
+- **Logout seguro** con invalidación de tokens
 
-- **Laravel Sanctum** para autenticación API
-- **CORS** configurado para desarrollo
-- **Validación** de datos en requests
-- **Autorización** basada en roles y permisos
-- **Sanitización** de inputs
+### Autorización
+- **Sistema de roles** (Admin, Docente, Estudiante)
+- **Permisos granulares** por funcionalidad
+- **Middleware de autorización** en rutas
+- **Validación de acceso** en frontend
+
+### Validación
+- **Form Requests** en Laravel para validación backend
+- **Validación en tiempo real** en formularios React
+- **Sanitización** de datos de entrada
+- **Protección CSRF** en formularios
+
+## 🧪 Testing
+
+### Backend Tests
+```bash
+# Ejecutar todos los tests
+php artisan test
+
+# Tests específicos
+php artisan test --filter=StudentControllerTest
+```
+
+### Frontend Tests
+```bash
+# Ejecutar tests (cuando se implementen)
+npm test
+```
+
+## 📊 Base de Datos
+
+### Principales Entidades
+- **users**: Usuarios del sistema
+- **estudiantes**: Información de estudiantes
+- **docentes**: Información de docentes
+- **instituciones**: Centros educativos
+- **grupos**: Grupos académicos
+- **asignaturas**: Materias
+- **notas**: Calificaciones
+- **inasistencias**: Control de asistencia
+
+### Relaciones
+- Estudiante ↔ Acudiente (Muchos a Muchos)
+- Estudiante ↔ Grupo (Muchos a Muchos con historial)
+- Docente ↔ Asignatura (Muchos a Muchos)
+- Usuario ↔ Rol (Muchos a Muchos)
+
+## 🚀 Despliegue
+
+### Backend (Laravel)
+1. Configurar servidor web (Apache/Nginx)
+2. Configurar PHP 8.1+
+3. Configurar MySQL
+4. Ejecutar `composer install --optimize-autoloader --no-dev`
+5. Ejecutar `php artisan config:cache`
+6. Ejecutar `php artisan route:cache`
+
+### Frontend (React)
+1. Ejecutar `npm run build`
+2. Servir archivos de `dist/` desde servidor web
+3. Configurar proxy para API
 
 ## 🤝 Contribución
 
 1. Fork el proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+2. Crear una rama para tu feature (`git checkout -b feature/AmazingFeature`)
 3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
 4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abre un Pull Request
+5. Abrir un Pull Request
 
-## 📄 Licencia
+## 📝 Licencia
 
-Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) para detalles.
+Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
 
-## 👨‍💻 Autor
+## 📞 Soporte
 
-**Victor Puello**
-- GitHub: [@victorpuello](https://github.com/victorpuello)
+Para soporte técnico o preguntas:
+- **Email**: soporte@kampus.com
+- **Documentación**: [docs.kampus.com](https://docs.kampus.com)
+- **Issues**: [GitHub Issues](https://github.com/victorpuello/kampus-api/issues)
 
-## 🙏 Agradecimientos
+## 🔄 Changelog
 
-- [Laravel](https://laravel.com) - Framework PHP
-- [React](https://reactjs.org) - Biblioteca de UI
-- [Tailwind CSS](https://tailwindcss.com) - Framework CSS
-- [Vite](https://vitejs.dev) - Build tool
+### v1.0.0 (2025-01-XX)
+- ✅ Sistema de autenticación completo
+- ✅ Gestión de estudiantes y docentes
+- ✅ Sistema de alertas personalizado
+- ✅ DataTable avanzado con funcionalidades completas
+- ✅ Interfaz responsive y moderna
+- ✅ Validaciones robustas
+- ✅ Sistema de confirmaciones elegante
 
 ---
 
-⭐ Si este proyecto te ayuda, ¡dale una estrella en GitHub!
+**Desarrollado con ❤️ por el equipo de Kampus**
