@@ -1,20 +1,25 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axiosClient from '../api/axiosClient';
+import { Button } from '../components/ui/Button';
+import { Card, CardHeader, CardBody } from '../components/ui/Card';
+import { Badge } from '../components/ui/Badge';
 
 interface Student {
   id: number;
-  nombre: string;
-  apellido: string;
-  tipo_documento: string;
-  numero_documento: string;
+  user?: {
+    nombre: string;
+    apellido: string;
+    tipo_documento: string;
+    numero_documento: string;
+    email: string;
+  };
   fecha_nacimiento: string;
   genero: string;
   direccion: string;
   telefono: string;
-  email: string;
   estado: string;
-  institucion: {
+  institucion?: {
     id: number;
     nombre: string;
   };
@@ -25,7 +30,7 @@ interface Student {
     telefono: string;
     email: string;
   };
-  historial_grupos: Array<{
+  historial_grupos?: Array<{
     id: number;
     grupo: {
       id: number;
@@ -35,13 +40,13 @@ interface Student {
     fecha_inicio: string;
     fecha_fin: string | null;
   }>;
-  observador: Array<{
+  observador?: Array<{
     id: number;
     fecha: string;
     descripcion: string;
     tipo: string;
   }>;
-  notas: Array<{
+  notas?: Array<{
     id: number;
     asignatura: {
       id: number;
@@ -51,7 +56,7 @@ interface Student {
     periodo: string;
     fecha: string;
   }>;
-  inasistencias: Array<{
+  inasistencias?: Array<{
     id: number;
     fecha: string;
     tipo: string;
@@ -71,9 +76,11 @@ const StudentDetailPage = () => {
     const fetchStudent = async () => {
       try {
         const response = await axiosClient.get(`/estudiantes/${id}`);
+        console.log('Datos del estudiante recibidos:', response.data);
         setStudent(response.data.data);
         setError(null);
       } catch (err: any) {
+        console.error('Error al cargar estudiante:', err);
         setError(err.response?.data?.message || 'Error al cargar el estudiante');
       } finally {
         setLoading(false);
@@ -84,15 +91,22 @@ const StudentDetailPage = () => {
   }, [id]);
 
   const handleDelete = async () => {
-    if (!window.confirm('¿Estás seguro de que deseas eliminar este estudiante?')) {
+    const studentName = student?.user ? `${student.user.nombre} ${student.user.apellido}` : 'este estudiante';
+    if (!window.confirm(`¿Estás seguro de que deseas eliminar a ${studentName}? Esta acción no se puede deshacer.`)) {
       return;
     }
 
     try {
+      setLoading(true);
       await axiosClient.delete(`/estudiantes/${id}`);
+      alert('Estudiante eliminado exitosamente');
       navigate('/estudiantes');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al eliminar el estudiante');
+      const errorMessage = err.response?.data?.message || 'Error al eliminar el estudiante';
+      alert(`Error: ${errorMessage}`);
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -124,329 +138,381 @@ const StudentDetailPage = () => {
     );
   }
 
+  // Verificar si tenemos datos básicos del estudiante
+  if (!student.user) {
+    return (
+      <div className="text-center">
+        <h3 className="text-lg font-medium text-gray-900">Datos del estudiante incompletos</h3>
+        <p className="text-sm text-gray-500 mt-2">La información del usuario no está disponible</p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="sm:flex sm:items-center sm:justify-between flex-wrap">
         <div>
           <h1 className="text-2xl font-semibold text-gray-900">
-            {student.nombre} {student.apellido}
+            {student.user.nombre} {student.user.apellido}
           </h1>
           <p className="mt-2 text-sm text-gray-700">
-            {student.tipo_documento} {student.numero_documento}
+            {student.user.tipo_documento} {student.user.numero_documento}
           </p>
         </div>
         <div className="mt-4 sm:mt-0 flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
-          <button
+          <Button
+            variant="primary"
             onClick={() => navigate(`/estudiantes/${id}/editar`)}
-            className="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 w-full sm:w-auto"
+            leftIcon={
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+            }
           >
             Editar
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="danger"
             onClick={handleDelete}
-            className="inline-flex items-center justify-center rounded-md border border-red-300 bg-white px-4 py-2 text-sm font-medium text-red-700 shadow-sm hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 w-full sm:w-auto"
+            leftIcon={
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            }
           >
             Eliminar
-          </button>
+          </Button>
         </div>
       </div>
 
-      <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-        <div className="px-4 py-5 sm:px-6">
-          <h3 className="text-lg leading-6 font-medium text-gray-900">Información Personal</h3>
-        </div>
-        <div className="border-t border-gray-200">
-          <dl>
-            <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-              <dt className="text-sm font-medium text-gray-500">Fecha de Nacimiento</dt>
-              <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                {new Date(student.fecha_nacimiento).toLocaleDateString()}
-              </dd>
-            </div>
-            <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-              <dt className="text-sm font-medium text-gray-500">Género</dt>
-              <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                {student.genero === 'M' ? 'Masculino' : student.genero === 'F' ? 'Femenino' : 'Otro'}
-              </dd>
-            </div>
-            <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-              <dt className="text-sm font-medium text-gray-500">Dirección</dt>
-              <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{student.direccion}</dd>
-            </div>
-            <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-              <dt className="text-sm font-medium text-gray-500">Teléfono</dt>
-              <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{student.telefono}</dd>
-            </div>
-            <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-              <dt className="text-sm font-medium text-gray-500">Email</dt>
-              <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{student.email}</dd>
-            </div>
-            <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-              <dt className="text-sm font-medium text-gray-500">Estado</dt>
-              <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                <span
-                  className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
-                    student.estado === 'activo'
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-red-100 text-red-800'
-                  }`}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Información Personal */}
+        <Card>
+          <CardHeader>
+            <h3 className="text-lg font-semibold text-gray-900">Información Personal</h3>
+          </CardHeader>
+          <CardBody>
+            <div className="space-y-4">
+              <div className="flex justify-between">
+                <span className="text-sm font-medium text-gray-500">Nombre Completo:</span>
+                <span className="text-sm text-gray-900">
+                  {student.user.nombre} {student.user.apellido}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm font-medium text-gray-500">Documento:</span>
+                <span className="text-sm text-gray-900">
+                  {student.user.tipo_documento} {student.user.numero_documento}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm font-medium text-gray-500">Email:</span>
+                <span className="text-sm text-gray-900">{student.user.email}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm font-medium text-gray-500">Fecha de Nacimiento:</span>
+                <span className="text-sm text-gray-900">
+                  {student.fecha_nacimiento ? new Date(student.fecha_nacimiento).toLocaleDateString() : 'No especificada'}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm font-medium text-gray-500">Género:</span>
+                <span className="text-sm text-gray-900">
+                  {student.genero === 'M' ? 'Masculino' : student.genero === 'F' ? 'Femenino' : 'Otro'}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm font-medium text-gray-500">Dirección:</span>
+                <span className="text-sm text-gray-900">{student.direccion || 'No especificada'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm font-medium text-gray-500">Teléfono:</span>
+                <span className="text-sm text-gray-900">{student.telefono || 'No especificado'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm font-medium text-gray-500">Estado:</span>
+                <Badge
+                  variant={student.estado === 'activo' ? 'success' : 'error'}
                 >
                   {student.estado}
-                </span>
-              </dd>
-            </div>
-            <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-              <dt className="text-sm font-medium text-gray-500">Institución</dt>
-              <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                {student.institucion.nombre}
-              </dd>
-            </div>
-            {student.acudiente && (
-              <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt className="text-sm font-medium text-gray-500">Acudiente</dt>
-                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                  <div>
-                    <p className="font-medium">
-                      {student.acudiente.nombre} {student.acudiente.apellido}
-                    </p>
-                    <p className="text-gray-500">{student.acudiente.telefono}</p>
-                    <p className="text-gray-500">{student.acudiente.email}</p>
-                  </div>
-                </dd>
+                </Badge>
               </div>
-            )}
-          </dl>
-        </div>
-      </div>
+            </div>
+          </CardBody>
+        </Card>
 
-      <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-        <div className="px-4 py-5 sm:px-6">
-          <h3 className="text-lg leading-6 font-medium text-gray-900">Historial de Grupos</h3>
-        </div>
-        <div className="border-t border-gray-200">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Grupo
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Grado
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Fecha Inicio
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Fecha Fin
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {student.historial_grupos.map((historial) => (
-                  <tr key={historial.id}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {historial.grupo.nombre}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {historial.grupo.grado}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {new Date(historial.fecha_inicio).toLocaleDateString()}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {historial.fecha_fin
-                        ? new Date(historial.fecha_fin).toLocaleDateString()
-                        : 'Actual'}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-        <div className="px-4 py-5 sm:px-6">
-          <h3 className="text-lg leading-6 font-medium text-gray-900">Observaciones</h3>
-        </div>
-        <div className="border-t border-gray-200">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Fecha
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Tipo
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Descripción
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {student.observador.map((observacion) => (
-                  <tr key={observacion.id}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {new Date(observacion.fecha).toLocaleDateString()}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {observacion.tipo}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">{observacion.descripcion}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-        <div className="px-4 py-5 sm:px-6">
-          <h3 className="text-lg leading-6 font-medium text-gray-900">Notas</h3>
-        </div>
-        <div className="border-t border-gray-200">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Asignatura
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Valor
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Período
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Fecha
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {student.notas.map((nota) => (
-                  <tr key={nota.id}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {nota.asignatura.nombre}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {nota.valor}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {nota.periodo}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {new Date(nota.fecha).toLocaleDateString()}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-        <div className="px-4 py-5 sm:px-6">
-          <h3 className="text-lg leading-6 font-medium text-gray-900">Inasistencias</h3>
-        </div>
-        <div className="border-t border-gray-200">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Fecha
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Tipo
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Justificada
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Descripción
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {student.inasistencias.map((inasistencia) => (
-                  <tr key={inasistencia.id}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {new Date(inasistencia.fecha).toLocaleDateString()}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {inasistencia.tipo}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <span
-                        className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
-                          inasistencia.justificada
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-red-100 text-red-800'
-                        }`}
-                      >
-                        {inasistencia.justificada ? 'Sí' : 'No'}
+        {/* Información Académica */}
+        <Card>
+          <CardHeader>
+            <h3 className="text-lg font-semibold text-gray-900">Información Académica</h3>
+          </CardHeader>
+          <CardBody>
+            <div className="space-y-4">
+              <div className="flex justify-between">
+                <span className="text-sm font-medium text-gray-500">Institución:</span>
+                <span className="text-sm text-gray-900">{student.institucion?.nombre || 'No asignada'}</span>
+              </div>
+              {student.acudiente && (
+                <div className="border-t pt-4">
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">Acudiente</h4>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-500">Nombre:</span>
+                      <span className="text-sm text-gray-900">
+                        {student.acudiente.nombre} {student.acudiente.apellido}
                       </span>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">{inasistencia.descripcion}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-500">Teléfono:</span>
+                      <span className="text-sm text-gray-900">{student.acudiente.telefono}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-500">Email:</span>
+                      <span className="text-sm text-gray-900">{student.acudiente.email}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </CardBody>
+        </Card>
       </div>
+
+      {/* Historial de Grupos */}
+      {student.historial_grupos && student.historial_grupos.length > 0 && (
+        <Card>
+          <CardHeader>
+            <h3 className="text-lg font-semibold text-gray-900">Historial de Grupos</h3>
+          </CardHeader>
+          <CardBody>
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Grupo
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Grado
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Fecha Inicio
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Fecha Fin
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {student.historial_grupos.map((historial) => (
+                    <tr key={historial.id}>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {historial.grupo.nombre}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {historial.grupo.grado}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {new Date(historial.fecha_inicio).toLocaleDateString()}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {historial.fecha_fin
+                          ? new Date(historial.fecha_fin).toLocaleDateString()
+                          : 'Actual'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardBody>
+        </Card>
+      )}
+
+      {/* Observaciones */}
+      {student.observador && student.observador.length > 0 && (
+        <Card>
+          <CardHeader>
+            <h3 className="text-lg font-semibold text-gray-900">Observaciones</h3>
+          </CardHeader>
+          <CardBody>
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Fecha
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Tipo
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Descripción
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {student.observador.map((observacion) => (
+                    <tr key={observacion.id}>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {new Date(observacion.fecha).toLocaleDateString()}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {observacion.tipo}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-500">{observacion.descripcion}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardBody>
+        </Card>
+      )}
+
+      {/* Notas */}
+      {student.notas && student.notas.length > 0 && (
+        <Card>
+          <CardHeader>
+            <h3 className="text-lg font-semibold text-gray-900">Notas</h3>
+          </CardHeader>
+          <CardBody>
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Asignatura
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Valor
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Período
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Fecha
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {student.notas.map((nota) => (
+                    <tr key={nota.id}>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {nota.asignatura.nombre}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {nota.valor}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {nota.periodo}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {new Date(nota.fecha).toLocaleDateString()}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardBody>
+        </Card>
+      )}
+
+      {/* Inasistencias */}
+      {student.inasistencias && student.inasistencias.length > 0 && (
+        <Card>
+          <CardHeader>
+            <h3 className="text-lg font-semibold text-gray-900">Inasistencias</h3>
+          </CardHeader>
+          <CardBody>
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Fecha
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Tipo
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Justificada
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Descripción
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {student.inasistencias.map((inasistencia) => (
+                    <tr key={inasistencia.id}>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {new Date(inasistencia.fecha).toLocaleDateString()}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {inasistencia.tipo}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <Badge
+                          variant={inasistencia.justificada ? 'success' : 'error'}
+                        >
+                          {inasistencia.justificada ? 'Sí' : 'No'}
+                        </Badge>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-500">{inasistencia.descripcion}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardBody>
+        </Card>
+      )}
+
+      {/* Acciones adicionales */}
+      <Card>
+        <CardHeader>
+          <h3 className="text-lg font-semibold text-gray-900">Acciones</h3>
+        </CardHeader>
+        <CardBody>
+          <div className="flex flex-wrap gap-3">
+            <Button
+              variant="secondary"
+              onClick={() => navigate('/estudiantes')}
+              leftIcon={
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+              }
+            >
+              Volver a la Lista
+            </Button>
+            <Button
+              variant="primary"
+              onClick={() => navigate(`/estudiantes/${id}/editar`)}
+              leftIcon={
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+              }
+            >
+              Editar Estudiante
+            </Button>
+            <Button
+              variant="danger"
+              onClick={handleDelete}
+              leftIcon={
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              }
+            >
+              Eliminar Estudiante
+            </Button>
+          </div>
+        </CardBody>
+      </Card>
     </div>
   );
 };

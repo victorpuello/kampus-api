@@ -7,6 +7,9 @@ import StudentDetailPage from '../pages/StudentDetailPage'
 import CreateStudentPage from '../pages/CreateStudentPage'
 import EditStudentPage from '../pages/EditStudentPage'
 import TeachersListPage from '../pages/TeachersListPage'
+import TeacherDetailPage from '../pages/TeacherDetailPage'
+import CreateTeacherPage from '../pages/CreateTeacherPage'
+import EditTeacherPage from '../pages/EditTeacherPage'
 import DashboardPage from '../pages/DashboardPage'
 
 export const router = createBrowserRouter([
@@ -45,6 +48,18 @@ export const router = createBrowserRouter([
       {
         path: 'docentes',
         element: <DashboardLayout><TeachersListPage /></DashboardLayout>
+      },
+      {
+        path: 'docentes/crear',
+        element: <DashboardLayout><CreateTeacherPage /></DashboardLayout>
+      },
+      {
+        path: 'docentes/:id',
+        element: <DashboardLayout><TeacherDetailPage /></DashboardLayout>
+      },
+      {
+        path: 'docentes/:id/editar',
+        element: <DashboardLayout><EditTeacherPage /></DashboardLayout>
       }
     ],
   }

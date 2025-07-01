@@ -67,7 +67,7 @@ class StudentController extends Controller
     public function index(Request $request)
     {
         $query = Estudiante::query()
-            ->with(['user', 'institucion', 'acudientes'])
+            ->with(['user', 'institucion', 'acudientes', 'acudiente'])
             ->when($request->search, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('codigo_estudiantil', 'like', "%{$search}%")
@@ -120,7 +120,7 @@ class StudentController extends Controller
         // Crear el estudiante y asociarlo al usuario
         $estudiante = $user->estudiante()->create($request->validated());
 
-        return new StudentResource($estudiante->load(['user', 'institucion', 'acudientes']));
+        return new StudentResource($estudiante->load(['user', 'institucion', 'acudientes', 'acudiente']));
     }
 
     /**
@@ -157,7 +157,7 @@ class StudentController extends Controller
      */
     public function show(Estudiante $estudiante)
     {
-        return new StudentResource($estudiante->load(['user', 'institucion', 'acudientes']));
+        return new StudentResource($estudiante->load(['user', 'institucion', 'acudientes', 'acudiente']));
     }
 
     /**

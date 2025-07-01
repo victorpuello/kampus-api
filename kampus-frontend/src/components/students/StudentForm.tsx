@@ -90,12 +90,16 @@ const StudentForm = ({ studentId }: StudentFormProps) => {
     try {
       if (studentId) {
         await axiosClient.put(`/estudiantes/${studentId}`, formData);
+        alert('Estudiante actualizado exitosamente');
       } else {
         await axiosClient.post('/estudiantes', formData);
+        alert('Estudiante creado exitosamente');
       }
       navigate('/estudiantes');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al guardar el estudiante');
+      const errorMessage = err.response?.data?.message || 'Error al guardar el estudiante';
+      setError(errorMessage);
+      alert(`Error: ${errorMessage}`);
     } finally {
       setLoading(false);
     }

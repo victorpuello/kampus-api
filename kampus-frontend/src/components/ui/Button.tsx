@@ -11,6 +11,7 @@ const buttonVariants = cva(
         secondary: 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:ring-primary-500 shadow-sm',
         danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 shadow-sm',
         success: 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500 shadow-sm',
+        warning: 'bg-yellow-600 text-white hover:bg-yellow-700 focus:ring-yellow-500 shadow-sm',
         ghost: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900',
         link: 'text-primary-600 hover:text-primary-700 underline-offset-4 hover:underline',
       },

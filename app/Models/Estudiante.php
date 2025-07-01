@@ -51,6 +51,12 @@ class Estudiante extends Model
     protected $fillable = [
         'user_id',
         'codigo_estudiantil',
+        'fecha_nacimiento',
+        'genero',
+        'direccion',
+        'telefono',
+        'estado',
+        'institucion_id',
     ];
 
     /**
@@ -76,6 +82,14 @@ class Estudiante extends Model
     public function acudientes()
     {
         return $this->belongsToMany(Acudiente::class, 'estudiante_acudiente');
+    }
+
+    /**
+     * Obtiene el primer acudiente asociado al estudiante.
+     */
+    public function acudiente()
+    {
+        return $this->belongsToMany(Acudiente::class, 'estudiante_acudiente')->limit(1);
     }
 
     /**

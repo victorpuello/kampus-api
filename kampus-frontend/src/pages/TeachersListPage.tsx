@@ -47,30 +47,44 @@ const TeachersListPage = () => {
   }, []);
 
   const handleDelete = async (teacher: Teacher) => {
-    if (!window.confirm('¿Estás seguro de que deseas eliminar este docente?')) {
+    if (!window.confirm(`¿Estás seguro de que deseas eliminar al docente ${teacher.user.nombre} ${teacher.user.apellido}? Esta acción no se puede deshacer.`)) {
       return;
     }
 
     try {
+      setLoading(true);
       await axiosClient.delete(`/docentes/${teacher.id}`);
+      // Mostrar mensaje de éxito
+      alert('Docente eliminado exitosamente');
       fetchTeachers();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al eliminar el docente');
+      const errorMessage = err.response?.data?.message || 'Error al eliminar el docente';
+      alert(`Error: ${errorMessage}`);
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleBulkDelete = async (selectedTeachers: Teacher[]) => {
-    if (!window.confirm(`¿Estás seguro de que deseas eliminar ${selectedTeachers.length} docentes?`)) {
+    if (!window.confirm(`¿Estás seguro de que deseas eliminar ${selectedTeachers.length} docentes? Esta acción no se puede deshacer.`)) {
       return;
     }
 
     try {
+      setLoading(true);
       await Promise.all(selectedTeachers.map(teacher => 
         axiosClient.delete(`/docentes/${teacher.id}`)
       ));
+      // Mostrar mensaje de éxito
+      alert(`${selectedTeachers.length} docentes eliminados exitosamente`);
       fetchTeachers();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al eliminar los docentes');
+      const errorMessage = err.response?.data?.message || 'Error al eliminar los docentes';
+      alert(`Error: ${errorMessage}`);
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
