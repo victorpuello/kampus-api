@@ -35,6 +35,18 @@ import AsignaturasListPage from '../pages/AsignaturasListPage'
 import AsignaturaDetailPage from '../pages/AsignaturaDetailPage'
 import CreateAsignaturaPage from '../pages/CreateAsignaturaPage'
 import EditAsignaturaPage from '../pages/EditAsignaturaPage'
+import InstitutionsListPage from '../pages/InstitutionsListPage'
+import InstitutionDetailPage from '../pages/InstitutionDetailPage'
+import CreateInstitutionPage from '../pages/CreateInstitutionPage'
+import EditInstitutionPage from '../pages/EditInstitutionPage'
+import SedesListPage from '../pages/SedesListPage'
+import SedeDetailPage from '../pages/SedeDetailPage'
+import CreateSedePage from '../pages/CreateSedePage'
+import EditSedePage from '../pages/EditSedePage'
+import InstitutionSedesPage from '../pages/InstitutionSedesPage'
+import InstitutionSedeDetailPage from '../pages/InstitutionSedeDetailPage'
+import InstitutionSedeEditPage from '../pages/InstitutionSedeEditPage'
+import InstitutionSedeCreatePage from '../pages/InstitutionSedeCreatePage'
 
 export const router = createBrowserRouter([
   {
@@ -180,7 +192,55 @@ export const router = createBrowserRouter([
       {
         path: 'asignaturas/:id/editar',
         element: <DashboardLayout><EditAsignaturaPage /></DashboardLayout>
-      }
+      },
+      {
+        path: 'instituciones',
+        element: <DashboardLayout><InstitutionsListPage /></DashboardLayout>
+      },
+      {
+        path: 'instituciones/crear',
+        element: <DashboardLayout><CreateInstitutionPage /></DashboardLayout>
+      },
+      {
+        path: 'instituciones/:id',
+        element: <DashboardLayout><InstitutionDetailPage /></DashboardLayout>
+      },
+      {
+        path: 'instituciones/:id/editar',
+        element: <DashboardLayout><EditInstitutionPage /></DashboardLayout>
+      },
+      {
+        path: 'instituciones/:id/sedes',
+        element: <DashboardLayout><InstitutionSedesPage /></DashboardLayout>
+      },
+      {
+        path: 'instituciones/:institutionId/sedes/crear',
+        element: <DashboardLayout><InstitutionSedeCreatePage /></DashboardLayout>
+      },
+      {
+        path: 'instituciones/:institutionId/sedes/:id',
+        element: <DashboardLayout><InstitutionSedeDetailPage /></DashboardLayout>
+      },
+      {
+        path: 'instituciones/:institutionId/sedes/:id/editar',
+        element: <DashboardLayout><InstitutionSedeEditPage /></DashboardLayout>
+      },
+      {
+        path: 'sedes',
+        element: <DashboardLayout><SedesListPage /></DashboardLayout>
+      },
+      {
+        path: 'sedes/crear',
+        element: <DashboardLayout><CreateSedePage /></DashboardLayout>
+      },
+      {
+        path: 'sedes/:id',
+        element: <DashboardLayout><SedeDetailPage /></DashboardLayout>
+      },
+      {
+        path: 'sedes/:id/editar',
+        element: <DashboardLayout><EditSedePage /></DashboardLayout>
+      },
     ],
   }
 ]) 

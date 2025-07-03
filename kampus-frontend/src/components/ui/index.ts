@@ -14,4 +14,6 @@ export { default as FormField } from './FormField';
 export { default as FormSelect } from './FormSelect';
 export { default as FormContainer } from './FormContainer';
 export { default as FormActions } from './FormActions';
-export { default as PageHeader } from './PageHeader'; 
+export { default as PageHeader } from './PageHeader';
+export { ValidateParams } from './ValidateParams';
+export { FileUpload } from './FileUpload'; 

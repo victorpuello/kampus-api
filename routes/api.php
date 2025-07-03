@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\StudentController;
 use App\Http\Controllers\Api\V1\DocenteController;
 use App\Http\Controllers\Api\V1\InstitucionController;
+use App\Http\Controllers\Api\V1\SedeController;
 use App\Http\Controllers\Api\V1\AnioController;
 use App\Http\Controllers\Api\V1\AcudienteController;
 use App\Http\Controllers\Api\V1\GradoController;
@@ -24,27 +25,28 @@ use Illuminate\Support\Facades\Route;
  * (como el login) y rutas protegidas que requieren autenticación con Sanctum.
  */
 Route::prefix('v1')->group(function () {
-    // Rutas públicas
-    /**
-     * @OA\Post(
-     *     path="/v1/login",
-     *     summary="Inicia sesión de un usuario y devuelve un token de acceso",
-     *     tags={"Autenticación"},
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\JsonContent(
-     *             required={"email","password"},
-     *             @OA\Property(property="email", type="string", format="email", example="admin@example.com"),
-     *             @OA\Property(property="password", type="string", format="password", example="password"),
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Inicio de sesión exitoso",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="token", type="string", example="1|abcdefg12345"),
-     *             @OA\Property(property="user", type="object", ref="#/components/schemas/UserResource"),
-     *         )
+    // Rutas públicas con middleware de sesión para Sanctum SPA
+    Route::middleware(['web'])->group(function () {
+        /**
+         * @OA\Post(
+         *     path="/v1/login",
+         *     summary="Inicia sesión de un usuario y devuelve un token de acceso",
+         *     tags={"Autenticación"},
+         *     @OA\RequestBody(
+         *         required=true,
+         *         @OA\JsonContent(
+         *             required={"email","password"},
+         *             @OA\Property(property="email", type="string", format="email", example="admin@example.com"),
+         *             @OA\Property(property="password", type="string", format="password", example="password"),
+         *         )
+         *     ),
+         *     @OA\Response(
+         *         response=200,
+         *         description="Inicio de sesión exitoso",
+         *         @OA\JsonContent(
+         *             @OA\Property(property="token", type="string", example="1|abcdefg12345"),
+         *             @OA\Property(property="user", type="object", ref="#/components/schemas/UserResource"),
+         *         )
      *     ),
      *     @OA\Response(
      *         response=422,
@@ -56,13 +58,14 @@ Route::prefix('v1')->group(function () {
      *     )
      * )
      */
-    Route::post('/login', [AuthController::class, 'login']);
+        Route::post('/login', [AuthController::class, 'login']);
+    });
 
     // Rutas protegidas
     /**
      * Grupo de rutas que requieren autenticación con Laravel Sanctum.
      */
-    Route::middleware('auth:sanctum')->group(function () {
+    Route::middleware(['auth:sanctum'])->group(function () {
         /**
          * @OA\Post(
          *     path="/v1/logout",
@@ -106,7 +109,18 @@ Route::prefix('v1')->group(function () {
         /**
          * Rutas para la gestión de instituciones (CRUD).
          */
-        Route::apiResource('instituciones', InstitucionController::class);
+        Route::apiResource('instituciones', InstitucionController::class)->parameters([
+            'instituciones' => 'institucion',
+        ]);
+
+        // Ruta específica para obtener sedes de una institución
+        Route::get('instituciones/{institucion}/sedes', [InstitucionController::class, 'sedes']);
+
+        // Rutas de sedes
+        /**
+         * Rutas para la gestión de sedes (CRUD).
+         */
+        Route::apiResource('sedes', SedeController::class);
 
         // Rutas de años
         /**

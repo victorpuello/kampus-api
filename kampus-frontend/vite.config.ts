@@ -5,8 +5,10 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
+    host: 'kampus.test',
     port: 5173,
-    host: true,
+    strictPort: true,
+    cors: true,
     proxy: {
       '/api': {
         target: 'http://kampus.test',
@@ -14,5 +16,11 @@ export default defineConfig({
         secure: false
       }
     }
+  },
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: ['./src/test/setup.ts'],
+    css: true,
   }
 })

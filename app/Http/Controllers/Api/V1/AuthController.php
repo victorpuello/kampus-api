@@ -7,7 +7,7 @@ use App\Http\Requests\LoginRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -21,7 +21,7 @@ class AuthController extends Controller
     /**
      * @OA\Post(
      *     path="/v1/login",
-     *     summary="Inicia sesión de un usuario y devuelve un token de acceso",
+     *     summary="Inicia sesión de un usuario usando autenticación basada en sesiones",
      *     tags={"Autenticación"},
      *     @OA\RequestBody(
      *         required=true,
@@ -35,7 +35,7 @@ class AuthController extends Controller
      *         response=200,
      *         description="Inicio de sesión exitoso",
      *         @OA\JsonContent(
-     *             @OA\Property(property="token", type="string", example="1|abcdefg12345"),
+     *             @OA\Property(property="message", type="string", example="Inicio de sesión exitoso"),
      *             @OA\Property(property="user", type="object", ref="#/components/schemas/UserResource"),
      *         )
      *     ),
@@ -51,31 +51,28 @@ class AuthController extends Controller
      */
     public function login(LoginRequest $request)
     {
-        $user = User::where('email', $request->email)->first();
+        $credentials = $request->only('email', 'password');
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['Las credenciales proporcionadas son incorrectas.'],
+        if (Auth::attempt($credentials, $request->boolean('remember'))) {
+            $request->session()->regenerate();
+
+            $user = Auth::user();
+
+            return response()->json([
+                'message' => 'Inicio de sesión exitoso',
+                'user' => new UserResource($user->load('roles.permissions', 'institucion')),
             ]);
         }
 
-        // Revocar tokens anteriores para asegurar que solo haya un token activo por usuario
-        $user->tokens()->delete();
-
-        // Crear un nuevo token de acceso
-        $token = $user->createToken('auth-token')->plainTextToken;
-
-        // Devolver el token y los datos del usuario con sus roles y permisos cargados
-        return response()->json([
-            'token' => $token,
-            'user' => new UserResource($user->load('roles.permissions', 'institucion')),
+        throw ValidationException::withMessages([
+            'email' => ['Las credenciales proporcionadas son incorrectas.'],
         ]);
     }
 
     /**
      * @OA\Post(
      *     path="/v1/logout",
-     *     summary="Cierra la sesión del usuario actual invalidando su token de acceso",
+     *     summary="Cierra la sesión del usuario actual",
      *     tags={"Autenticación"},
      *     security={{"sanctum":{}}},
      *     @OA\Response(
@@ -93,10 +90,9 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
-        $token = $request->user()->currentAccessToken();
-        if ($token) {
-            $token->delete();
-        }
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
         return response()->json([
             'message' => 'Sesión cerrada exitosamente'

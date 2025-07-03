@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import axios from 'axios'
 import axiosClient from '../api/axiosClient'
 
 interface User {
@@ -24,7 +25,6 @@ interface User {
 }
 
 interface AuthState {
-  token: string | null
   user: User | null
   isAuthenticated: boolean
   login: (email: string, password: string) => Promise<void>
@@ -34,27 +34,33 @@ interface AuthState {
 export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
-      token: null,
       user: null,
       isAuthenticated: false,
 
       login: async (email: string, password: string) => {
         console.log('Iniciando login con:', email)
         try {
+          // Obtener el CSRF token (sin baseURL de la API)
+          await axios.get('http://kampus.test/sanctum/csrf-cookie', {
+            withCredentials: true,
+          })
+          console.log('CSRF token obtenido')
+
+          // Hacer login con credenciales y cookies
           const response = await axiosClient.post('/login', {
             email,
             password,
+          }, {
+            withCredentials: true,
           })
 
           console.log('Respuesta del servidor:', response.data)
-          const { token, user } = response.data
+          const { user } = response.data
 
           set({
-            token,
             user,
             isAuthenticated: true,
           })
-          
           console.log('Estado actualizado:', get())
         } catch (error: any) {
           console.error('Error en login:', error.response?.data || error.message)
@@ -67,10 +73,8 @@ export const useAuthStore = create<AuthState>()(
           await axiosClient.post('/logout')
         } catch (error) {
           console.error('Error al cerrar sesión en el backend:', error)
-          // Aunque haya un error en el backend, limpiamos el estado local para evitar inconsistencias
         } finally {
           set({
-            token: null,
             user: null,
             isAuthenticated: false,
           })
