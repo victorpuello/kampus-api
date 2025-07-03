@@ -114,16 +114,44 @@ class InstitucionController extends Controller
         // Crear la institución sin el archivo
         $institucion = Institucion::create($data);
         
+        // Configurar campos de archivo
+        $institucion->setFileFields(['escudo']);
+        $institucion->setFilePaths(['escudo' => 'instituciones/escudos']);
+        
         // Manejar la carga del escudo si se proporciona
         if ($request->hasFile('escudo')) {
             try {
-                $institucion->uploadFile($request->file('escudo'), 'escudo', [
+                \Log::info('🔄 Intentando subir escudo en store', [
+                    'institucion_id' => $institucion->id,
+                    'file_size' => $request->file('escudo')->getSize(),
+                    'file_name' => $request->file('escudo')->getClientOriginalName()
+                ]);
+                
+                $result = $institucion->uploadFile($request->file('escudo'), 'escudo', [
                     'resize' => true,
                     'width' => 300,
                     'height' => 300,
                     'quality' => 85
                 ]);
+                
+                if (!$result) {
+                    throw new \Exception('El método uploadFile retornó false');
+                }
+                
+                \Log::info('✅ Escudo subido exitosamente', [
+                    'institucion_id' => $institucion->id,
+                    'escudo_path' => $institucion->escudo
+                ]);
+                
             } catch (\Exception $e) {
+                \Log::error('❌ Error al subir escudo en store', [
+                    'institucion_id' => $institucion->id,
+                    'error' => $e->getMessage()
+                ]);
+                
+                // Limpiar el campo escudo si la carga falla
+                $institucion->escudo = null;
+                $institucion->save();
                 // Si falla la carga del archivo, eliminar la institución creada
                 $institucion->delete();
                 return response()->json([
@@ -169,6 +197,17 @@ class InstitucionController extends Controller
      */
     public function show(Request $request, Institucion $institucion)
     {
+        // Debug: Log de la petición
+        \Log::info('🔍 Petición GET institución', [
+            'id' => $institucion->id,
+            'nombre' => $institucion->nombre,
+            'escudo' => $institucion->escudo,
+            'escudo_url' => $institucion->getFileUrl('escudo'),
+            'request_url' => $request->fullUrl(),
+            'user_agent' => $request->userAgent(),
+            'headers' => $request->headers->all()
+        ]);
+
         if ($request->has('include') && str_contains($request->include, 'sedes')) {
             $institucion->load('sedes');
         }
@@ -286,19 +325,49 @@ class InstitucionController extends Controller
     {
         $data = $request->validated();
         
+        // Configurar campos de archivo ANTES de cualquier operación
+        $institucion->setFileFields(['escudo']);
+        $institucion->setFilePaths(['escudo' => 'instituciones/escudos']);
+        
         // Manejar la carga del escudo si se proporciona
         if ($request->hasFile('escudo')) {
             try {
-                $institucion->uploadFile($request->file('escudo'), 'escudo', [
+                \Log::info('🔄 Intentando actualizar escudo', [
+                    'institucion_id' => $institucion->id,
+                    'file_size' => $request->file('escudo')->getSize(),
+                    'file_name' => $request->file('escudo')->getClientOriginalName(),
+                    'file_fields' => $institucion->fileFields,
+                    'file_paths' => $institucion->filePaths
+                ]);
+                
+                $result = $institucion->uploadFile($request->file('escudo'), 'escudo', [
                     'resize' => true,
                     'width' => 300,
                     'height' => 300,
                     'quality' => 85
                 ]);
                 
+                if (!$result) {
+                    throw new \Exception('El método uploadFile retornó false');
+                }
+                
+                \Log::info('✅ Escudo actualizado exitosamente', [
+                    'institucion_id' => $institucion->id,
+                    'escudo_path' => $institucion->escudo
+                ]);
+                
                 // Remover el campo escudo de los datos ya que se maneja por separado
                 unset($data['escudo']);
             } catch (\Exception $e) {
+                \Log::error('❌ Error al actualizar escudo', [
+                    'institucion_id' => $institucion->id,
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+                
+                // Limpiar el campo escudo si la carga falla
+                $institucion->escudo = null;
+                $institucion->save();
                 return response()->json([
                     'message' => 'Error al cargar el escudo: ' . $e->getMessage()
                 ], 422);

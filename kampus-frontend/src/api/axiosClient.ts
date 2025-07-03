@@ -6,21 +6,20 @@ const axiosClient = axios.create({
   baseURL: API_CONFIG.baseURL,
   timeout: API_CONFIG.timeout,
   headers: API_CONFIG.headers,
-  withCredentials: true, // Importante para cookies de sesión
-  withXSRFToken: true, // Importante para CSRF protection
 })
 
-// Configurar axios para que lea el token CSRF de las cookies
-axios.defaults.withCredentials = true
-axios.defaults.withXSRFToken = true
-
-// Interceptor para agregar headers necesarios
+// Interceptor para agregar el token de autorización
 axiosClient.interceptors.request.use(
   (config) => {
     console.log('🚀 Enviando petición:', config.method?.toUpperCase(), config.url)
     
-    // Asegurar que las credenciales se envíen
-    config.withCredentials = true
+    // Obtener el token del store de autenticación
+    const token = useAuthStore.getState().token
+    
+    // Agregar el token al header de autorización si existe
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
     
     return config
   },

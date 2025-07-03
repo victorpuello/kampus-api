@@ -1,6 +1,5 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import axios from 'axios'
 import axiosClient from '../api/axiosClient'
 
 interface User {
@@ -26,6 +25,7 @@ interface User {
 
 interface AuthState {
   user: User | null
+  token: string | null
   isAuthenticated: boolean
   login: (email: string, password: string) => Promise<void>
   logout: () => void
@@ -35,30 +35,24 @@ export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
       user: null,
+      token: null,
       isAuthenticated: false,
 
       login: async (email: string, password: string) => {
         console.log('Iniciando login con:', email)
         try {
-          // Obtener el CSRF token (sin baseURL de la API)
-          await axios.get('http://kampus.test/sanctum/csrf-cookie', {
-            withCredentials: true,
-          })
-          console.log('CSRF token obtenido')
-
-          // Hacer login con credenciales y cookies
+          // Hacer login y obtener token
           const response = await axiosClient.post('/login', {
             email,
             password,
-          }, {
-            withCredentials: true,
           })
 
           console.log('Respuesta del servidor:', response.data)
-          const { user } = response.data
+          const { token, user } = response.data
 
           set({
             user,
+            token,
             isAuthenticated: true,
           })
           console.log('Estado actualizado:', get())
@@ -70,12 +64,15 @@ export const useAuthStore = create<AuthState>()(
 
       logout: async () => {
         try {
+          // Hacer logout para invalidar el token en el servidor
           await axiosClient.post('/logout')
+          console.log('Logout exitoso en el backend')
         } catch (error) {
           console.error('Error al cerrar sesión en el backend:', error)
         } finally {
           set({
             user: null,
+            token: null,
             isAuthenticated: false,
           })
         }

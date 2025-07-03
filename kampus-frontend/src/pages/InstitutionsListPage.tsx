@@ -27,6 +27,8 @@ interface InstitutionsResponse {
   total: number;
 }
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE || 'http://kampus.test';
+
 const InstitutionsListPage: React.FC = () => {
   const navigate = useNavigate();
   const { showSuccess, showError } = useAlertContext();
@@ -163,7 +165,7 @@ const InstitutionsListPage: React.FC = () => {
         <div className="flex items-center space-x-3">
           {institution.escudo && (
             <img 
-              src={institution.escudo} 
+              src={institution.escudo.startsWith('http') ? institution.escudo : `${API_BASE_URL}/storage/${institution.escudo}`}
               alt={`Escudo de ${institution.nombre}`}
               className="w-8 h-8 object-contain rounded border"
             />

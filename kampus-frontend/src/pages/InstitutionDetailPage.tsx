@@ -5,6 +5,8 @@ import { useConfirm } from '../hooks/useConfirm';
 import axiosClient from '../api/axiosClient';
 import { PageHeader, Button, Badge, Card, CardHeader, CardBody, LoadingSpinner } from '../components/ui';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE || 'http://kampus.test';
+
 interface Sede {
   id: number;
   nombre: string;
@@ -281,14 +283,14 @@ const InstitutionDetailPage: React.FC = () => {
                   <dd className="mt-1">
                     <div className="flex items-center space-x-3">
                       <img 
-                        src={institution.escudo} 
+                        src={institution.escudo.startsWith('http') ? institution.escudo : `${API_BASE_URL}/storage/${institution.escudo}`}
                         alt="Escudo de la institución"
                         className="w-24 h-24 object-contain rounded-lg border shadow-sm"
                       />
                       <div className="flex-1">
                         <p className="text-xs text-gray-500">Escudo oficial de la institución</p>
                         <a 
-                          href={institution.escudo} 
+                          href={institution.escudo.startsWith('http') ? institution.escudo : `${API_BASE_URL}/storage/${institution.escudo}`}
                           target="_blank" 
                           rel="noopener noreferrer"
                           className="text-xs text-blue-600 hover:text-blue-800"

@@ -39,6 +39,17 @@ class InstitucionResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        // Debug: Log de los datos que se van a enviar
+        \Log::info('📦 InstitucionResource - Datos a enviar', [
+            'id' => $this->id,
+            'nombre' => $this->nombre,
+            'escudo_raw' => $this->escudo,
+            'escudo_asset' => $this->escudo ? asset('storage/' . $this->escudo) : null,
+            'escudo_getFileUrl' => $this->escudo ? $this->getFileUrl('escudo') : null,
+            'request_url' => $request->fullUrl(),
+            'request_method' => $request->method()
+        ]);
+
         $data = [
             'id' => $this->id,
             'nombre' => $this->nombre,

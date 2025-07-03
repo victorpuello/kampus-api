@@ -1,44 +1,13 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
-import { Button } from '../components/ui/Button'
-import { Input } from '../components/ui/Input'
-import { Card, CardHeader, CardBody } from '../components/ui/Card'
-import { useAlertContext } from '../contexts/AlertContext'
+import LoginForm from '../components/auth/LoginForm'
 
 const LoginPage = () => {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
-  
-  const navigate = useNavigate()
-  const { login } = useAuth()
-  const { showError } = useAlertContext()
-  
-  // Log del estado inicial
-  console.log('LoginPage - Estado inicial:', { email, password, error, loading })
-  console.log('LoginPage - Función login disponible:', !!login)
+  const { isAuthenticated } = useAuth()
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
-    setLoading(true)
-
-    console.log('Iniciando login desde LoginPage con:', { email, password })
-
-    try {
-      await login(email, password)
-      console.log('Login exitoso, navegando a dashboard')
-      navigate('/dashboard')
-    } catch (err: any) {
-      console.error('Error en login desde LoginPage:', err)
-      const errorMessage = err.message || 'Credenciales inválidas'
-      setError(errorMessage)
-      showError(errorMessage, 'Error de autenticación')
-    } finally {
-      setLoading(false)
-    }
+  // Si ya está autenticado, redirigir al dashboard
+  if (isAuthenticated) {
+    window.location.href = '/dashboard'
+    return null
   }
 
   return (
@@ -55,75 +24,8 @@ const LoginPage = () => {
           <p className="text-gray-600">Sistema de Gestión Académica</p>
         </div>
 
-        {/* Formulario */}
-        <Card className="shadow-xl">
-          <CardHeader>
-            <h2 className="text-xl font-semibold text-gray-900 text-center">Iniciar Sesión</h2>
-            <p className="text-sm text-gray-600 text-center mt-1">
-              Ingresa tus credenciales para acceder al sistema
-            </p>
-          </CardHeader>
-          <CardBody>
-            {error && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                <div className="flex">
-                  <svg className="w-5 h-5 text-red-400 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <p className="text-sm text-red-800">{error}</p>
-                </div>
-              </div>
-            )}
-
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <Input
-                label="Correo Electrónico"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="tu@email.com"
-                required
-                leftIcon={
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
-                  </svg>
-                }
-              />
-
-              <Input
-                label="Contraseña"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-                leftIcon={
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                  </svg>
-                }
-              />
-
-              <Button
-                type="submit"
-                loading={loading}
-                className="w-full"
-                size="lg"
-              >
-                {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
-              </Button>
-            </form>
-
-            {/* Información adicional */}
-            <div className="mt-6 pt-6 border-t border-gray-200">
-              <div className="text-center">
-                <p className="text-xs text-gray-500">
-                  ¿Necesitas ayuda? Contacta al administrador del sistema
-                </p>
-              </div>
-            </div>
-          </CardBody>
-        </Card>
+        {/* Formulario de login usando el nuevo componente */}
+        <LoginForm />
 
         {/* Footer */}
         <div className="mt-8 text-center">

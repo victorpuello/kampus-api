@@ -74,6 +74,15 @@ class Institucion extends Model
     ];
 
     /**
+     * Constructor del modelo
+     */
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+        $this->initializeHasFileUploads();
+    }
+
+    /**
      * Boot del modelo
      */
     protected static function boot()
@@ -81,6 +90,19 @@ class Institucion extends Model
         parent::boot();
 
         static::creating(function ($model) {
+            $model->initializeHasFileUploads();
+            $model->setFileFields(['escudo']);
+            $model->setFilePaths(['escudo' => 'instituciones/escudos']);
+        });
+
+        static::updating(function ($model) {
+            $model->initializeHasFileUploads();
+            $model->setFileFields(['escudo']);
+            $model->setFilePaths(['escudo' => 'instituciones/escudos']);
+        });
+
+        static::retrieved(function ($model) {
+            $model->initializeHasFileUploads();
             $model->setFileFields(['escudo']);
             $model->setFilePaths(['escudo' => 'instituciones/escudos']);
         });

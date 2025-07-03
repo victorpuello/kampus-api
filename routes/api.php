@@ -25,28 +25,27 @@ use Illuminate\Support\Facades\Route;
  * (como el login) y rutas protegidas que requieren autenticación con Sanctum.
  */
 Route::prefix('v1')->group(function () {
-    // Rutas públicas con middleware de sesión para Sanctum SPA
-    Route::middleware(['web'])->group(function () {
-        /**
-         * @OA\Post(
-         *     path="/v1/login",
-         *     summary="Inicia sesión de un usuario y devuelve un token de acceso",
-         *     tags={"Autenticación"},
-         *     @OA\RequestBody(
-         *         required=true,
-         *         @OA\JsonContent(
-         *             required={"email","password"},
-         *             @OA\Property(property="email", type="string", format="email", example="admin@example.com"),
-         *             @OA\Property(property="password", type="string", format="password", example="password"),
-         *         )
-         *     ),
-         *     @OA\Response(
-         *         response=200,
-         *         description="Inicio de sesión exitoso",
-         *         @OA\JsonContent(
-         *             @OA\Property(property="token", type="string", example="1|abcdefg12345"),
-         *             @OA\Property(property="user", type="object", ref="#/components/schemas/UserResource"),
-         *         )
+    // Rutas públicas para autenticación
+    /**
+     * @OA\Post(
+     *     path="/v1/login",
+     *     summary="Inicia sesión de un usuario y devuelve un token de acceso",
+     *     tags={"Autenticación"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"email","password"},
+     *             @OA\Property(property="email", type="string", format="email", example="admin@example.com"),
+     *             @OA\Property(property="password", type="string", format="password", example="123456"),
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Inicio de sesión exitoso",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="token", type="string", example="1|abcdefg12345"),
+     *             @OA\Property(property="user", type="object", ref="#/components/schemas/UserResource"),
+     *         )
      *     ),
      *     @OA\Response(
      *         response=422,
@@ -58,14 +57,11 @@ Route::prefix('v1')->group(function () {
      *     )
      * )
      */
-        Route::post('/login', [AuthController::class, 'login']);
-    });
+    Route::post('/login', [AuthController::class, 'login']);
 
-    // Rutas protegidas
-    /**
-     * Grupo de rutas que requieren autenticación con Laravel Sanctum.
-     */
-    Route::middleware(['auth:sanctum'])->group(function () {
+    // Rutas protegidas con autenticación por token (desactivada en desarrollo)
+    $env = $_ENV['APP_ENV'] ?? 'production';
+    Route::middleware(in_array($env, ['local', 'development']) ? [] : ['auth:sanctum'])->group(function () {
         /**
          * @OA\Post(
          *     path="/v1/logout",
@@ -86,6 +82,27 @@ Route::prefix('v1')->group(function () {
          * )
          */
         Route::post('/logout', [AuthController::class, 'logout']);
+
+        /**
+         * @OA\Get(
+         *     path="/v1/me",
+         *     summary="Obtiene la información del usuario autenticado",
+         *     tags={"Autenticación"},
+         *     security={{"sanctum":{}}},
+         *     @OA\Response(
+         *         response=200,
+         *         description="Información del usuario",
+         *         @OA\JsonContent(
+         *             @OA\Property(property="user", type="object", ref="#/components/schemas/UserResource"),
+         *         )
+         *     ),
+         *     @OA\Response(
+         *         response=401,
+         *         description="No autenticado",
+         *     )
+         * )
+         */
+        Route::get('/me', [AuthController::class, 'me']);
         
         // Rutas de usuarios
         /**

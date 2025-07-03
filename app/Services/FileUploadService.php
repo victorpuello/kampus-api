@@ -5,7 +5,8 @@ namespace App\Services;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Intervention\Image\Facades\Image;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
 
 class FileUploadService
 {
@@ -17,37 +18,43 @@ class FileUploadService
     const ALLOWED_ALL_TYPES = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'txt'];
 
     /**
-     * Tamaños máximos de archivo (en MB)
+     * Tamaños máximos de archivo (en KB)
      */
-    const MAX_IMAGE_SIZE = 5; // 5MB
-    const MAX_DOCUMENT_SIZE = 10; // 10MB
+    const MAX_IMAGE_SIZE = 5120; // 5MB en KB
+    const MAX_DOCUMENT_SIZE = 10240; // 10MB en KB
 
     /**
      * Subir una imagen con optimización
      */
     public function uploadImage(UploadedFile $file, string $path, array $options = []): array
     {
-        $this->validateFile($file, self::ALLOWED_IMAGE_TYPES, self::MAX_IMAGE_SIZE * 1024);
+        $this->validateFile($file, self::ALLOWED_IMAGE_TYPES, self::MAX_IMAGE_SIZE);
+
+        // Asegurar que el directorio existe
+        $this->ensureDirectoryExists($path);
 
         $filename = $this->generateFilename($file);
         $fullPath = $path . '/' . $filename;
 
         // Procesar imagen si es necesario
         if (isset($options['resize']) && $options['resize']) {
-            $image = Image::make($file);
+            $manager = new ImageManager(new Driver());
+            $image = $manager->read($file);
             
             if (isset($options['width']) && isset($options['height'])) {
-                $image->resize($options['width'], $options['height'], function ($constraint) {
-                    $constraint->aspectRatio();
-                    $constraint->upsize();
-                });
+                $image->resize($options['width'], $options['height']);
             }
 
+            // Guardar usando el storage de Laravel
+            $tempPath = 'temp/' . $filename;
             if (isset($options['quality'])) {
-                $image->save(storage_path('app/public/' . $fullPath), $options['quality']);
+                $image->save(Storage::disk('public')->path($tempPath), $options['quality']);
             } else {
-                $image->save(storage_path('app/public/' . $fullPath), 85);
+                $image->save(Storage::disk('public')->path($tempPath), 85);
             }
+            
+            // Mover al destino final
+            Storage::disk('public')->move($tempPath, $fullPath);
         } else {
             // Guardar archivo sin procesar
             Storage::disk('public')->putFileAs($path, $file, $filename);
@@ -67,7 +74,10 @@ class FileUploadService
      */
     public function uploadDocument(UploadedFile $file, string $path): array
     {
-        $this->validateFile($file, self::ALLOWED_DOCUMENT_TYPES, self::MAX_DOCUMENT_SIZE * 1024);
+        $this->validateFile($file, self::ALLOWED_DOCUMENT_TYPES, self::MAX_DOCUMENT_SIZE);
+
+        // Asegurar que el directorio existe
+        $this->ensureDirectoryExists($path);
 
         $filename = $this->generateFilename($file);
         $fullPath = $path . '/' . $filename;
@@ -88,7 +98,10 @@ class FileUploadService
      */
     public function uploadFile(UploadedFile $file, string $path): array
     {
-        $this->validateFile($file, self::ALLOWED_ALL_TYPES, self::MAX_DOCUMENT_SIZE * 1024);
+        $this->validateFile($file, self::ALLOWED_ALL_TYPES, self::MAX_DOCUMENT_SIZE);
+
+        // Asegurar que el directorio existe
+        $this->ensureDirectoryExists($path);
 
         $filename = $this->generateFilename($file);
         $fullPath = $path . '/' . $filename;
@@ -139,9 +152,9 @@ class FileUploadService
             );
         }
 
-        if ($file->getSize() > $maxSize) {
+        if ($file->getSize() > ($maxSize * 1024)) {
             throw new \InvalidArgumentException(
-                'El archivo es demasiado grande. Tamaño máximo: ' . ($maxSize / 1024) . 'MB'
+                'El archivo es demasiado grande. Tamaño máximo: ' . $maxSize . 'KB'
             );
         }
     }

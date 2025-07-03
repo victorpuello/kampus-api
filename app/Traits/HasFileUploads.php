@@ -11,12 +11,26 @@ trait HasFileUploads
     /**
      * Campos de archivo que maneja el modelo
      */
-    protected array $fileFields = [];
+    protected $fileFields = [];
 
     /**
      * Rutas base para cada tipo de archivo
      */
-    protected array $filePaths = [];
+    protected $filePaths = [];
+
+    /**
+     * Inicializa las propiedades del trait para evitar problemas de null/undefined.
+     * Debe llamarse en el constructor y en los eventos del modelo.
+     */
+    public function initializeHasFileUploads()
+    {
+        if (!is_array($this->fileFields)) {
+            $this->fileFields = [];
+        }
+        if (!is_array($this->filePaths)) {
+            $this->filePaths = [];
+        }
+    }
 
     /**
      * Subir archivo y actualizar modelo
@@ -71,8 +85,15 @@ trait HasFileUploads
      */
     public function getFileUrl(string $field): ?string
     {
-        if (!in_array($field, $this->fileFields) || !$this->$field) {
+        // Si no hay valor en el campo, retornar null
+        if (!$this->$field) {
             return null;
+        }
+
+        // Si los campos no están configurados, usar el servicio directamente
+        if (empty($this->fileFields) || !in_array($field, $this->fileFields)) {
+            $fileService = app(FileUploadService::class);
+            return $fileService->getFileUrl($this->$field);
         }
 
         $fileService = app(FileUploadService::class);
@@ -156,6 +177,10 @@ trait HasFileUploads
     public function setFileFields(array $fields): void
     {
         $this->fileFields = $fields;
+        \Log::info('setFileFields llamado', [
+            'fields' => $fields,
+            'result' => $this->fileFields
+        ]);
     }
 
     /**
@@ -164,6 +189,10 @@ trait HasFileUploads
     public function setFilePaths(array $paths): void
     {
         $this->filePaths = $paths;
+        \Log::info('setFilePaths llamado', [
+            'paths' => $paths,
+            'result' => $this->filePaths
+        ]);
     }
 
     /**
