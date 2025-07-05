@@ -40,8 +40,8 @@ class UpdateInstitucionRequest extends FormRequest
         $institucionId = $this->institucion?->id;
         
         return [
-            'nombre' => 'sometimes|required|string|max:255|min:3',
-            'siglas' => 'sometimes|required|string|max:10|min:2|unique:instituciones,siglas,' . $institucionId,
+            'nombre' => 'sometimes|string|max:255|min:3',
+            'siglas' => 'sometimes|string|max:10|min:2|unique:instituciones,siglas,' . $institucionId,
             'slogan' => 'nullable|string|max:255',
             'dane' => 'nullable|string|max:20',
             'resolucion_aprobacion' => 'nullable|string|max:100',

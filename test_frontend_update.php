@@ -4,6 +4,8 @@ require_once 'vendor/autoload.php';
 
 use App\Models\Institucion;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Support\Facades\Http;
 
 // Inicializar Laravel
 $app = require_once 'bootstrap/app.php';
@@ -128,4 +130,123 @@ try {
     echo "   Stack trace:\n" . $e->getTraceAsString() . "\n";
 }
 
-echo "\n🏁 SIMULACIÓN COMPLETADA\n"; 
+echo "\n🏁 SIMULACIÓN COMPLETADA\n";
+
+// Configurar la URL base
+$baseUrl = 'http://kampus.test/api/v1';
+
+// Datos de prueba (simulando el formulario del frontend)
+$institutionId = 1;
+$updateData = [
+    'nombre' => 'Institución Frontend Test',
+    'siglas' => 'IFT',
+    'slogan' => '', // Campo vacío para probar que se actualiza
+    'dane' => '',
+    'resolucion_aprobacion' => '',
+    'direccion' => 'Dirección de prueba',
+    'telefono' => '',
+    'email' => 'test@frontend.edu.co',
+    'rector' => 'Rector de Prueba'
+];
+
+echo "🔍 Probando actualización como frontend...\n";
+echo "ID: $institutionId\n";
+echo "Datos a actualizar: " . json_encode($updateData, JSON_PRETTY_PRINT) . "\n\n";
+
+try {
+    // 1. Obtener la institución actual
+    echo "📥 Obteniendo institución actual...\n";
+    $response = Http::get("$baseUrl/instituciones/$institutionId");
+    
+    if ($response->successful()) {
+        $currentData = $response->json('data');
+        echo "✅ Institución actual obtenida:\n";
+        echo "   Nombre: " . $currentData['nombre'] . "\n";
+        echo "   Siglas: " . $currentData['siglas'] . "\n";
+        echo "   Slogan: " . ($currentData['slogan'] ?? 'N/A') . "\n";
+        echo "   Email: " . ($currentData['email'] ?? 'N/A') . "\n\n";
+    } else {
+        echo "❌ Error al obtener institución: " . $response->status() . "\n";
+        echo $response->body() . "\n";
+        exit(1);
+    }
+
+    // 2. Simular FormData como lo hace el frontend
+    echo "🔄 Simulando FormData del frontend...\n";
+    
+    // Crear un archivo temporal para simular FormData
+    $tempFile = tempnam(sys_get_temp_dir(), 'test_');
+    file_put_contents($tempFile, 'test image content');
+    
+    // Simular FormData con campos vacíos incluidos
+    $formData = [];
+    foreach ($updateData as $key => $value) {
+        $formData[$key] = $value !== null ? $value : '';
+    }
+    
+    echo "📤 Datos a enviar:\n";
+    foreach ($formData as $key => $value) {
+        echo "   $key: '$value'\n";
+    }
+    echo "\n";
+
+    // 3. Actualizar la institución usando multipart/form-data
+    echo "🔄 Actualizando institución con FormData...\n";
+    $updateResponse = Http::attach('escudo', file_get_contents($tempFile), 'test.jpg', ['Content-Type' => 'image/jpeg'])
+        ->put("$baseUrl/instituciones/$institutionId", $formData);
+    
+    if ($updateResponse->successful()) {
+        $updatedData = $updateResponse->json('data');
+        echo "✅ Institución actualizada exitosamente:\n";
+        echo "   Nombre: " . $updatedData['nombre'] . "\n";
+        echo "   Siglas: " . $updatedData['siglas'] . "\n";
+        echo "   Slogan: " . ($updatedData['slogan'] ?? 'N/A') . "\n";
+        echo "   Email: " . ($updatedData['email'] ?? 'N/A') . "\n";
+        echo "   Escudo: " . ($updatedData['escudo'] ?? 'N/A') . "\n\n";
+    } else {
+        echo "❌ Error al actualizar institución: " . $updateResponse->status() . "\n";
+        echo $updateResponse->body() . "\n";
+        exit(1);
+    }
+
+    // 4. Verificar que los cambios se guardaron
+    echo "🔍 Verificando cambios...\n";
+    $verifyResponse = Http::get("$baseUrl/instituciones/$institutionId");
+    
+    if ($verifyResponse->successful()) {
+        $verifiedData = $verifyResponse->json('data');
+        echo "✅ Verificación completada:\n";
+        echo "   Nombre: " . $verifiedData['nombre'] . "\n";
+        echo "   Siglas: " . $verifiedData['siglas'] . "\n";
+        echo "   Slogan: " . ($verifiedData['slogan'] ?? 'N/A') . "\n";
+        echo "   Email: " . ($verifiedData['email'] ?? 'N/A') . "\n";
+        echo "   Escudo: " . ($verifiedData['escudo'] ?? 'N/A') . "\n\n";
+        
+        // Verificar que los cambios se aplicaron
+        $changesApplied = true;
+        foreach ($updateData as $field => $value) {
+            $actualValue = $verifiedData[$field] ?? null;
+            if ($actualValue !== $value) {
+                echo "❌ Campo '$field' no se actualizó correctamente\n";
+                echo "   Esperado: '$value'\n";
+                echo "   Actual: '$actualValue'\n";
+                $changesApplied = false;
+            }
+        }
+        
+        if ($changesApplied) {
+            echo "🎉 ¡Todos los cambios se aplicaron correctamente!\n";
+        } else {
+            echo "❌ Algunos cambios no se aplicaron\n";
+        }
+    } else {
+        echo "❌ Error al verificar cambios: " . $verifyResponse->status() . "\n";
+        echo $verifyResponse->body() . "\n";
+    }
+
+    // Limpiar archivo temporal
+    unlink($tempFile);
+
+} catch (Exception $e) {
+    echo "❌ Error: " . $e->getMessage() . "\n";
+} 

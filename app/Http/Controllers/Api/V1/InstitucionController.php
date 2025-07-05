@@ -332,14 +332,6 @@ class InstitucionController extends Controller
         // Manejar la carga del escudo si se proporciona
         if ($request->hasFile('escudo')) {
             try {
-                \Log::info('🔄 Intentando actualizar escudo', [
-                    'institucion_id' => $institucion->id,
-                    'file_size' => $request->file('escudo')->getSize(),
-                    'file_name' => $request->file('escudo')->getClientOriginalName(),
-                    'file_fields' => $institucion->fileFields,
-                    'file_paths' => $institucion->filePaths
-                ]);
-                
                 $result = $institucion->uploadFile($request->file('escudo'), 'escudo', [
                     'resize' => true,
                     'width' => 300,
@@ -351,18 +343,12 @@ class InstitucionController extends Controller
                     throw new \Exception('El método uploadFile retornó false');
                 }
                 
-                \Log::info('✅ Escudo actualizado exitosamente', [
-                    'institucion_id' => $institucion->id,
-                    'escudo_path' => $institucion->escudo
-                ]);
-                
                 // Remover el campo escudo de los datos ya que se maneja por separado
                 unset($data['escudo']);
             } catch (\Exception $e) {
                 \Log::error('❌ Error al actualizar escudo', [
                     'institucion_id' => $institucion->id,
-                    'error' => $e->getMessage(),
-                    'trace' => $e->getTraceAsString()
+                    'error' => $e->getMessage()
                 ]);
                 
                 // Limpiar el campo escudo si la carga falla

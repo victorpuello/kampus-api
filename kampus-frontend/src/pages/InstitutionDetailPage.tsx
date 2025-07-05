@@ -4,6 +4,7 @@ import { useAlertContext } from '../contexts/AlertContext';
 import { useConfirm } from '../hooks/useConfirm';
 import axiosClient from '../api/axiosClient';
 import { PageHeader, Button, Badge, Card, CardHeader, CardBody, LoadingSpinner } from '../components/ui';
+import ConfirmDialog from '../components/ui/ConfirmDialog';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE || 'http://kampus.test';
 
@@ -37,11 +38,16 @@ const InstitutionDetailPage: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { showSuccess, showError } = useAlertContext();
-  const { confirm } = useConfirm();
+  const { confirm, dialogState } = useConfirm();
   
   const [institution, setInstitution] = useState<Institution | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Log para monitorear el estado del dialogState
+  useEffect(() => {
+    console.log('🔍 dialogState cambió:', dialogState);
+  }, [dialogState]);
 
   // Validar ID antes de hacer fetch
   const isValidId = (id: string | undefined): boolean => {
@@ -92,6 +98,9 @@ const InstitutionDetailPage: React.FC = () => {
   }, [id, showError]);
 
   const handleDelete = async () => {
+    console.log('🔍 handleDelete ejecutado', { institution, institutionId: institution?.id });
+    console.log('🔍 Estado inicial dialogState:', dialogState);
+    
     if (!institution) {
       showError('No se puede eliminar una institución que no existe');
       return;
@@ -104,6 +113,9 @@ const InstitutionDetailPage: React.FC = () => {
       cancelText: 'Cancelar',
       variant: 'danger'
     });
+
+    console.log('🔍 Estado después de confirm:', dialogState);
+    console.log('🔍 Resultado de confirmación:', confirmed);
 
     if (confirmed) {
       try {
@@ -437,6 +449,19 @@ const InstitutionDetailPage: React.FC = () => {
           </dl>
         </CardBody>
       </Card>
+
+      {/* ConfirmDialog */}
+      <ConfirmDialog
+        isOpen={dialogState.isOpen}
+        title={dialogState.title || 'Confirmar acción'}
+        message={dialogState.message}
+        confirmText={dialogState.confirmText || 'Confirmar'}
+        cancelText={dialogState.cancelText || 'Cancelar'}
+        variant={dialogState.variant || 'danger'}
+        loading={dialogState.loading}
+        onConfirm={dialogState.onConfirm}
+        onCancel={dialogState.onCancel}
+      />
     </div>
   );
 };

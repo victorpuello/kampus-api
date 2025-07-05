@@ -36,37 +36,94 @@ class FileUploadService
         $filename = $this->generateFilename($file);
         $fullPath = $path . '/' . $filename;
 
+        \Log::info('🔄 Iniciando uploadImage', [
+            'filename' => $filename,
+            'path' => $path,
+            'fullPath' => $fullPath,
+            'file_size' => $file->getSize(),
+            'mime_type' => $file->getMimeType(),
+            'options' => $options
+        ]);
+
         // Procesar imagen si es necesario
         if (isset($options['resize']) && $options['resize']) {
-            $manager = new ImageManager(new Driver());
-            $image = $manager->read($file);
-            
-            if (isset($options['width']) && isset($options['height'])) {
-                $image->resize($options['width'], $options['height']);
-            }
+            try {
+                $manager = new ImageManager(new Driver());
+                $image = $manager->read($file);
+                
+                if (isset($options['width']) && isset($options['height'])) {
+                    $image->resize($options['width'], $options['height']);
+                }
 
-            // Guardar usando el storage de Laravel
-            $tempPath = 'temp/' . $filename;
-            if (isset($options['quality'])) {
-                $image->save(Storage::disk('public')->path($tempPath), $options['quality']);
-            } else {
-                $image->save(Storage::disk('public')->path($tempPath), 85);
+                // Crear directorio temp si no existe
+                Storage::disk('public')->makeDirectory('temp');
+
+                // Guardar usando el storage de Laravel
+                $tempPath = 'temp/' . $filename;
+                $quality = isset($options['quality']) ? $options['quality'] : 85;
+                
+                \Log::info('🔄 Guardando imagen temporal', [
+                    'tempPath' => $tempPath,
+                    'quality' => $quality
+                ]);
+
+                // Guardar directamente en el disco sin usar path físico
+                $imageData = $image->toJpeg($quality);
+                Storage::disk('public')->put($tempPath, $imageData);
+                
+                \Log::info('✅ Imagen temporal guardada', [
+                    'tempPath' => $tempPath,
+                    'exists' => Storage::disk('public')->exists($tempPath)
+                ]);
+
+                // Mover al destino final
+                if (Storage::disk('public')->exists($tempPath)) {
+                    Storage::disk('public')->move($tempPath, $fullPath);
+                    \Log::info('✅ Imagen movida al destino final', [
+                        'fullPath' => $fullPath,
+                        'exists' => Storage::disk('public')->exists($fullPath)
+                    ]);
+                } else {
+                    throw new \Exception('No se pudo guardar la imagen temporal');
+                }
+            } catch (\Exception $e) {
+                \Log::error('❌ Error procesando imagen', [
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+                throw $e;
             }
-            
-            // Mover al destino final
-            Storage::disk('public')->move($tempPath, $fullPath);
         } else {
             // Guardar archivo sin procesar
-            Storage::disk('public')->putFileAs($path, $file, $filename);
+            \Log::info('🔄 Guardando archivo sin procesar', [
+                'path' => $path,
+                'filename' => $filename
+            ]);
+            
+            $result = Storage::disk('public')->putFileAs($path, $file, $filename);
+            
+            \Log::info('✅ Archivo guardado sin procesar', [
+                'result' => $result,
+                'fullPath' => $fullPath,
+                'exists' => Storage::disk('public')->exists($fullPath)
+            ]);
+            
+            if (!$result) {
+                throw new \Exception('No se pudo guardar el archivo');
+            }
         }
 
-        return [
+        $result = [
             'filename' => $filename,
             'path' => $fullPath,
             'url' => Storage::disk('public')->url($fullPath),
             'size' => $file->getSize(),
             'mime_type' => $file->getMimeType(),
         ];
+
+        \Log::info('✅ UploadImage completado exitosamente', $result);
+
+        return $result;
     }
 
     /**

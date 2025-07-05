@@ -181,6 +181,32 @@ class Institucion extends Model
     }
 
     /**
+     * Mutador para el campo escudo - asigna imagen por defecto si está vacío
+     */
+    public function setEscudoAttribute($value)
+    {
+        // Si el valor está vacío o es null, asignar imagen por defecto
+        if (empty($value)) {
+            $this->attributes['escudo'] = 'instituciones/escudos/default.png';
+        } else {
+            $this->attributes['escudo'] = $value;
+        }
+    }
+
+    /**
+     * Accesor para el campo escudo - siempre retorna una URL válida
+     */
+    public function getEscudoAttribute($value)
+    {
+        // Si no hay valor o el archivo no existe, retornar imagen por defecto
+        if (empty($value) || !\Storage::disk('public')->exists($value)) {
+            return 'instituciones/escudos/default.png';
+        }
+        
+        return $value;
+    }
+
+    /**
      * Obtiene el nombre de la clave de ruta para el modelo.
      *
      * @return string

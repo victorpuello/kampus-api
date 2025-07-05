@@ -62,6 +62,7 @@ class InstitucionResource extends JsonResource
             'email' => $this->email,
             'rector' => $this->rector,
             'escudo' => $this->escudo ? asset('storage/' . $this->escudo) : null,
+            'escudo_url' => $this->escudo ? ($this->getFileUrl('escudo') ?? asset('storage/' . $this->escudo)) : null,
             'created_at' => $this->created_at ? $this->created_at->toISOString() : null,
             'updated_at' => $this->updated_at ? $this->updated_at->toISOString() : null,
         ];

@@ -152,4 +152,39 @@ class User extends Authenticatable
             $query->where('nombre', $permission);
         })->exists();
     }
+
+    /**
+     * Verifica si el usuario tiene un rol específico (por nombre o id).
+     *
+     * @param string|int $role Nombre o id del rol
+     * @return bool
+     */
+    public function hasRole($role): bool
+    {
+        if (is_numeric($role)) {
+            return $this->roles()->where('id', $role)->exists();
+        }
+        return $this->roles()->where('nombre', $role)->exists();
+    }
+
+    /**
+     * Permite verificar permisos usando el método can() de Laravel.
+     *
+     * @param string $ability
+     * @param array $arguments
+     * @return bool
+     */
+    public function can($ability, $arguments = [])
+    {
+        // Mapeo de alias de permisos
+        $map = [
+            'users.create' => 'crear_usuarios',
+            'users.view.any' => 'ver_usuarios',
+            'users.update.any' => 'editar_usuarios',
+            'users.delete.any' => 'eliminar_usuarios',
+            // Agrega otros alias si es necesario
+        ];
+        $permiso = $map[$ability] ?? $ability;
+        return $this->hasPermissionTo($permiso);
+    }
 }

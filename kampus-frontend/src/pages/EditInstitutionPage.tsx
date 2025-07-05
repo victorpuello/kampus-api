@@ -146,10 +146,12 @@ const EditInstitutionPage: React.FC = () => {
     try {
       const formDataToSend = new FormData();
       
-      // Agregar todos los campos de texto
+      // Agregar todos los campos de texto (incluyendo los vacíos)
       Object.keys(formData).forEach(key => {
-        if (key !== 'escudo' && key !== 'currentEscudoUrl' && formData[key as keyof InstitutionFormData]) {
-          formDataToSend.append(key, formData[key as keyof InstitutionFormData] as string);
+        if (key !== 'escudo' && key !== 'currentEscudoUrl') {
+          const value = formData[key as keyof InstitutionFormData];
+          // Enviar el valor incluso si está vacío para permitir limpiar campos
+          formDataToSend.append(key, value !== null && value !== undefined ? value : '');
         }
       });
       
@@ -158,7 +160,12 @@ const EditInstitutionPage: React.FC = () => {
         formDataToSend.append('escudo', formData.escudo);
       }
 
-      await axiosClient.put(`/instituciones/${id}`, formDataToSend, {
+      // Agregar el campo _method para que Laravel procese correctamente el update
+      formDataToSend.append('_method', 'PUT');
+
+      console.log('🔄 Enviando datos:', Object.fromEntries(formDataToSend.entries()));
+
+      await axiosClient.post(`/instituciones/${id}`, formDataToSend, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -170,6 +177,7 @@ const EditInstitutionPage: React.FC = () => {
       const errorMessage = error.response?.data?.message || 'Error al actualizar la institución';
       setError(errorMessage);
       showError(errorMessage);
+      console.error('❌ Error al actualizar:', error);
     } finally {
       setLoading(false);
     }

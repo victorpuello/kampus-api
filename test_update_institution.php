@@ -4,6 +4,8 @@ require_once 'vendor/autoload.php';
 
 use App\Models\Institucion;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Support\Facades\Http;
 
 // Inicializar Laravel
 $app = require_once 'bootstrap/app.php';
@@ -120,4 +122,89 @@ try {
     echo "   Stack trace: " . $e->getTraceAsString() . "\n";
 }
 
-echo "\n🏁 DIAGNÓSTICO COMPLETADO\n"; 
+echo "\n🏁 DIAGNÓSTICO COMPLETADO\n";
+
+// Script para probar el endpoint de actualización de institución
+$baseUrl = 'http://kampus.test/api/v1';
+
+// Datos de prueba
+$institutionId = 1;
+$updateData = [
+    'nombre' => 'Institución de Prueba Actualizada',
+    'siglas' => 'IPA',
+    'slogan' => 'Slogan de prueba actualizado',
+    'email' => 'test@institucion.edu.co'
+];
+
+echo "🔍 Probando actualización de institución...\n";
+echo "ID: $institutionId\n";
+echo "Datos a actualizar: " . json_encode($updateData, JSON_PRETTY_PRINT) . "\n\n";
+
+try {
+    // 1. Obtener la institución actual
+    echo "📥 Obteniendo institución actual...\n";
+    $response = Http::get("$baseUrl/instituciones/$institutionId");
+    
+    if ($response->successful()) {
+        $currentData = $response->json('data');
+        echo "✅ Institución actual obtenida:\n";
+        echo "   Nombre: " . $currentData['nombre'] . "\n";
+        echo "   Siglas: " . $currentData['siglas'] . "\n";
+        echo "   Slogan: " . ($currentData['slogan'] ?? 'N/A') . "\n\n";
+    } else {
+        echo "❌ Error al obtener institución: " . $response->status() . "\n";
+        echo $response->body() . "\n";
+        exit(1);
+    }
+
+    // 2. Actualizar la institución
+    echo "🔄 Actualizando institución...\n";
+    $updateResponse = Http::put("$baseUrl/instituciones/$institutionId", $updateData);
+    
+    if ($updateResponse->successful()) {
+        $updatedData = $updateResponse->json('data');
+        echo "✅ Institución actualizada exitosamente:\n";
+        echo "   Nombre: " . $updatedData['nombre'] . "\n";
+        echo "   Siglas: " . $updatedData['siglas'] . "\n";
+        echo "   Slogan: " . ($updatedData['slogan'] ?? 'N/A') . "\n\n";
+    } else {
+        echo "❌ Error al actualizar institución: " . $updateResponse->status() . "\n";
+        echo $updateResponse->body() . "\n";
+        exit(1);
+    }
+
+    // 3. Verificar que los cambios se guardaron
+    echo "🔍 Verificando cambios...\n";
+    $verifyResponse = Http::get("$baseUrl/instituciones/$institutionId");
+    
+    if ($verifyResponse->successful()) {
+        $verifiedData = $verifyResponse->json('data');
+        echo "✅ Verificación completada:\n";
+        echo "   Nombre: " . $verifiedData['nombre'] . "\n";
+        echo "   Siglas: " . $verifiedData['siglas'] . "\n";
+        echo "   Slogan: " . ($verifiedData['slogan'] ?? 'N/A') . "\n\n";
+        
+        // Verificar que los cambios se aplicaron
+        $changesApplied = true;
+        foreach ($updateData as $field => $value) {
+            if ($verifiedData[$field] !== $value) {
+                echo "❌ Campo '$field' no se actualizó correctamente\n";
+                echo "   Esperado: $value\n";
+                echo "   Actual: " . $verifiedData[$field] . "\n";
+                $changesApplied = false;
+            }
+        }
+        
+        if ($changesApplied) {
+            echo "🎉 ¡Todos los cambios se aplicaron correctamente!\n";
+        } else {
+            echo "❌ Algunos cambios no se aplicaron\n";
+        }
+    } else {
+        echo "❌ Error al verificar cambios: " . $verifyResponse->status() . "\n";
+        echo $verifyResponse->body() . "\n";
+    }
+
+} catch (Exception $e) {
+    echo "❌ Error: " . $e->getMessage() . "\n";
+} 

@@ -26,7 +26,21 @@ class InstitucionFactory extends Factory
             'telefono' => $this->faker->phoneNumber(),
             'email' => $this->faker->email(),
             'rector' => $this->faker->name(),
-            'escudo' => 'escudos/' . $this->faker->image('public/storage/escudos', 200, 200, null, false),
+            'escudo' => null,
         ];
+    }
+
+    /**
+     * Indica que la institución debe tener un escudo.
+     *
+     * @return static
+     */
+    public function withEscudo(): static
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'escudo' => 'escudos/test-escudo.jpg',
+            ];
+        });
     }
 }

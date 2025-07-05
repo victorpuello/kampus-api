@@ -9,6 +9,7 @@ import {
   DataTable,
   LoadingSpinner
 } from '../components/ui';
+import ConfirmDialog from '../components/ui/ConfirmDialog';
 
 interface Institution {
   id: number;
@@ -32,7 +33,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE || 'http://kampus.test';
 const InstitutionsListPage: React.FC = () => {
   const navigate = useNavigate();
   const { showSuccess, showError } = useAlertContext();
-  const { confirm } = useConfirm();
+  const { confirm, dialogState } = useConfirm();
   
   const [institutions, setInstitutions] = useState<Institution[]>([]);
   const [loading, setLoading] = useState(true);
@@ -85,6 +86,8 @@ const InstitutionsListPage: React.FC = () => {
   };
 
   const handleDelete = async (institution: Institution) => {
+    console.log('🔍 handleDelete (lista) ejecutado', { institution, institutionId: institution?.id });
+    
     const confirmed = await confirm({
       title: '¿Eliminar institución?',
       message: `¿Estás seguro de que quieres eliminar la institución "${institution.nombre}"? Esta acción no se puede deshacer.`,
@@ -288,6 +291,19 @@ const InstitutionsListPage: React.FC = () => {
         selectable={true}
         onSelectionChange={setSelectedInstitutions}
         bulkActions={bulkActions}
+      />
+
+      {/* ConfirmDialog */}
+      <ConfirmDialog
+        isOpen={dialogState.isOpen}
+        title={dialogState.title || 'Confirmar acción'}
+        message={dialogState.message}
+        confirmText={dialogState.confirmText || 'Confirmar'}
+        cancelText={dialogState.cancelText || 'Cancelar'}
+        variant={dialogState.variant || 'danger'}
+        loading={dialogState.loading}
+        onConfirm={dialogState.onConfirm}
+        onCancel={dialogState.onCancel}
       />
     </div>
   );

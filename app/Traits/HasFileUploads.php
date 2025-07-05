@@ -85,8 +85,11 @@ trait HasFileUploads
      */
     public function getFileUrl(string $field): ?string
     {
-        // Si no hay valor en el campo, retornar null
+        // Si no hay valor en el campo, retornar imagen por defecto para escudos
         if (!$this->$field) {
+            if ($field === 'escudo') {
+                return asset('storage/instituciones/escudos/default.png');
+            }
             return null;
         }
 
@@ -94,6 +97,14 @@ trait HasFileUploads
         if (empty($this->fileFields) || !in_array($field, $this->fileFields)) {
             $fileService = app(FileUploadService::class);
             return $fileService->getFileUrl($this->$field);
+        }
+
+        // Verificar si el archivo existe, si no, retornar imagen por defecto para escudos
+        if (!Storage::disk('public')->exists($this->$field)) {
+            if ($field === 'escudo') {
+                return asset('storage/instituciones/escudos/default.png');
+            }
+            return null;
         }
 
         $fileService = app(FileUploadService::class);
