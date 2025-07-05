@@ -38,15 +38,78 @@ class PermissionSeeder extends Seeder
             ['nombre' => 'editar_docentes', 'descripcion' => 'Modificar docentes'],
             ['nombre' => 'eliminar_docentes', 'descripcion' => 'Eliminar docentes'],
             
+            // Acudientes
+            ['nombre' => 'ver_acudientes', 'descripcion' => 'Ver lista de acudientes'],
+            ['nombre' => 'crear_acudientes', 'descripcion' => 'Crear nuevos acudientes'],
+            ['nombre' => 'editar_acudientes', 'descripcion' => 'Modificar acudientes'],
+            ['nombre' => 'eliminar_acudientes', 'descripcion' => 'Eliminar acudientes'],
+            
+            // Grados
+            ['nombre' => 'ver_grados', 'descripcion' => 'Ver lista de grados'],
+            ['nombre' => 'crear_grados', 'descripcion' => 'Crear nuevos grados'],
+            ['nombre' => 'editar_grados', 'descripcion' => 'Modificar grados'],
+            ['nombre' => 'eliminar_grados', 'descripcion' => 'Eliminar grados'],
+            
+            // Grupos
+            ['nombre' => 'ver_grupos', 'descripcion' => 'Ver lista de grupos'],
+            ['nombre' => 'crear_grupos', 'descripcion' => 'Crear nuevos grupos'],
+            ['nombre' => 'editar_grupos', 'descripcion' => 'Modificar grupos'],
+            ['nombre' => 'eliminar_grupos', 'descripcion' => 'Eliminar grupos'],
+            
+            // Areas
+            ['nombre' => 'ver_areas', 'descripcion' => 'Ver lista de áreas'],
+            ['nombre' => 'crear_areas', 'descripcion' => 'Crear nuevas áreas'],
+            ['nombre' => 'editar_areas', 'descripcion' => 'Modificar áreas'],
+            ['nombre' => 'eliminar_areas', 'descripcion' => 'Eliminar áreas'],
+            
+            // Asignaturas
+            ['nombre' => 'ver_asignaturas', 'descripcion' => 'Ver lista de asignaturas'],
+            ['nombre' => 'crear_asignaturas', 'descripcion' => 'Crear nuevas asignaturas'],
+            ['nombre' => 'editar_asignaturas', 'descripcion' => 'Modificar asignaturas'],
+            ['nombre' => 'eliminar_asignaturas', 'descripcion' => 'Eliminar asignaturas'],
+            
+            // Sedes
+            ['nombre' => 'ver_sedes', 'descripcion' => 'Ver lista de sedes'],
+            ['nombre' => 'crear_sedes', 'descripcion' => 'Crear nuevas sedes'],
+            ['nombre' => 'editar_sedes', 'descripcion' => 'Modificar sedes'],
+            ['nombre' => 'eliminar_sedes', 'descripcion' => 'Eliminar sedes'],
+            
+            // Años académicos
+            ['nombre' => 'ver_anios', 'descripcion' => 'Ver lista de años académicos'],
+            ['nombre' => 'crear_anios', 'descripcion' => 'Crear nuevos años académicos'],
+            ['nombre' => 'editar_anios', 'descripcion' => 'Modificar años académicos'],
+            ['nombre' => 'eliminar_anios', 'descripcion' => 'Eliminar años académicos'],
+            
+            // Períodos
+            ['nombre' => 'ver_periodos', 'descripcion' => 'Ver lista de períodos'],
+            ['nombre' => 'crear_periodos', 'descripcion' => 'Crear nuevos períodos'],
+            ['nombre' => 'editar_periodos', 'descripcion' => 'Modificar períodos'],
+            ['nombre' => 'eliminar_periodos', 'descripcion' => 'Eliminar períodos'],
+            
             // Notas
             ['nombre' => 'ver_notas', 'descripcion' => 'Ver notas de estudiantes'],
             ['nombre' => 'crear_notas', 'descripcion' => 'Crear nuevas notas'],
             ['nombre' => 'editar_notas', 'descripcion' => 'Modificar notas'],
             ['nombre' => 'eliminar_notas', 'descripcion' => 'Eliminar notas'],
+            
+            // Instituciones
+            ['nombre' => 'ver_instituciones', 'descripcion' => 'Ver lista de instituciones'],
+            ['nombre' => 'crear_instituciones', 'descripcion' => 'Crear nuevas instituciones'],
+            ['nombre' => 'editar_instituciones', 'descripcion' => 'Modificar instituciones'],
+            ['nombre' => 'eliminar_instituciones', 'descripcion' => 'Eliminar instituciones'],
+            
+            // Reportes
+            ['nombre' => 'ver_reportes', 'descripcion' => 'Ver reportes del sistema'],
+            ['nombre' => 'crear_reportes', 'descripcion' => 'Crear nuevos reportes'],
+            ['nombre' => 'editar_reportes', 'descripcion' => 'Modificar reportes'],
+            ['nombre' => 'eliminar_reportes', 'descripcion' => 'Eliminar reportes'],
         ];
 
         foreach ($permisos as $permiso) {
-            Permission::create($permiso);
+            Permission::updateOrCreate(
+                ['nombre' => $permiso['nombre']],
+                ['descripcion' => $permiso['descripcion']]
+            );
         }
     }
 } 

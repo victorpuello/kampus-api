@@ -2,16 +2,16 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Grado;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
  * @OA\Schema(
  *     schema="StoreGradoRequest",
  *     title="Solicitud para Crear Grado",
- *     required={"nombre", "nivel", "institucion_id"},
+ *     required={"nombre", "nivel"},
  *     @OA\Property(property="nombre", type="string", maxLength=255, description="Nombre del grado (ej. Primero, Undécimo)"),
- *     @OA\Property(property="nivel", type="integer", description="Nivel numérico del grado (ej. 1, 11)"),
- *     @OA\Property(property="institucion_id", type="integer", description="ID de la institución a la que pertenece el grado"),
+ *     @OA\Property(property="nivel", type="string", enum={"Preescolar", "Básica Primaria", "Básica Secundaria", "Educación Media"}, description="Nivel educativo del grado"),
  * )
  */
 class StoreGradoRequest extends FormRequest
@@ -31,10 +31,30 @@ class StoreGradoRequest extends FormRequest
      */
     public function rules(): array
     {
+        $user = auth()->user();
+        
+        if (!$user) {
+            return [
+                'nombre' => 'required|string|max:255',
+                'nivel' => 'required|string|in:' . implode(',', Grado::getNivelesDisponibles()),
+            ];
+        }
+        
         return [
-            'nombre' => 'required|string|max:255|unique:grados',
-            'nivel' => 'required|integer',
-            'institucion_id' => 'required|integer|exists:instituciones,id',
+            'nombre' => 'required|string|max:255|unique:grados,nombre,NULL,id,institucion_id,' . $user->institucion_id,
+            'nivel' => 'required|string|in:' . implode(',', Grado::getNivelesDisponibles()),
+        ];
+    }
+
+    /**
+     * Obtiene los mensajes de error personalizados para las reglas de validación.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'nivel.in' => 'El nivel debe ser uno de los siguientes: ' . implode(', ', Grado::getNivelesDisponibles()),
         ];
     }
 }

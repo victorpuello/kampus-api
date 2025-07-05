@@ -1,6 +1,8 @@
 import React from 'react';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
+import FormSelect from '../ui/FormSelect';
+import { useGradoNiveles } from '../../hooks/useGradoNiveles';
 
 export interface GradoFormValues {
   nombre: string;
@@ -26,6 +28,8 @@ export const GradoForm: React.FC<GradoFormProps> = ({
   errors = {},
   submitText = 'Guardar',
 }) => {
+  const { niveles, loading: loadingNiveles } = useGradoNiveles();
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     onChange({ ...values, [name]: value });
@@ -55,13 +59,16 @@ export const GradoForm: React.FC<GradoFormProps> = ({
         error={errors.descripcion}
         placeholder="Descripción opcional"
       />
-      <Input
-        label="Nivel"
+      <FormSelect
+        label="Nivel Educativo"
         name="nivel"
         value={values.nivel || ''}
         onChange={handleChange}
+        required
+        options={niveles}
+        placeholder="Selecciona un nivel educativo"
         error={errors.nivel}
-        placeholder="Ej: Básica, Media, Preescolar..."
+        disabled={loadingNiveles}
       />
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">Estado</label>

@@ -6,21 +6,19 @@ const axiosClient = axios.create({
   baseURL: API_CONFIG.baseURL,
   timeout: API_CONFIG.timeout,
   headers: API_CONFIG.headers,
-  withCredentials: API_CONFIG.withCredentials,
 })
 
-// Interceptor para agregar token de autenticación
+// Interceptor para agregar el token de autorización
 axiosClient.interceptors.request.use(
   (config) => {
     console.log('🚀 Enviando petición:', config.method?.toUpperCase(), config.url)
     
-    // Obtener el token del store
+    // Obtener el token del store de autenticación
     const token = useAuthStore.getState().token
     
-    // Agregar el token al header si existe
+    // Agregar el token al header de autorización si existe
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
-      console.log('🔑 Token agregado a la petición')
     }
     
     return config

@@ -17,6 +17,16 @@ interface Grado {
   grupos_count?: number;
 }
 
+interface GradosResponse {
+  data: Grado[];
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
+  from: number;
+  to: number;
+}
+
 const GradesListPage = () => {
   const navigate = useNavigate();
   const { showSuccess, showError } = useAlertContext();
@@ -24,13 +34,35 @@ const GradesListPage = () => {
   const [grados, setGrados] = useState<Grado[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Estados para paginación del servidor
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
-  const fetchGrados = async () => {
+  const fetchGrados = async (page = 1, perPage = 10, search = '') => {
     try {
       setLoading(true);
-      const response = await axiosClient.get('/grados');
-      console.log('Datos de grados recibidos:', response.data);
-      setGrados(response.data.data || response.data);
+      const params = new URLSearchParams({
+        page: page.toString(),
+        per_page: perPage.toString(),
+      });
+      
+      if (search) {
+        params.append('search', search);
+      }
+      
+      const response = await axiosClient.get(`/grados?${params.toString()}`);
+      const data: GradosResponse = response.data;
+      
+      console.log('Datos de grados recibidos:', data);
+      setGrados(data.data);
+      setTotalItems(data.total);
+      setTotalPages(data.last_page);
+      setCurrentPage(data.current_page);
+      setItemsPerPage(data.per_page);
       setError(null);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Error al cargar los grados');
@@ -40,8 +72,25 @@ const GradesListPage = () => {
   };
 
   useEffect(() => {
-    fetchGrados();
-  }, []);
+    fetchGrados(currentPage, itemsPerPage, searchTerm);
+  }, [currentPage, itemsPerPage, searchTerm]);
+
+  // Manejar cambio de página
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  // Manejar cambio de elementos por página
+  const handleItemsPerPageChange = (perPage: number) => {
+    setItemsPerPage(perPage);
+    setCurrentPage(1); // Resetear a la primera página
+  };
+
+  // Manejar búsqueda
+  const handleSearch = (search: string) => {
+    setSearchTerm(search);
+    setCurrentPage(1); // Resetear a la primera página
+  };
 
   const handleDelete = async (grado: Grado) => {
     const confirmed = await confirm({
@@ -58,7 +107,7 @@ const GradesListPage = () => {
       setConfirmLoading(true);
       await axiosClient.delete(`/grados/${grado.id}`);
       showSuccess('Grado eliminado exitosamente', 'Éxito');
-      fetchGrados();
+      fetchGrados(currentPage, itemsPerPage, searchTerm);
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Error al eliminar el grado';
       showError(errorMessage, 'Error');
@@ -85,7 +134,7 @@ const GradesListPage = () => {
         axiosClient.delete(`/grados/${grado.id}`)
       ));
       showSuccess(`${selectedGrados.length} grados eliminados exitosamente`, 'Éxito');
-      fetchGrados();
+      fetchGrados(currentPage, itemsPerPage, searchTerm);
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Error al eliminar los grados';
       showError(errorMessage, 'Error');
@@ -250,7 +299,7 @@ const GradesListPage = () => {
         searchKeys={['nombre', 'nivel', 'descripcion', 'estado']}
         sortable={true}
         pagination={true}
-        itemsPerPage={10}
+        itemsPerPage={itemsPerPage}
         itemsPerPageOptions={[5, 10, 25, 50]}
         emptyMessage="No hay grados registrados"
         emptyIcon={
@@ -261,6 +310,14 @@ const GradesListPage = () => {
         selectable={true}
         bulkActions={bulkActions}
         onRowClick={(grado) => navigate(`/grados/${grado.id}`)}
+        // Props para paginación del servidor
+        serverSidePagination={true}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={totalItems}
+        onPageChange={handlePageChange}
+        onItemsPerPageChange={handleItemsPerPageChange}
+        onSearch={handleSearch}
       />
 
       {/* ConfirmDialog */}

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
 import axiosClient from '../../api/axiosClient';
+import { useAuth } from '../../hooks/useAuth';
 
 export interface AsignaturaFormValues {
   nombre: string;
@@ -9,6 +10,7 @@ export interface AsignaturaFormValues {
   descripcion?: string;
   creditos?: number;
   area_id: number;
+  porcentaje_area: number;
   estado: 'activo' | 'inactivo';
   grados?: number[];
 }
@@ -18,12 +20,14 @@ interface Area {
   nombre: string;
   codigo?: string;
   color?: string;
+  institucion_id?: number;
 }
 
 interface Grado {
   id: number;
   nombre: string;
   nivel?: string;
+  institucion_id?: number;
 }
 
 interface AsignaturaFormProps {
@@ -43,6 +47,7 @@ export const AsignaturaForm: React.FC<AsignaturaFormProps> = ({
   errors = {},
   submitText = 'Guardar',
 }) => {
+  const { user } = useAuth();
   const [areas, setAreas] = useState<Area[]>([]);
   const [grados, setGrados] = useState<Grado[]>([]);
   const [loadingAreas, setLoadingAreas] = useState(true);
@@ -51,13 +56,15 @@ export const AsignaturaForm: React.FC<AsignaturaFormProps> = ({
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Cargar áreas
+        // Cargar áreas (ya filtradas por institución en el backend)
         const areasResponse = await axiosClient.get('/areas');
-        setAreas(areasResponse.data.data || areasResponse.data);
+        const areas = areasResponse.data.data || areasResponse.data;
+        setAreas(areas);
         
-        // Cargar grados
-        const gradosResponse = await axiosClient.get('/grados');
-        setGrados(gradosResponse.data.data || gradosResponse.data);
+        // Cargar grados (ya filtrados por institución en el backend)
+        const gradosResponse = await axiosClient.get('/grados?per_page=100');
+        const grados = gradosResponse.data.data || gradosResponse.data;
+        setGrados(grados);
       } catch (error) {
         console.error('Error al cargar datos:', error);
       } finally {
@@ -66,8 +73,10 @@ export const AsignaturaForm: React.FC<AsignaturaFormProps> = ({
       }
     };
 
-    fetchData();
-  }, []);
+    if (user?.institucion?.id) {
+      fetchData();
+    }
+  }, [user?.institucion?.id]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -168,6 +177,28 @@ export const AsignaturaForm: React.FC<AsignaturaFormProps> = ({
           )}
         </div>
 
+        {/* Porcentaje del Área */}
+        <div>
+          <label htmlFor="porcentaje_area" className="block text-sm font-medium text-gray-700 mb-2">
+            Porcentaje del Área *
+          </label>
+          <Input
+            id="porcentaje_area"
+            type="number"
+            min="0"
+            max="100"
+            step="0.1"
+            value={values.porcentaje_area || ''}
+            onChange={(e) => handleInputChange('porcentaje_area', Number(e.target.value))}
+            placeholder="Ej: 25.5"
+            error={errors.porcentaje_area}
+            required
+          />
+          <p className="mt-1 text-xs text-gray-500">
+            Porcentaje que representa esta asignatura dentro del área (0-100%)
+          </p>
+        </div>
+
         {/* Estado */}
         <div>
           <label htmlFor="estado" className="block text-sm font-medium text-gray-700 mb-2">
@@ -195,6 +226,11 @@ export const AsignaturaForm: React.FC<AsignaturaFormProps> = ({
         </label>
         {loadingGrados ? (
           <div className="text-sm text-gray-500">Cargando grados...</div>
+        ) : grados.length === 0 ? (
+          <div className="text-sm text-amber-600 bg-amber-50 p-3 rounded-lg border border-amber-200">
+            No hay grados disponibles para la institución "{user?.institucion?.nombre}". 
+            Contacta al administrador para crear grados en tu institución.
+          </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {grados.map((grado) => (

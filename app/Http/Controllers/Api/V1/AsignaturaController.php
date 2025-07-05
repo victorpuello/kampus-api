@@ -73,13 +73,25 @@ class AsignaturaController extends Controller
      */
     public function index(Request $request)
     {
+        $user = auth()->user();
+        
+        if (!$user) {
+            abort(401, 'Usuario no autenticado');
+        }
+        
         $query = Asignatura::query()
-            ->with('area')
+            ->with(['area.institucion'])
+            ->whereHas('area', function ($query) use ($user) {
+                $query->where('institucion_id', $user->institucion_id);
+            })
             ->when($request->search, function ($query, $search) {
                 $query->where('nombre', 'like', "%{$search}%");
             })
-            ->when($request->area_id, function ($query, $areaId) {
-                $query->where('area_id', $areaId);
+            ->when($request->area_id, function ($query, $areaId) use ($user) {
+                $query->where('area_id', $areaId)
+                      ->whereHas('area', function ($subQuery) use ($user) {
+                          $subQuery->where('institucion_id', $user->institucion_id);
+                      });
             });
 
         $asignaturas = $query->paginate($request->per_page ?? 10);
@@ -118,9 +130,21 @@ class AsignaturaController extends Controller
      */
     public function store(StoreAsignaturaRequest $request)
     {
+        $user = auth()->user();
+        
+        if (!$user) {
+            abort(401, 'Usuario no autenticado');
+        }
+        
+        // Verificar que el área seleccionada pertenece a la institución del usuario
+        $area = \App\Models\Area::find($request->area_id);
+        if (!$area || $area->institucion_id !== $user->institucion_id) {
+            abort(403, 'No tienes permisos para crear asignaturas en esta área');
+        }
+        
         $asignatura = Asignatura::create($request->validated());
 
-        return new AsignaturaResource($asignatura->load('area'));
+        return new AsignaturaResource($asignatura->load(['area.institucion']));
     }
 
     /**
@@ -157,7 +181,18 @@ class AsignaturaController extends Controller
      */
     public function show(Asignatura $asignatura)
     {
-        return new AsignaturaResource($asignatura->load('area'));
+        $user = auth()->user();
+        
+        if (!$user) {
+            abort(401, 'Usuario no autenticado');
+        }
+        
+        // Verificar que la asignatura pertenece a la institución del usuario
+        if ($asignatura->area->institucion_id !== $user->institucion_id) {
+            abort(403, 'No tienes permisos para acceder a esta asignatura');
+        }
+        
+        return new AsignaturaResource($asignatura->load(['area.institucion']));
     }
 
     /**
@@ -202,9 +237,28 @@ class AsignaturaController extends Controller
      */
     public function update(UpdateAsignaturaRequest $request, Asignatura $asignatura)
     {
+        $user = auth()->user();
+        
+        if (!$user) {
+            abort(401, 'Usuario no autenticado');
+        }
+        
+        // Verificar que la asignatura pertenece a la institución del usuario
+        if ($asignatura->area->institucion_id !== $user->institucion_id) {
+            abort(403, 'No tienes permisos para editar esta asignatura');
+        }
+        
+        // Si se está cambiando el área, verificar que la nueva área también pertenece a la institución
+        if ($request->has('area_id') && $request->area_id !== $asignatura->area_id) {
+            $newArea = \App\Models\Area::find($request->area_id);
+            if (!$newArea || $newArea->institucion_id !== $user->institucion_id) {
+                abort(403, 'No tienes permisos para asignar esta área');
+            }
+        }
+        
         $asignatura->update($request->validated());
 
-        return new AsignaturaResource($asignatura->load('area'));
+        return new AsignaturaResource($asignatura->load(['area.institucion']));
     }
 
     /**
@@ -240,6 +294,17 @@ class AsignaturaController extends Controller
      */
     public function destroy(Asignatura $asignatura)
     {
+        $user = auth()->user();
+        
+        if (!$user) {
+            abort(401, 'Usuario no autenticado');
+        }
+        
+        // Verificar que la asignatura pertenece a la institución del usuario
+        if ($asignatura->area->institucion_id !== $user->institucion_id) {
+            abort(403, 'No tienes permisos para eliminar esta asignatura');
+        }
+        
         $asignatura->delete();
 
         return response()->noContent();

@@ -18,7 +18,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *     @OA\Property(property="telefono", type="string", description="Teléfono del estudiante"),
  *     @OA\Property(property="estado", type="string", description="Estado del estudiante (activo, inactivo)"),
  *     @OA\Property(property="user", type="object", ref="#/components/schemas/UserResource", description="Datos del usuario asociado al estudiante"),
- *     @OA\Property(property="institucion", type="object", ref="#/components/schemas/InstitucionResource", description="Institución a la que pertenece el estudiante"),
+ *     @OA\Property(property="grupo", type="object", ref="#/components/schemas/GrupoResource", description="Grupo al que pertenece el estudiante"),
  *     @OA\Property(property="acudiente", type="object", ref="#/components/schemas/AcudienteResource", description="Acudiente principal del estudiante"),
  *     @OA\Property(property="acudientes", type="array", @OA\Items(ref="#/components/schemas/AcudienteResource"), description="Acudientes asociados al estudiante"),
  * )
@@ -40,8 +40,9 @@ class StudentResource extends JsonResource
             'direccion' => $this->direccion,
             'telefono' => $this->telefono,
             'estado' => $this->estado,
-            'user' => new UserResource($this->whenLoaded('user')),
-            'institucion' => new InstitucionResource($this->whenLoaded('institucion')),
+            'user' => $this->user ? new UserResource($this->user) : null,
+            'grupo' => $this->grupo ? new GrupoResource($this->grupo) : null,
+            'institucion' => $this->institucion ? new InstitucionResource($this->institucion) : null,
             'acudiente' => $this->whenLoaded('acudiente', function () {
                 return $this->acudiente->first() ? new AcudienteResource($this->acudiente->first()) : null;
             }),

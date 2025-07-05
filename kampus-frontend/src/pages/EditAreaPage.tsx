@@ -5,11 +5,13 @@ import { useAlertContext } from '../contexts/AlertContext';
 import { Card, CardHeader, CardBody } from '../components/ui/Card';
 import { AreaForm } from '../components/areas/AreaForm';
 import type { AreaFormValues } from '../components/areas/AreaForm';
+import { useAuthStore } from '../store/authStore';
 
 const EditAreaPage = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { showSuccess, showError } = useAlertContext();
+  const { user } = useAuthStore();
   const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
   const [errors, setErrors] = useState<Partial<Record<keyof AreaFormValues, string>>>({});
@@ -20,6 +22,7 @@ const EditAreaPage = () => {
     codigo: '',
     color: '#3B82F6',
     estado: 'activo',
+    institucion_id: user?.institucion?.id || 0,
   };
 
   const [values, setValues] = useState<AreaFormValues>(initialValues);
@@ -31,12 +34,20 @@ const EditAreaPage = () => {
         const response = await axiosClient.get(`/areas/${id}`);
         const area = response.data.data || response.data;
         
+        // Verificar que el usuario tenga permisos para editar esta área
+        if (user?.institucion && area.institucion_id !== user.institucion.id) {
+          showError('No tienes permisos para editar áreas de otras instituciones', 'Error de permisos');
+          navigate('/areas');
+          return;
+        }
+
         setValues({
           nombre: area.nombre,
           descripcion: area.descripcion || '',
           codigo: area.codigo || '',
           color: area.color || '#3B82F6',
           estado: area.estado,
+          institucion_id: area.institucion_id || user?.institucion?.id || 0,
         });
       } catch (err: any) {
         showError(err.response?.data?.message || 'Error al cargar el área', 'Error');

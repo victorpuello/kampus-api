@@ -73,13 +73,17 @@ class GradoController extends Controller
      */
     public function index(Request $request)
     {
+        $user = auth()->user();
+        
+        if (!$user) {
+            abort(401, 'Usuario no autenticado');
+        }
+        
         $query = Grado::query()
             ->with('institucion')
+            ->where('institucion_id', $user->institucion_id)
             ->when($request->search, function ($query, $search) {
                 $query->where('nombre', 'like', "%{$search}%");
-            })
-            ->when($request->institucion_id, function ($query, $institucionId) {
-                $query->where('institucion_id', $institucionId);
             });
 
         $grados = $query->paginate($request->per_page ?? 10);
@@ -118,7 +122,17 @@ class GradoController extends Controller
      */
     public function store(StoreGradoRequest $request)
     {
-        $grado = Grado::create($request->validated());
+        $user = auth()->user();
+        
+        if (!$user) {
+            abort(401, 'Usuario no autenticado');
+        }
+        
+        // Asegurar que el grado se crea para la institución del usuario
+        $data = $request->validated();
+        $data['institucion_id'] = $user->institucion_id;
+        
+        $grado = Grado::create($data);
 
         return new GradoResource($grado->load('institucion'));
     }
@@ -157,6 +171,17 @@ class GradoController extends Controller
      */
     public function show(Grado $grado)
     {
+        $user = auth()->user();
+        
+        if (!$user) {
+            abort(401, 'Usuario no autenticado');
+        }
+        
+        // Verificar que el grado pertenece a la institución del usuario
+        if ($grado->institucion_id !== $user->institucion_id) {
+            abort(403, 'No tienes permisos para acceder a este grado');
+        }
+        
         return new GradoResource($grado->load('institucion'));
     }
 
@@ -202,6 +227,17 @@ class GradoController extends Controller
      */
     public function update(UpdateGradoRequest $request, Grado $grado)
     {
+        $user = auth()->user();
+        
+        if (!$user) {
+            abort(401, 'Usuario no autenticado');
+        }
+        
+        // Verificar que el grado pertenece a la institución del usuario
+        if ($grado->institucion_id !== $user->institucion_id) {
+            abort(403, 'No tienes permisos para editar este grado');
+        }
+        
         $grado->update($request->validated());
 
         return new GradoResource($grado->load('institucion'));
@@ -240,8 +276,50 @@ class GradoController extends Controller
      */
     public function destroy(Grado $grado)
     {
+        $user = auth()->user();
+        
+        if (!$user) {
+            abort(401, 'Usuario no autenticado');
+        }
+        
+        // Verificar que el grado pertenece a la institución del usuario
+        if ($grado->institucion_id !== $user->institucion_id) {
+            abort(403, 'No tienes permisos para eliminar este grado');
+        }
+        
         $grado->delete();
 
         return response()->noContent();
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/v1/grados/niveles",
+     *     summary="Obtiene la lista de niveles educativos disponibles",
+     *     tags={"Grados"},
+     *     security={{"sanctum":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Lista de niveles obtenida exitosamente",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(type="string", example="Preescolar")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="No autenticado",
+     *     )
+     * )
+     */
+    public function niveles()
+    {
+        return response()->json([
+            'data' => Grado::getNivelesDisponibles()
+        ]);
     }
 }

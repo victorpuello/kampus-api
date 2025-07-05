@@ -30,6 +30,9 @@ class DocenteResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'nombre' => $this->user?->nombre,
+            'apellido' => $this->user?->apellido,
+            'email' => $this->user?->email,
             'user' => new UserResource($this->whenLoaded('user')),
             'telefono' => $this->telefono,
             'especialidad' => $this->especialidad,

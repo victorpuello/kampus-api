@@ -8,26 +8,70 @@ use Illuminate\Http\Resources\Json\JsonResource;
 /**
  * @OA\Schema(
  *     schema="InstitucionResource",
- *     title="Recurso de Institución",
- *     description="Representación de una institución en la API",
- *     @OA\Property(property="id", type="integer", description="ID de la institución"),
- *     @OA\Property(property="nombre", type="string", description="Nombre de la institución"),
- *     @OA\Property(property="siglas", type="string", description="Siglas de la institución"),
+ *     title="Institucion Resource",
+ *     description="Recurso de institución",
+ *     @OA\Property(property="id", type="integer", example=1),
+ *     @OA\Property(property="nombre", type="string", example="Institución Educativa Ejemplo"),
+ *     @OA\Property(property="siglas", type="string", example="IEE"),
+ *     @OA\Property(property="slogan", type="string", example="Educando para el futuro"),
+ *     @OA\Property(property="dane", type="string", example="123456789"),
+ *     @OA\Property(property="resolucion_aprobacion", type="string", example="Resolución 1234 de 2020"),
+ *     @OA\Property(property="direccion", type="string", example="Calle 123 #45-67"),
+ *     @OA\Property(property="telefono", type="string", example="3001234567"),
+ *     @OA\Property(property="email", type="string", example="info@institucion.edu.co"),
+ *     @OA\Property(property="rector", type="string", example="Dr. Juan Pérez"),
+ *     @OA\Property(property="escudo", type="string", example="escudos/institucion.png"),
+ *     @OA\Property(property="created_at", type="string", format="date-time"),
+ *     @OA\Property(property="updated_at", type="string", format="date-time"),
+ *     @OA\Property(
+ *         property="sedes",
+ *         type="array",
+ *         @OA\Items(ref="#/components/schemas/SedeResource")
+ *     )
  * )
  */
 class InstitucionResource extends JsonResource
 {
     /**
-     * Transforma el recurso en un array.
+     * Transform the resource into an array.
      *
      * @return array<string, mixed>
      */
     public function toArray(Request $request): array
     {
-        return [
+        // Debug: Log de los datos que se van a enviar
+        \Log::info('📦 InstitucionResource - Datos a enviar', [
+            'id' => $this->id,
+            'nombre' => $this->nombre,
+            'escudo_raw' => $this->escudo,
+            'escudo_asset' => $this->escudo ? asset('storage/' . $this->escudo) : null,
+            'escudo_getFileUrl' => $this->escudo ? $this->getFileUrl('escudo') : null,
+            'request_url' => $request->fullUrl(),
+            'request_method' => $request->method()
+        ]);
+
+        $data = [
             'id' => $this->id,
             'nombre' => $this->nombre,
             'siglas' => $this->siglas,
+            'slogan' => $this->slogan,
+            'dane' => $this->dane,
+            'resolucion_aprobacion' => $this->resolucion_aprobacion,
+            'direccion' => $this->direccion,
+            'telefono' => $this->telefono,
+            'email' => $this->email,
+            'rector' => $this->rector,
+            'escudo' => $this->escudo ? asset('storage/' . $this->escudo) : null,
+            'escudo_url' => $this->escudo ? ($this->getFileUrl('escudo') ?? asset('storage/' . $this->escudo)) : null,
+            'created_at' => $this->created_at ? $this->created_at->toISOString() : null,
+            'updated_at' => $this->updated_at ? $this->updated_at->toISOString() : null,
         ];
+
+        // Solo incluir sedes si están cargadas
+        if ($this->relationLoaded('sedes')) {
+            $data['sedes'] = SedeResource::collection($this->sedes);
+        }
+
+        return $data;
     }
 }

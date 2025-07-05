@@ -46,6 +46,20 @@ class DocenteController extends Controller
      *         required=false,
      *         @OA\Schema(type="string")
      *     ),
+     *     @OA\Parameter(
+     *         name="disponibles_grupo",
+     *         in="query",
+     *         description="Filtrar solo docentes disponibles para ser directores de grupo",
+     *         required=false,
+     *         @OA\Schema(type="boolean")
+     *     ),
+     *     @OA\Parameter(
+     *         name="institucion_id",
+     *         in="query",
+     *         description="Filtrar docentes por institución",
+     *         required=false,
+     *         @OA\Schema(type="integer")
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="Lista de docentes obtenida exitosamente",
@@ -74,9 +88,75 @@ class DocenteController extends Controller
                         ->orWhere('apellido', 'like', "%{$search}%")
                         ->orWhere('email', 'like', "%{$search}%");
                 });
+            })
+            ->when($request->disponibles_grupo, function ($query) {
+                $query->disponiblesParaGrupo();
+            })
+            ->when($request->institucion_id, function ($query, $institucionId) {
+                $query->porInstitucion($institucionId);
             });
 
         $docentes = $query->paginate($request->per_page ?? 10);
+
+        return DocenteResource::collection($docentes);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/v1/docentes/disponibles-grupo",
+     *     summary="Obtiene docentes disponibles para ser directores de grupo",
+     *     tags={"Docentes"},
+     *     security={{"sanctum":{}}},
+     *     @OA\Parameter(
+     *         name="institucion_id",
+     *         in="query",
+     *         description="Filtrar docentes por institución",
+     *         required=false,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Parameter(
+     *         name="grupo_id",
+     *         in="query",
+     *         description="ID del grupo (para incluir el director actual en edición)",
+     *         required=false,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Lista de docentes disponibles obtenida exitosamente",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/DocenteResource")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="No autenticado",
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Acceso denegado",
+     *     )
+     * )
+     */
+    public function disponiblesGrupo(Request $request)
+    {
+        $query = Docente::query()
+            ->with(['user.institucion'])
+            ->disponiblesParaGrupo()
+            ->when($request->institucion_id, function ($query, $institucionId) {
+                $query->porInstitucion($institucionId);
+            });
+
+        // Si se está editando un grupo, incluir el director actual
+        if ($request->grupo_id) {
+            $grupo = \App\Models\Grupo::find($request->grupo_id);
+            if ($grupo && $grupo->director_docente_id) {
+                $query->orWhere('id', $grupo->director_docente_id);
+            }
+        }
+
+        $docentes = $query->get();
 
         return DocenteResource::collection($docentes);
     }

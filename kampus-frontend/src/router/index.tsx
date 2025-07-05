@@ -2,6 +2,8 @@ import { createBrowserRouter, Outlet, Navigate } from 'react-router-dom'
 import DashboardLayout from '../components/layouts/DashboardLayout'
 import LoginPage from '../pages/LoginPage'
 import ProtectedRoute from './ProtectedRoute'
+import PermissionRoute from './PermissionRoute'
+import NoAutorizadoPage from '../pages/NoAutorizadoPage'
 import StudentsListPage from '../pages/StudentsListPage'
 import StudentDetailPage from '../pages/StudentDetailPage'
 import CreateStudentPage from '../pages/CreateStudentPage'
@@ -35,11 +37,36 @@ import AsignaturasListPage from '../pages/AsignaturasListPage'
 import AsignaturaDetailPage from '../pages/AsignaturaDetailPage'
 import CreateAsignaturaPage from '../pages/CreateAsignaturaPage'
 import EditAsignaturaPage from '../pages/EditAsignaturaPage'
+import InstitutionsListPage from '../pages/InstitutionsListPage'
+import InstitutionDetailPage from '../pages/InstitutionDetailPage'
+import CreateInstitutionPage from '../pages/CreateInstitutionPage'
+import EditInstitutionPage from '../pages/EditInstitutionPage'
+import SedesListPage from '../pages/SedesListPage'
+import SedeDetailPage from '../pages/SedeDetailPage'
+import CreateSedePage from '../pages/CreateSedePage'
+import EditSedePage from '../pages/EditSedePage'
+import InstitutionSedesPage from '../pages/InstitutionSedesPage'
+import InstitutionSedeDetailPage from '../pages/InstitutionSedeDetailPage'
+import InstitutionSedeEditPage from '../pages/InstitutionSedeEditPage'
+import InstitutionSedeCreatePage from '../pages/InstitutionSedeCreatePage'
+import AcademicYearsListPage from '../pages/AcademicYearsListPage'
+import CreateAcademicYearPage from '../pages/CreateAcademicYearPage'
+import EditAcademicYearPage from '../pages/EditAcademicYearPage'
+import AcademicYearDetailPage from '../pages/AcademicYearDetailPage'
+import AnioPeriodosListPage from '../pages/AnioPeriodosListPage'
+import AnioPeriodoDetailPage from '../pages/AnioPeriodoDetailPage'
+import AnioCreatePeriodoPage from '../pages/AnioCreatePeriodoPage'
+import AnioEditPeriodoPage from '../pages/AnioEditPeriodoPage'
+
 
 export const router = createBrowserRouter([
   {
     path: '/login',
     element: <LoginPage />,
+  },
+  {
+    path: '/no-autorizado',
+    element: <NoAutorizadoPage />,
   },
   {
     path: '/',
@@ -55,132 +82,405 @@ export const router = createBrowserRouter([
       },
       {
         path: 'estudiantes',
-        element: <DashboardLayout><StudentsListPage /></DashboardLayout>
+        element: (
+          <PermissionRoute permission="ver_estudiantes">
+            <DashboardLayout><StudentsListPage /></DashboardLayout>
+          </PermissionRoute>
+        )
       },
       {
         path: 'estudiantes/crear',
-        element: <DashboardLayout><CreateStudentPage /></DashboardLayout>
+        element: (
+          <PermissionRoute permission="crear_estudiantes">
+            <DashboardLayout><CreateStudentPage /></DashboardLayout>
+          </PermissionRoute>
+        )
       },
       {
         path: 'estudiantes/:id',
-        element: <DashboardLayout><StudentDetailPage /></DashboardLayout>
+        element: (
+          <PermissionRoute permission="ver_estudiantes">
+            <DashboardLayout><StudentDetailPage /></DashboardLayout>
+          </PermissionRoute>
+        )
       },
       {
         path: 'estudiantes/:id/editar',
-        element: <DashboardLayout><EditStudentPage /></DashboardLayout>
+        element: (
+          <PermissionRoute permission="editar_estudiantes">
+            <DashboardLayout><EditStudentPage /></DashboardLayout>
+          </PermissionRoute>
+        )
       },
       {
         path: 'docentes',
-        element: <DashboardLayout><TeachersListPage /></DashboardLayout>
+        element: (
+          <PermissionRoute permission="ver_docentes">
+            <DashboardLayout><TeachersListPage /></DashboardLayout>
+          </PermissionRoute>
+        )
       },
       {
         path: 'docentes/crear',
-        element: <DashboardLayout><CreateTeacherPage /></DashboardLayout>
+        element: (
+          <PermissionRoute permission="crear_docentes">
+            <DashboardLayout><CreateTeacherPage /></DashboardLayout>
+          </PermissionRoute>
+        )
       },
       {
         path: 'docentes/:id',
-        element: <DashboardLayout><TeacherDetailPage /></DashboardLayout>
+        element: (
+          <PermissionRoute permission="ver_docentes">
+            <DashboardLayout><TeacherDetailPage /></DashboardLayout>
+          </PermissionRoute>
+        )
       },
       {
         path: 'docentes/:id/editar',
-        element: <DashboardLayout><EditTeacherPage /></DashboardLayout>
+        element: (
+          <PermissionRoute permission="editar_docentes">
+            <DashboardLayout><EditTeacherPage /></DashboardLayout>
+          </PermissionRoute>
+        )
       },
       {
         path: 'acudientes',
-        element: <DashboardLayout><GuardiansListPage /></DashboardLayout>
+        element: (
+          <PermissionRoute permission="ver_acudientes">
+            <DashboardLayout><GuardiansListPage /></DashboardLayout>
+          </PermissionRoute>
+        )
       },
       {
         path: 'acudientes/crear',
-        element: <DashboardLayout><CreateGuardianPage /></DashboardLayout>
+        element: (
+          <PermissionRoute permission="crear_acudientes">
+            <DashboardLayout><CreateGuardianPage /></DashboardLayout>
+          </PermissionRoute>
+        )
       },
       {
         path: 'acudientes/:id',
-        element: <DashboardLayout><GuardianDetailPage /></DashboardLayout>
+        element: (
+          <PermissionRoute permission="ver_acudientes">
+            <DashboardLayout><GuardianDetailPage /></DashboardLayout>
+          </PermissionRoute>
+        )
       },
       {
         path: 'acudientes/:id/editar',
-        element: <DashboardLayout><EditGuardianPage /></DashboardLayout>
+        element: (
+          <PermissionRoute permission="editar_acudientes">
+            <DashboardLayout><EditGuardianPage /></DashboardLayout>
+          </PermissionRoute>
+        )
       },
       {
         path: 'usuarios',
-        element: <DashboardLayout><UsersListPage /></DashboardLayout>
+        element: (
+          <PermissionRoute permission="ver_usuarios">
+            <DashboardLayout><UsersListPage /></DashboardLayout>
+          </PermissionRoute>
+        )
       },
       {
         path: 'usuarios/crear',
-        element: <DashboardLayout><CreateUserPage /></DashboardLayout>
+        element: (
+          <PermissionRoute permission="crear_usuarios">
+            <DashboardLayout><CreateUserPage /></DashboardLayout>
+          </PermissionRoute>
+        )
       },
       {
         path: 'usuarios/:id',
-        element: <DashboardLayout><UserDetailPage /></DashboardLayout>
+        element: (
+          <PermissionRoute permission="ver_usuarios">
+            <DashboardLayout><UserDetailPage /></DashboardLayout>
+          </PermissionRoute>
+        )
       },
       {
         path: 'usuarios/:id/editar',
-        element: <DashboardLayout><EditUserPage /></DashboardLayout>
+        element: (
+          <PermissionRoute permission="editar_usuarios">
+            <DashboardLayout><EditUserPage /></DashboardLayout>
+          </PermissionRoute>
+        )
       },
       {
         path: 'grados',
-        element: <DashboardLayout><GradesListPage /></DashboardLayout>
+        element: (
+          <PermissionRoute permission="ver_grados">
+            <DashboardLayout><GradesListPage /></DashboardLayout>
+          </PermissionRoute>
+        )
       },
       {
         path: 'grados/crear',
-        element: <DashboardLayout><CreateGradePage /></DashboardLayout>
+        element: (
+          <PermissionRoute permission="crear_grados">
+            <DashboardLayout><CreateGradePage /></DashboardLayout>
+          </PermissionRoute>
+        )
       },
       {
         path: 'grados/:id',
-        element: <DashboardLayout><GradeDetailPage /></DashboardLayout>
+        element: (
+          <PermissionRoute permission="ver_grados">
+            <DashboardLayout><GradeDetailPage /></DashboardLayout>
+          </PermissionRoute>
+        )
       },
       {
         path: 'grados/:id/editar',
-        element: <DashboardLayout><EditGradePage /></DashboardLayout>
+        element: (
+          <PermissionRoute permission="editar_grados">
+            <DashboardLayout><EditGradePage /></DashboardLayout>
+          </PermissionRoute>
+        )
       },
       {
         path: 'grupos',
-        element: <DashboardLayout><GroupsListPage /></DashboardLayout>
+        element: (
+          <PermissionRoute permission="ver_grupos">
+            <DashboardLayout><GroupsListPage /></DashboardLayout>
+          </PermissionRoute>
+        )
       },
       {
         path: 'grupos/crear',
-        element: <DashboardLayout><CreateGroupPage /></DashboardLayout>
+        element: (
+          <PermissionRoute permission="crear_grupos">
+            <DashboardLayout><CreateGroupPage /></DashboardLayout>
+          </PermissionRoute>
+        )
       },
       {
         path: 'grupos/:id',
-        element: <DashboardLayout><GroupDetailPage /></DashboardLayout>
+        element: (
+          <PermissionRoute permission="ver_grupos">
+            <DashboardLayout><GroupDetailPage /></DashboardLayout>
+          </PermissionRoute>
+        )
       },
       {
         path: 'grupos/:id/editar',
-        element: <DashboardLayout><EditGroupPage /></DashboardLayout>
+        element: (
+          <PermissionRoute permission="editar_grupos">
+            <DashboardLayout><EditGroupPage /></DashboardLayout>
+          </PermissionRoute>
+        )
       },
       {
         path: 'areas',
-        element: <DashboardLayout><AreasListPage /></DashboardLayout>
+        element: (
+          <PermissionRoute permission="ver_areas">
+            <DashboardLayout><AreasListPage /></DashboardLayout>
+          </PermissionRoute>
+        )
       },
       {
         path: 'areas/crear',
-        element: <DashboardLayout><CreateAreaPage /></DashboardLayout>
+        element: (
+          <PermissionRoute permission="crear_areas">
+            <DashboardLayout><CreateAreaPage /></DashboardLayout>
+          </PermissionRoute>
+        )
       },
       {
         path: 'areas/:id',
-        element: <DashboardLayout><AreaDetailPage /></DashboardLayout>
+        element: (
+          <PermissionRoute permission="ver_areas">
+            <DashboardLayout><AreaDetailPage /></DashboardLayout>
+          </PermissionRoute>
+        )
       },
       {
         path: 'areas/:id/editar',
-        element: <DashboardLayout><EditAreaPage /></DashboardLayout>
+        element: (
+          <PermissionRoute permission="editar_areas">
+            <DashboardLayout><EditAreaPage /></DashboardLayout>
+          </PermissionRoute>
+        )
       },
       {
         path: 'asignaturas',
-        element: <DashboardLayout><AsignaturasListPage /></DashboardLayout>
+        element: (
+          <PermissionRoute permission="ver_asignaturas">
+            <DashboardLayout><AsignaturasListPage /></DashboardLayout>
+          </PermissionRoute>
+        )
       },
       {
         path: 'asignaturas/crear',
-        element: <DashboardLayout><CreateAsignaturaPage /></DashboardLayout>
+        element: (
+          <PermissionRoute permission="crear_asignaturas">
+            <DashboardLayout><CreateAsignaturaPage /></DashboardLayout>
+          </PermissionRoute>
+        )
       },
       {
         path: 'asignaturas/:id',
-        element: <DashboardLayout><AsignaturaDetailPage /></DashboardLayout>
+        element: (
+          <PermissionRoute permission="ver_asignaturas">
+            <DashboardLayout><AsignaturaDetailPage /></DashboardLayout>
+          </PermissionRoute>
+        )
       },
       {
         path: 'asignaturas/:id/editar',
-        element: <DashboardLayout><EditAsignaturaPage /></DashboardLayout>
-      }
+        element: (
+          <PermissionRoute permission="editar_asignaturas">
+            <DashboardLayout><EditAsignaturaPage /></DashboardLayout>
+          </PermissionRoute>
+        )
+      },
+      {
+        path: 'instituciones',
+        element: (
+          <PermissionRoute permission="ver_instituciones">
+            <DashboardLayout><InstitutionsListPage /></DashboardLayout>
+          </PermissionRoute>
+        )
+      },
+      {
+        path: 'instituciones/crear',
+        element: (
+          <PermissionRoute permission="crear_instituciones">
+            <DashboardLayout><CreateInstitutionPage /></DashboardLayout>
+          </PermissionRoute>
+        )
+      },
+      {
+        path: 'instituciones/:id',
+        element: (
+          <PermissionRoute permission="ver_instituciones">
+            <DashboardLayout><InstitutionDetailPage /></DashboardLayout>
+          </PermissionRoute>
+        )
+      },
+      {
+        path: 'instituciones/:id/editar',
+        element: (
+          <PermissionRoute permission="editar_instituciones">
+            <DashboardLayout><EditInstitutionPage /></DashboardLayout>
+          </PermissionRoute>
+        )
+      },
+      {
+        path: 'instituciones/:id/sedes',
+        element: <DashboardLayout><InstitutionSedesPage /></DashboardLayout>
+      },
+      {
+        path: 'instituciones/:institutionId/sedes/crear',
+        element: <DashboardLayout><InstitutionSedeCreatePage /></DashboardLayout>
+      },
+      {
+        path: 'instituciones/:institutionId/sedes/:id',
+        element: <DashboardLayout><InstitutionSedeDetailPage /></DashboardLayout>
+      },
+      {
+        path: 'instituciones/:institutionId/sedes/:id/editar',
+        element: <DashboardLayout><InstitutionSedeEditPage /></DashboardLayout>
+      },
+      {
+        path: 'sedes',
+        element: (
+          <PermissionRoute permission="ver_sedes">
+            <DashboardLayout><SedesListPage /></DashboardLayout>
+          </PermissionRoute>
+        )
+      },
+      {
+        path: 'sedes/crear',
+        element: (
+          <PermissionRoute permission="crear_sedes">
+            <DashboardLayout><CreateSedePage /></DashboardLayout>
+          </PermissionRoute>
+        )
+      },
+      {
+        path: 'sedes/:id',
+        element: (
+          <PermissionRoute permission="ver_sedes">
+            <DashboardLayout><SedeDetailPage /></DashboardLayout>
+          </PermissionRoute>
+        )
+      },
+      {
+        path: 'sedes/:id/editar',
+        element: (
+          <PermissionRoute permission="editar_sedes">
+            <DashboardLayout><EditSedePage /></DashboardLayout>
+          </PermissionRoute>
+        )
+      },
+      {
+        path: 'anios',
+        element: (
+          <PermissionRoute permission="ver_anios">
+            <DashboardLayout><AcademicYearsListPage /></DashboardLayout>
+          </PermissionRoute>
+        )
+      },
+      {
+        path: 'anios/crear',
+        element: (
+          <PermissionRoute permission="crear_anios">
+            <DashboardLayout><CreateAcademicYearPage /></DashboardLayout>
+          </PermissionRoute>
+        )
+      },
+      {
+        path: 'anios/:id',
+        element: (
+          <PermissionRoute permission="ver_anios">
+            <DashboardLayout><AcademicYearDetailPage /></DashboardLayout>
+          </PermissionRoute>
+        )
+      },
+      {
+        path: 'anios/:id/editar',
+        element: (
+          <PermissionRoute permission="editar_anios">
+            <DashboardLayout><EditAcademicYearPage /></DashboardLayout>
+          </PermissionRoute>
+        )
+      },
+      {
+        path: 'anios/:anioId/periodos',
+        element: (
+          <PermissionRoute permission="ver_periodos">
+            <DashboardLayout><AnioPeriodosListPage /></DashboardLayout>
+          </PermissionRoute>
+        )
+      },
+      {
+        path: 'anios/:anioId/periodos/crear',
+        element: (
+          <PermissionRoute permission="crear_periodos">
+            <DashboardLayout><AnioCreatePeriodoPage /></DashboardLayout>
+          </PermissionRoute>
+        )
+      },
+      {
+        path: 'anios/:anioId/periodos/:periodoId',
+        element: (
+          <PermissionRoute permission="ver_periodos">
+            <DashboardLayout><AnioPeriodoDetailPage /></DashboardLayout>
+          </PermissionRoute>
+        )
+      },
+      {
+        path: 'anios/:anioId/periodos/:periodoId/editar',
+        element: (
+          <PermissionRoute permission="editar_periodos">
+            <DashboardLayout><AnioEditPeriodoPage /></DashboardLayout>
+          </PermissionRoute>
+        )
+      },
+
     ],
   }
 ]) 

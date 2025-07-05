@@ -46,6 +46,13 @@ class StudentController extends Controller
      *         required=false,
      *         @OA\Schema(type="string")
      *     ),
+     *     @OA\Parameter(
+     *         name="sin_grupo",
+     *         in="query",
+     *         description="Filtrar solo estudiantes que no tienen grupo asignado",
+     *         required=false,
+     *         @OA\Schema(type="boolean")
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="Lista de estudiantes obtenida exitosamente",
@@ -67,7 +74,7 @@ class StudentController extends Controller
     public function index(Request $request)
     {
         $query = Estudiante::query()
-            ->with(['user', 'institucion', 'acudientes', 'acudiente'])
+            ->with(['user', 'grupo.sede.institucion', 'grupo.grado', 'acudientes', 'acudiente'])
             ->when($request->search, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('codigo_estudiantil', 'like', "%{$search}%")
@@ -77,6 +84,22 @@ class StudentController extends Controller
                                 ->orWhere('email', 'like', "%{$search}%");
                         });
                 });
+            })
+            ->when($request->grupo_id, function ($query, $grupoId) {
+                $query->where('grupo_id', $grupoId);
+            })
+            ->when($request->sede_id, function ($query, $sedeId) {
+                $query->whereHas('grupo', function ($q) use ($sedeId) {
+                    $q->where('sede_id', $sedeId);
+                });
+            })
+            ->when($request->grado_id, function ($query, $gradoId) {
+                $query->whereHas('grupo', function ($q) use ($gradoId) {
+                    $q->where('grado_id', $gradoId);
+                });
+            })
+            ->when($request->sin_grupo, function ($query) {
+                $query->whereNull('grupo_id');
             });
 
         $estudiantes = $query->paginate($request->per_page ?? 10);
@@ -125,7 +148,7 @@ class StudentController extends Controller
         
         $studentData = array_intersect_key($validatedData, array_flip([
             'codigo_estudiantil', 'fecha_nacimiento', 'genero', 'direccion', 
-            'telefono'
+            'telefono', 'grupo_id', 'estado'
         ]));
         
         // Generar username único si no se proporciona
@@ -153,7 +176,7 @@ class StudentController extends Controller
             $estudiante->acudientes()->attach($validatedData['acudiente_id']);
         }
 
-        return new StudentResource($estudiante->load(['user', 'institucion', 'acudientes', 'acudiente']));
+        return new StudentResource($estudiante->load(['user', 'grupo.sede.institucion', 'grupo.grado', 'acudientes', 'acudiente']));
     }
 
     /**
@@ -190,7 +213,7 @@ class StudentController extends Controller
      */
     public function show(Estudiante $estudiante)
     {
-        return new StudentResource($estudiante->load(['user', 'institucion', 'acudientes', 'acudiente']));
+        return new StudentResource($estudiante->load(['user', 'grupo.sede.institucion', 'grupo.grado', 'acudientes', 'acudiente']));
     }
 
     /**
@@ -245,7 +268,7 @@ class StudentController extends Controller
         
         $studentData = array_intersect_key($validatedData, array_flip([
             'codigo_estudiantil', 'fecha_nacimiento', 'genero', 'direccion', 
-            'telefono'
+            'telefono', 'grupo_id', 'estado'
         ]));
         
         // Actualizar los datos del usuario asociado al estudiante
@@ -269,7 +292,7 @@ class StudentController extends Controller
             }
         }
 
-        return new StudentResource($estudiante->load(['user', 'institucion', 'acudientes', 'acudiente']));
+        return new StudentResource($estudiante->load(['user', 'grupo.sede.institucion', 'grupo.grado', 'acudientes', 'acudiente']));
     }
 
     /**
@@ -286,8 +309,8 @@ class StudentController extends Controller
      *         @OA\Schema(type="integer")
      *     ),
      *     @OA\Response(
-     *         response=204,
-     *         description="Estudiante eliminado exitosamente (sin contenido)",
+     *         response=200,
+     *         description="Estudiante eliminado exitosamente",
      *     ),
      *     @OA\Response(
      *         response=404,
@@ -310,7 +333,7 @@ class StudentController extends Controller
         // Eliminar lógicamente el estudiante
         $estudiante->delete();
 
-        return response()->noContent();
+        return response()->json(['message' => 'Estudiante eliminado exitosamente'], 200);
     }
 }
  

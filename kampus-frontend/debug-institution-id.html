@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Institution ID</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .debug { background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .error { background: #ffebee; color: #c62828; padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .success { background: #e8f5e8; color: #2e7d32; padding: 10px; margin: 10px 0; border-radius: 5px; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Debug Institution ID</h1>
+    
+    <div class="debug">
+        <h3>Información de la URL:</h3>
+        <p>URL actual: <span id="current-url"></span></p>
+        <p>Parámetros de URL: <span id="url-params"></span></p>
+    </div>
+
+    <div class="debug">
+        <h3>Pruebas de navegación:</h3>
+        <button onclick="testValidId()">Probar con ID válido (4)</button>
+        <button onclick="testNullId()">Probar con ID nulo</button>
+        <button onclick="testInvalidId()">Probar con ID inválido</button>
+    </div>
+
+    <div id="results"></div>
+
+    <script>
+        function updateDebugInfo() {
+            document.getElementById('current-url').textContent = window.location.href;
+            const urlParams = new URLSearchParams(window.location.search);
+            const params = {};
+            for (let [key, value] of urlParams) {
+                params[key] = value;
+            }
+            document.getElementById('url-params').textContent = JSON.stringify(params);
+        }
+
+        function testValidId() {
+            window.location.href = '/instituciones/4';
+        }
+
+        function testNullId() {
+            window.location.href = '/instituciones/null';
+        }
+
+        function testInvalidId() {
+            window.location.href = '/instituciones/undefined';
+        }
+
+        function addResult(message, type = 'debug') {
+            const div = document.createElement('div');
+            div.className = type;
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}:</strong> ${message}`;
+            document.getElementById('results').appendChild(div);
+        }
+
+        // Actualizar información al cargar
+        updateDebugInfo();
+        addResult('Página de debug cargada', 'success');
+        
+        // Verificar si hay algún problema con el localStorage o sessionStorage
+        try {
+            const token = localStorage.getItem('token');
+            addResult(`Token en localStorage: ${token ? 'Presente' : 'Ausente'}`);
+        } catch (e) {
+            addResult(`Error al acceder localStorage: ${e.message}`, 'error');
+        }
+    </script>
+</body>
+</html> 

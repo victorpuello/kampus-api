@@ -5,10 +5,12 @@ import { useAlertContext } from '../contexts/AlertContext';
 import { Card, CardHeader, CardBody } from '../components/ui/Card';
 import { AreaForm } from '../components/areas/AreaForm';
 import type { AreaFormValues } from '../components/areas/AreaForm';
+import { useAuthStore } from '../store/authStore';
 
 const CreateAreaPage = () => {
   const navigate = useNavigate();
   const { showSuccess, showError } = useAlertContext();
+  const { user } = useAuthStore();
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Partial<Record<keyof AreaFormValues, string>>>({});
 
@@ -18,6 +20,7 @@ const CreateAreaPage = () => {
     codigo: '',
     color: '#3B82F6',
     estado: 'activo',
+    institucion_id: user?.institucion?.id || 0,
   };
 
   const [values, setValues] = useState<AreaFormValues>(initialValues);

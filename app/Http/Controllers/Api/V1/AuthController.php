@@ -7,6 +7,7 @@ use App\Http\Requests\LoginRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
@@ -28,7 +29,7 @@ class AuthController extends Controller
      *         @OA\JsonContent(
      *             required={"email","password"},
      *             @OA\Property(property="email", type="string", format="email", example="admin@example.com"),
-     *             @OA\Property(property="password", type="string", format="password", example="password"),
+     *             @OA\Property(property="password", type="string", format="password", example="123456"),
      *         )
      *     ),
      *     @OA\Response(
@@ -59,13 +60,12 @@ class AuthController extends Controller
             ]);
         }
 
-        // Revocar tokens anteriores para asegurar que solo haya un token activo por usuario
+        // Revocar tokens previos del usuario
         $user->tokens()->delete();
 
-        // Crear un nuevo token de acceso
+        // Generar nuevo token
         $token = $user->createToken('auth-token')->plainTextToken;
 
-        // Devolver el token y los datos del usuario con sus roles y permisos cargados
         return response()->json([
             'token' => $token,
             'user' => new UserResource($user->load('roles.permissions', 'institucion')),
@@ -93,13 +93,37 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
-        $token = $request->user()->currentAccessToken();
-        if ($token) {
-            $token->delete();
-        }
+        // Invalidar el token actual del usuario
+        $request->user()->currentAccessToken()->delete();
 
         return response()->json([
             'message' => 'Sesión cerrada exitosamente'
+        ]);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/v1/me",
+     *     summary="Obtiene la información del usuario autenticado",
+     *     tags={"Autenticación"},
+     *     security={{"sanctum":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Información del usuario",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="user", type="object", ref="#/components/schemas/UserResource"),
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="No autenticado",
+     *     )
+     * )
+     */
+    public function me(Request $request)
+    {
+        return response()->json([
+            'user' => new UserResource($request->user()->load('roles.permissions', 'institucion')),
         ]);
     }
 }

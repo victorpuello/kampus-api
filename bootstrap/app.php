@@ -11,7 +11,17 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        $middleware->api([
+            \Illuminate\Http\Middleware\HandleCors::class,
+        ]);
+        
+        // Middleware de desarrollo para autenticación automática
+        $env = $_ENV['APP_ENV'] ?? 'production';
+        if (in_array($env, ['local', 'development'])) {
+            $middleware->alias([
+                'dev.auth' => \App\Http\Middleware\DevAuthMiddleware::class,
+            ]);
+        }
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

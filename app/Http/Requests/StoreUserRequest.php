@@ -39,6 +39,14 @@ class StoreUserRequest extends FormRequest
      */
     protected function prepareForValidation(): void
     {
+        // No hacer nada aquí para password
+    }
+
+    /**
+     * Hashea la contraseña después de la validación.
+     */
+    protected function passedValidation(): void
+    {
         if ($this->has('password')) {
             $this->merge([
                 'password' => Hash::make($this->password),

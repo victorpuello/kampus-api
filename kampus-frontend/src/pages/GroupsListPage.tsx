@@ -12,11 +12,32 @@ interface Grupo {
   id: number;
   nombre: string;
   descripcion?: string;
+  sede_id: number;
+  sede?: {
+    id: number;
+    nombre: string;
+    institucion: {
+      id: number;
+      nombre: string;
+    };
+  };
   grado_id: number;
   grado?: {
     id: number;
     nombre: string;
     nivel?: string;
+  };
+  anio_id: number;
+  anio?: {
+    id: number;
+    nombre: string;
+    estado: string;
+  };
+  director_docente_id?: number;
+  director_docente?: {
+    id: number;
+    nombre: string;
+    apellido: string;
   };
   capacidad_maxima?: number;
   estado: string;
@@ -130,12 +151,56 @@ const GroupsListPage = () => {
       sortable: true,
     },
     {
-      key: 'descripcion',
-      header: 'Descripción',
+      key: 'sede',
+      header: 'Sede',
       accessor: (grupo) => (
-        <span className="text-sm text-gray-500">
-          {grupo.descripcion || 'Sin descripción'}
-        </span>
+        <div className="text-sm">
+          <div className="font-medium text-gray-900">
+            {grupo.sede?.nombre || 'Sin sede'}
+          </div>
+          {grupo.sede?.institucion && (
+            <div className="text-gray-500">
+              {grupo.sede.institucion.nombre}
+            </div>
+          )}
+        </div>
+      ),
+      sortable: true,
+    },
+    {
+      key: 'anio',
+      header: 'Año Académico',
+      accessor: (grupo) => (
+        <div className="text-sm">
+          <div className="font-medium text-gray-900">
+            {grupo.anio?.nombre || 'Sin año'}
+          </div>
+          {grupo.anio && (
+            <span
+              className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
+                grupo.anio.estado === 'activo'
+                  ? 'bg-green-100 text-green-800'
+                  : 'bg-gray-100 text-gray-800'
+              }`}
+            >
+              {grupo.anio.estado}
+            </span>
+          )}
+        </div>
+      ),
+      sortable: true,
+    },
+    {
+      key: 'director_docente',
+      header: 'Director',
+      accessor: (grupo) => (
+        <div className="text-sm text-gray-900">
+          {grupo.director_docente ? (
+            `${grupo.director_docente.nombre} ${grupo.director_docente.apellido}`
+          ) : (
+            <span className="text-gray-500">Sin asignar</span>
+          )}
+        </div>
       ),
       sortable: true,
     },
@@ -256,7 +321,7 @@ const GroupsListPage = () => {
         error={error}
         searchable={true}
         searchPlaceholder="Buscar grupos por nombre, descripción o grado..."
-        searchKeys={['nombre', 'descripcion', 'grado.nombre', 'grado.nivel', 'estado']}
+        searchKeys={['nombre', 'descripcion', 'grado.nombre', 'grado.nivel', 'sede.nombre', 'sede.institucion.nombre', 'anio.nombre', 'director_docente.nombre', 'director_docente.apellido', 'estado']}
         sortable={true}
         pagination={true}
         itemsPerPage={10}

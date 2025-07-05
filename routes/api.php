@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\UserController;
+use App\Http\Controllers\Api\V1\RoleController;
 use App\Http\Controllers\Api\V1\StudentController;
 use App\Http\Controllers\Api\V1\DocenteController;
 use App\Http\Controllers\Api\V1\InstitucionController;
+use App\Http\Controllers\Api\V1\SedeController;
 use App\Http\Controllers\Api\V1\AnioController;
 use App\Http\Controllers\Api\V1\AcudienteController;
 use App\Http\Controllers\Api\V1\GradoController;
@@ -14,6 +16,7 @@ use App\Http\Controllers\Api\V1\GrupoController;
 use App\Http\Controllers\Api\V1\AulaController;
 use App\Http\Controllers\Api\V1\FranjaHorariaController;
 use App\Http\Controllers\Api\V1\AsignacionController;
+use App\Http\Controllers\Api\V1\PeriodoController;
 use Illuminate\Support\Facades\Route;
 
 /**
@@ -24,7 +27,7 @@ use Illuminate\Support\Facades\Route;
  * (como el login) y rutas protegidas que requieren autenticación con Sanctum.
  */
 Route::prefix('v1')->group(function () {
-    // Rutas públicas
+    // Rutas públicas para autenticación
     /**
      * @OA\Post(
      *     path="/v1/login",
@@ -35,7 +38,7 @@ Route::prefix('v1')->group(function () {
      *         @OA\JsonContent(
      *             required={"email","password"},
      *             @OA\Property(property="email", type="string", format="email", example="admin@example.com"),
-     *             @OA\Property(property="password", type="string", format="password", example="password"),
+     *             @OA\Property(property="password", type="string", format="password", example="123456"),
      *         )
      *     ),
      *     @OA\Response(
@@ -58,11 +61,8 @@ Route::prefix('v1')->group(function () {
      */
     Route::post('/login', [AuthController::class, 'login']);
 
-    // Rutas protegidas
-    /**
-     * Grupo de rutas que requieren autenticación con Laravel Sanctum.
-     */
-    Route::middleware('auth:sanctum')->group(function () {
+    // Rutas protegidas con autenticación por token
+    Route::middleware(['auth:sanctum'])->group(function () {
         /**
          * @OA\Post(
          *     path="/v1/logout",
@@ -83,12 +83,44 @@ Route::prefix('v1')->group(function () {
          * )
          */
         Route::post('/logout', [AuthController::class, 'logout']);
+
+        /**
+         * @OA\Get(
+         *     path="/v1/me",
+         *     summary="Obtiene la información del usuario autenticado",
+         *     tags={"Autenticación"},
+         *     security={{"sanctum":{}}},
+         *     @OA\Response(
+         *         response=200,
+         *         description="Información del usuario",
+         *         @OA\JsonContent(
+         *             @OA\Property(property="user", type="object", ref="#/components/schemas/UserResource"),
+         *         )
+         *     ),
+         *     @OA\Response(
+         *         response=401,
+         *         description="No autenticado",
+         *     )
+         * )
+         */
+        Route::get('/me', [AuthController::class, 'me']);
         
         // Rutas de usuarios
         /**
          * Rutas para la gestión de usuarios (CRUD).
          */
         Route::apiResource('users', UserController::class);
+        
+        // Rutas anidadas de roles bajo usuarios
+        Route::prefix('users/{user}')->group(function () {
+            Route::get('roles', [RoleController::class, 'index']);
+            Route::get('roles/{role}', [RoleController::class, 'show']);
+            Route::post('roles', [RoleController::class, 'assignRoles']);
+        });
+        
+        // Rutas generales de roles
+        Route::get('roles', [RoleController::class, 'getAllRoles']);
+        Route::get('roles/{role}/permissions', [RoleController::class, 'getRolePermissions']);
 
         // Rutas de estudiantes
         /**
@@ -101,12 +133,26 @@ Route::prefix('v1')->group(function () {
          * Rutas para la gestión de docentes (CRUD).
          */
         Route::apiResource('docentes', DocenteController::class);
+        
+        // Ruta específica para obtener docentes disponibles para grupos
+        Route::get('docentes/disponibles-grupo', [DocenteController::class, 'disponiblesGrupo']);
 
         // Rutas de instituciones
         /**
          * Rutas para la gestión de instituciones (CRUD).
          */
-        Route::apiResource('instituciones', InstitucionController::class);
+        Route::apiResource('instituciones', InstitucionController::class)->parameters([
+            'instituciones' => 'institucion',
+        ]);
+
+        // Ruta específica para obtener sedes de una institución
+        Route::get('instituciones/{institucion}/sedes', [InstitucionController::class, 'sedes']);
+
+        // Rutas de sedes
+        /**
+         * Rutas para la gestión de sedes (CRUD).
+         */
+        Route::apiResource('sedes', SedeController::class);
 
         // Rutas de años
         /**
@@ -124,6 +170,9 @@ Route::prefix('v1')->group(function () {
         /**
          * Rutas para la gestión de grados académicos (CRUD).
          */
+        // Ruta específica para obtener niveles educativos disponibles (debe ir antes del resource)
+        Route::get('grados/niveles', [GradoController::class, 'niveles']);
+        
         Route::apiResource('grados', GradoController::class);
 
         // Rutas de áreas
@@ -161,5 +210,18 @@ Route::prefix('v1')->group(function () {
          * Rutas para la gestión de asignaciones (CRUD).
          */
         Route::apiResource('asignaciones', AsignacionController::class);
+
+        // Rutas de periodos
+        /**
+         * Rutas para la gestión de periodos académicos (CRUD).
+         */
+        Route::apiResource('periodos', PeriodoController::class);
+
+        // Rutas anidadas de periodos bajo años académicos
+        Route::get('anios/{anio}/periodos', [PeriodoController::class, 'getByAnio']);
+        Route::post('anios/{anio}/periodos', [PeriodoController::class, 'storeForAnio']);
+        Route::get('anios/{anio}/periodos/{periodo}', [PeriodoController::class, 'showForAnio']);
+        Route::put('anios/{anio}/periodos/{periodo}', [PeriodoController::class, 'updateForAnio']);
+        Route::delete('anios/{anio}/periodos/{periodo}', [PeriodoController::class, 'destroyForAnio']);
     });
 }); 

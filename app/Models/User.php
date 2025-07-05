@@ -152,4 +152,62 @@ class User extends Authenticatable
             $query->where('nombre', $permission);
         })->exists();
     }
+
+    /**
+     * Verifica si el usuario tiene un rol específico (por nombre o id).
+     *
+     * @param string|int $role Nombre o id del rol
+     * @return bool
+     */
+    public function hasRole($role): bool
+    {
+        if (is_numeric($role)) {
+            return $this->roles()->where('id', $role)->exists();
+        }
+        return $this->roles()->where('nombre', $role)->exists();
+    }
+
+    /**
+     * Permite verificar permisos usando el método can() de Laravel.
+     *
+     * @param string $ability
+     * @param array $arguments
+     * @return bool
+     */
+    public function can($ability, $arguments = [])
+    {
+        // Mapeo de alias de permisos
+        $map = [
+            'users.create' => 'crear_usuarios',
+            'users.view.any' => 'ver_usuarios',
+            'users.update.any' => 'editar_usuarios',
+            'users.delete.any' => 'eliminar_usuarios',
+            // Agrega otros alias si es necesario
+        ];
+        $permiso = $map[$ability] ?? $ability;
+        return $this->hasPermissionTo($permiso);
+    }
+
+    /**
+     * Devuelve una colección de todos los permisos únicos del usuario a través de sus roles.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function getAllPermissions()
+    {
+        return $this->roles
+            ->load('permissions')
+            ->pluck('permissions')
+            ->flatten()
+            ->unique('id')
+            ->values();
+    }
+
+    /**
+     * Alias para hasPermissionTo (compatibilidad)
+     */
+    public function hasPermission($permission)
+    {
+        return $this->hasPermissionTo($permission);
+    }
 }

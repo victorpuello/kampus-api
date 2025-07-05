@@ -394,6 +394,11 @@ Para soporte técnico o preguntas:
 - ✅ Validaciones robustas
 - ✅ Sistema de confirmaciones elegante
 
+## To Do
+
+- [ ] Solucionar el cargue de imágenes (asegurar que funcione tanto en creación como en actualización de entidades).
+- [ ] Solucionar el login de usuarios (mejorar la robustez y compatibilidad del sistema de autenticación).
+
 ---
 
 **Desarrollado con ❤️ por el equipo de Kampus**

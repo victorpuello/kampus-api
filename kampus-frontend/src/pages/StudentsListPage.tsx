@@ -18,6 +18,24 @@ interface Student {
     numero_documento: string;
   };
   estado: string;
+  grupo_id?: number;
+  grupo?: {
+    id: number;
+    nombre: string;
+    sede: {
+      id: number;
+      nombre: string;
+      institucion: {
+        id: number;
+        nombre: string;
+      };
+    };
+    grado: {
+      id: number;
+      nombre: string;
+      nivel: string;
+    };
+  };
   institucion: {
     id: number;
     nombre: string;
@@ -111,13 +129,16 @@ const StudentsListPage = () => {
           <div className="flex-shrink-0 h-10 w-10">
             <div className="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center">
               <span className="text-sm font-medium text-primary-700">
-                {(student.user?.nombre?.charAt(0) ?? '')}{(student.user?.apellido?.charAt(0) ?? '')}
+                {student.user?.nombre?.charAt(0) ?? ''}{student.user?.apellido?.charAt(0) ?? ''}
               </span>
             </div>
           </div>
           <div className="ml-4">
             <div className="text-sm font-medium text-gray-900">
-              {student.user?.nombre} {student.user?.apellido}
+              {student.user ? `${student.user.nombre ?? 'Sin nombre'} ${student.user.apellido ?? ''}` : <span className="text-red-500">Sin usuario</span>}
+            </div>
+            <div className="text-sm text-gray-500">
+              {student.user?.email ?? 'Sin email'}
             </div>
           </div>
         </div>
@@ -135,10 +156,23 @@ const StudentsListPage = () => {
       sortable: true,
     },
     {
-      key: 'email',
-      header: 'Email',
+      key: 'grupo',
+      header: 'Ubicación Académica',
       accessor: (student) => (
-        <span className="text-sm text-gray-500">{student.user?.email}</span>
+        <div className="text-sm">
+          {student.grupo ? (
+            <>
+              <div className="font-medium text-gray-900">
+                {student.grupo.sede?.nombre ?? 'Sin sede'} - {student.grupo.grado?.nombre ?? 'Sin grado'}
+              </div>
+              <div className="text-gray-500">
+                Grupo {student.grupo.nombre ?? 'Sin nombre'}
+              </div>
+            </>
+          ) : (
+            <span className="text-gray-500">Sin asignar</span>
+          )}
+        </div>
       ),
       sortable: true,
     },
@@ -146,7 +180,7 @@ const StudentsListPage = () => {
       key: 'institucion',
       header: 'Institución',
       accessor: (student) => (
-        <span className="text-sm text-gray-500">{student.institucion?.nombre}</span>
+        <span className="text-sm text-gray-500">{student.institucion?.nombre ?? 'Sin institución'}</span>
       ),
       sortable: true,
     },
@@ -253,7 +287,7 @@ const StudentsListPage = () => {
         error={error}
         searchable={true}
         searchPlaceholder="Buscar estudiantes por nombre, documento o email..."
-        searchKeys={['user.nombre', 'user.apellido', 'user.email', 'user.numero_documento', 'institucion.nombre', 'estado']}
+        searchKeys={['user.nombre', 'user.apellido', 'user.email', 'user.numero_documento', 'institucion.nombre', 'grupo.sede.nombre', 'grupo.grado.nombre', 'grupo.nombre', 'estado']}
         sortable={true}
         pagination={true}
         itemsPerPage={10}
