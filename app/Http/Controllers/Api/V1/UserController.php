@@ -21,7 +21,7 @@ class UserController extends Controller
      */
     public function __construct()
     {
-        // Las políticas de autorización se pueden implementar aquí si es necesario
+        // Constructor del controlador
     }
 
     /**
@@ -57,8 +57,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        // Para pruebas, devolver todos los usuarios sin paginación
-        // En producción, usar: ->paginate(10);
+        // Obtener todos los usuarios con sus relaciones
         $users = User::with(['institucion', 'roles.permissions'])
             ->get();
 
