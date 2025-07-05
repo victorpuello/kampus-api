@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
+import axiosClient from '../../api/axiosClient';
+import { useAuthStore } from '../../store/authStore';
 
 export interface AreaFormValues {
   nombre: string;
@@ -8,6 +10,7 @@ export interface AreaFormValues {
   codigo?: string;
   color?: string;
   estado: 'activo' | 'inactivo';
+  institucion_id: number;
 }
 
 interface AreaFormProps {
@@ -27,12 +30,45 @@ export const AreaForm: React.FC<AreaFormProps> = ({
   errors = {},
   submitText = 'Guardar',
 }) => {
+  const { user } = useAuthStore();
+  const [instituciones, setInstituciones] = useState<Array<{ id: number; nombre: string }>>([]);
+  const [loadingInstituciones, setLoadingInstituciones] = useState(false);
+
+  useEffect(() => {
+    const fetchInstituciones = async () => {
+      setLoadingInstituciones(true);
+      try {
+        // Si el usuario tiene una institución específica, solo mostrar esa
+        if (user?.institucion) {
+          setInstituciones([user.institucion]);
+          // Establecer automáticamente la institución del usuario
+          if (!values.institucion_id) {
+            onChange({
+              ...values,
+              institucion_id: user.institucion.id,
+            });
+          }
+        } else {
+          // Si no tiene institución específica, cargar todas (para administradores)
+          const response = await axiosClient.get('/instituciones');
+          setInstituciones(response.data.data || []);
+        }
+      } catch (error) {
+        console.error('Error al cargar instituciones:', error);
+      } finally {
+        setLoadingInstituciones(false);
+      }
+    };
+
+    fetchInstituciones();
+  }, [user, values.institucion_id, onChange, values]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit(values);
   };
 
-  const handleInputChange = (field: keyof AreaFormValues, value: string) => {
+  const handleInputChange = (field: keyof AreaFormValues, value: string | number) => {
     onChange({
       ...values,
       [field]: value,
@@ -95,6 +131,53 @@ export const AreaForm: React.FC<AreaFormProps> = ({
               className="flex-1"
             />
           </div>
+        </div>
+
+        {/* Institución */}
+        <div>
+          <label htmlFor="institucion_id" className="block text-sm font-medium text-gray-700 mb-2">
+            Institución *
+          </label>
+          {instituciones.length === 1 ? (
+            <div className="space-y-2">
+              <select
+                id="institucion_id"
+                value={values.institucion_id || ''}
+                onChange={(e) => handleInputChange('institucion_id', parseInt(e.target.value))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-gray-50"
+                required
+                disabled={true}
+              >
+                {instituciones.map((institucion) => (
+                  <option key={institucion.id} value={institucion.id}>
+                    {institucion.nombre}
+                  </option>
+                ))}
+              </select>
+              <p className="text-sm text-gray-500">
+                Área será creada para tu institución actual
+              </p>
+            </div>
+          ) : (
+            <select
+              id="institucion_id"
+              value={values.institucion_id || ''}
+              onChange={(e) => handleInputChange('institucion_id', parseInt(e.target.value))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white"
+              required
+              disabled={loadingInstituciones}
+            >
+              <option value="">Selecciona una institución</option>
+              {instituciones.map((institucion) => (
+                <option key={institucion.id} value={institucion.id}>
+                  {institucion.nombre}
+                </option>
+              ))}
+            </select>
+          )}
+          {errors.institucion_id && (
+            <p className="mt-1 text-sm text-red-600">{errors.institucion_id}</p>
+          )}
         </div>
 
         {/* Estado */}

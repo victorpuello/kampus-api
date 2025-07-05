@@ -12,7 +12,11 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *     description="Representación de una asignatura en la API",
  *     @OA\Property(property="id", type="integer", description="ID de la asignatura"),
  *     @OA\Property(property="nombre", type="string", description="Nombre de la asignatura"),
+ *     @OA\Property(property="codigo", type="string", description="Código de la asignatura"),
+ *     @OA\Property(property="descripcion", type="string", description="Descripción de la asignatura"),
+ *     @OA\Property(property="creditos", type="integer", description="Número de créditos de la asignatura"),
  *     @OA\Property(property="porcentaje_area", type="number", format="float", description="Porcentaje que representa la asignatura dentro del área"),
+ *     @OA\Property(property="estado", type="string", description="Estado de la asignatura"),
  *     @OA\Property(property="area", type="object", ref="#/components/schemas/AreaResource", description="Área a la que pertenece la asignatura"),
  * )
  */
@@ -28,7 +32,11 @@ class AsignaturaResource extends JsonResource
         return [
             'id' => $this->id,
             'nombre' => $this->nombre,
+            'codigo' => $this->codigo,
+            'descripcion' => $this->descripcion,
+            'creditos' => $this->creditos,
             'porcentaje_area' => $this->porcentaje_area,
+            'estado' => $this->estado,
             'area' => new AreaResource($this->whenLoaded('area')),
         ];
     }

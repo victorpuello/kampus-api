@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\UserController;
+use App\Http\Controllers\Api\V1\RoleController;
 use App\Http\Controllers\Api\V1\StudentController;
 use App\Http\Controllers\Api\V1\DocenteController;
 use App\Http\Controllers\Api\V1\InstitucionController;
@@ -15,6 +16,7 @@ use App\Http\Controllers\Api\V1\GrupoController;
 use App\Http\Controllers\Api\V1\AulaController;
 use App\Http\Controllers\Api\V1\FranjaHorariaController;
 use App\Http\Controllers\Api\V1\AsignacionController;
+use App\Http\Controllers\Api\V1\PeriodoController;
 use Illuminate\Support\Facades\Route;
 
 /**
@@ -59,9 +61,8 @@ Route::prefix('v1')->group(function () {
      */
     Route::post('/login', [AuthController::class, 'login']);
 
-    // Rutas protegidas con autenticación por token (desactivada en desarrollo)
-    $env = $_ENV['APP_ENV'] ?? 'production';
-    Route::middleware(in_array($env, ['local', 'development']) ? [] : ['auth:sanctum'])->group(function () {
+    // Rutas protegidas con autenticación por token
+    Route::middleware(['auth:sanctum'])->group(function () {
         /**
          * @OA\Post(
          *     path="/v1/logout",
@@ -109,6 +110,17 @@ Route::prefix('v1')->group(function () {
          * Rutas para la gestión de usuarios (CRUD).
          */
         Route::apiResource('users', UserController::class);
+        
+        // Rutas anidadas de roles bajo usuarios
+        Route::prefix('users/{user}')->group(function () {
+            Route::get('roles', [RoleController::class, 'index']);
+            Route::get('roles/{role}', [RoleController::class, 'show']);
+            Route::post('roles', [RoleController::class, 'assignRoles']);
+        });
+        
+        // Rutas generales de roles
+        Route::get('roles', [RoleController::class, 'getAllRoles']);
+        Route::get('roles/{role}/permissions', [RoleController::class, 'getRolePermissions']);
 
         // Rutas de estudiantes
         /**
@@ -121,6 +133,9 @@ Route::prefix('v1')->group(function () {
          * Rutas para la gestión de docentes (CRUD).
          */
         Route::apiResource('docentes', DocenteController::class);
+        
+        // Ruta específica para obtener docentes disponibles para grupos
+        Route::get('docentes/disponibles-grupo', [DocenteController::class, 'disponiblesGrupo']);
 
         // Rutas de instituciones
         /**
@@ -195,5 +210,18 @@ Route::prefix('v1')->group(function () {
          * Rutas para la gestión de asignaciones (CRUD).
          */
         Route::apiResource('asignaciones', AsignacionController::class);
+
+        // Rutas de periodos
+        /**
+         * Rutas para la gestión de periodos académicos (CRUD).
+         */
+        Route::apiResource('periodos', PeriodoController::class);
+
+        // Rutas anidadas de periodos bajo años académicos
+        Route::get('anios/{anio}/periodos', [PeriodoController::class, 'getByAnio']);
+        Route::post('anios/{anio}/periodos', [PeriodoController::class, 'storeForAnio']);
+        Route::get('anios/{anio}/periodos/{periodo}', [PeriodoController::class, 'showForAnio']);
+        Route::put('anios/{anio}/periodos/{periodo}', [PeriodoController::class, 'updateForAnio']);
+        Route::delete('anios/{anio}/periodos/{periodo}', [PeriodoController::class, 'destroyForAnio']);
     });
 }); 

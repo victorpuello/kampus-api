@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axiosClient from '../api/axiosClient';
 import { useAlertContext } from '../contexts/AlertContext';
+import { useAuthStore } from '../store/authStore';
 import { Card, CardHeader, CardBody } from '../components/ui/Card';
 import { GrupoForm } from '../components/grupos/GrupoForm';
 import type { GrupoFormValues } from '../components/grupos/GrupoForm';
@@ -10,14 +11,18 @@ const EditGroupPage = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { showSuccess, showError } = useAlertContext();
+  const { user } = useAuthStore();
   const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
   const [errors, setErrors] = useState<Partial<Record<keyof GrupoFormValues, string>>>({});
 
   const initialValues: GrupoFormValues = {
     nombre: '',
-    descripcion: '',
+    sede_id: 0,
     grado_id: 0,
+    anio_id: 0,
+    director_docente_id: undefined,
+    descripcion: '',
     capacidad_maxima: undefined,
     estado: 'activo',
   };
@@ -33,8 +38,11 @@ const EditGroupPage = () => {
         
         setValues({
           nombre: grupo.nombre,
-          descripcion: grupo.descripcion || '',
+          sede_id: grupo.sede_id,
           grado_id: grupo.grado_id,
+          anio_id: grupo.anio_id,
+          director_docente_id: grupo.director_docente_id,
+          descripcion: grupo.descripcion || '',
           capacidad_maxima: grupo.capacidad_maxima,
           estado: grupo.estado,
         });
@@ -99,6 +107,7 @@ const EditGroupPage = () => {
             loading={loading}
             errors={errors}
             submitText="Actualizar Grupo"
+            institucionId={user?.institucion?.id}
           />
         </CardBody>
       </Card>

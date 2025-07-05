@@ -3,13 +3,15 @@ import { vi } from 'vitest'
 import React from 'react'
 
 // Mock de react-router-dom
-vi.mock('react-router-dom', () => ({
-  useNavigate: () => vi.fn(),
-  useParams: () => ({}),
-  Link: ({ children, to }: { children: React.ReactNode; to: string }) => 
-    React.createElement('a', { href: to }, children),
-  useLocation: () => ({ pathname: '/', search: '', hash: '', state: null }),
-}))
+vi.mock('react-router-dom', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    useNavigate: () => vi.fn(),
+    useParams: () => ({}),
+    useLocation: () => ({ pathname: '/', search: '', hash: '', state: null }),
+  };
+})
 
 // Mock de axios
 vi.mock('../api/axiosClient', () => ({

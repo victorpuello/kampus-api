@@ -18,6 +18,7 @@ const CreateAsignaturaPage = () => {
     descripcion: '',
     creditos: 3,
     area_id: 0,
+    porcentaje_area: 0,
     estado: 'activo',
     grados: [],
   };

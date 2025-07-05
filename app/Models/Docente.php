@@ -69,6 +69,14 @@ class Docente extends Model
     }
 
     /**
+     * Obtiene el grupo del cual es director (relación uno a uno).
+     */
+    public function grupoDirector()
+    {
+        return $this->hasOne(\App\Models\Grupo::class, 'director_docente_id');
+    }
+
+    /**
      * Obtiene la institución del docente a través del usuario.
      */
     public function institucion()
@@ -81,5 +89,23 @@ class Docente extends Model
             'user_id', // Local key en docentes
             'institucion_id' // Local key en users
         );
+    }
+
+    /**
+     * Scope para obtener docentes que no son directores de ningún grupo.
+     */
+    public function scopeDisponiblesParaGrupo($query)
+    {
+        return $query->whereDoesntHave('grupoDirector');
+    }
+
+    /**
+     * Scope para obtener docentes por institución.
+     */
+    public function scopePorInstitucion($query, $institucionId)
+    {
+        return $query->whereHas('user', function ($q) use ($institucionId) {
+            $q->where('institucion_id', $institucionId);
+        });
     }
 }

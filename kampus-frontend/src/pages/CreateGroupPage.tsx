@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosClient from '../api/axiosClient';
 import { useAlertContext } from '../contexts/AlertContext';
+import { useAuthStore } from '../store/authStore';
 import { Card, CardHeader, CardBody } from '../components/ui/Card';
 import { GrupoForm } from '../components/grupos/GrupoForm';
 import type { GrupoFormValues } from '../components/grupos/GrupoForm';
@@ -9,13 +10,17 @@ import type { GrupoFormValues } from '../components/grupos/GrupoForm';
 const CreateGroupPage = () => {
   const navigate = useNavigate();
   const { showSuccess, showError } = useAlertContext();
+  const { user } = useAuthStore();
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Partial<Record<keyof GrupoFormValues, string>>>({});
 
   const initialValues: GrupoFormValues = {
     nombre: '',
-    descripcion: '',
+    sede_id: 0,
     grado_id: 0,
+    anio_id: 0,
+    director_docente_id: undefined,
+    descripcion: '',
     capacidad_maxima: undefined,
     estado: 'activo',
   };
@@ -62,6 +67,7 @@ const CreateGroupPage = () => {
             loading={loading}
             errors={errors}
             submitText="Crear Grupo"
+            institucionId={user?.institucion?.id}
           />
         </CardBody>
       </Card>

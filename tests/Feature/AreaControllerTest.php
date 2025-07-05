@@ -13,16 +13,27 @@ class AreaControllerTest extends TestCase
     use RefreshDatabase;
 
     protected $user;
+    protected $institucion;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->user = User::factory()->create();
+        
+        // Crear institución
+        $this->institucion = Institucion::factory()->create();
+        
+        // Crear usuario con la institución
+        $this->user = User::factory()->create([
+            'institucion_id' => $this->institucion->id
+        ]);
     }
 
     public function test_can_list_areas()
     {
-        Area::factory()->count(3)->create();
+        // Crear áreas para la institución del usuario
+        Area::factory()->count(3)->create([
+            'institucion_id' => $this->institucion->id
+        ]);
 
         $response = $this->actingAs($this->user, 'sanctum')->getJson('/api/v1/areas');
 
@@ -32,10 +43,8 @@ class AreaControllerTest extends TestCase
 
     public function test_can_create_area()
     {
-        $institucion = Institucion::factory()->create();
         $areaData = [
             'nombre' => 'Nueva Area',
-            'institucion_id' => $institucion->id,
         ];
 
         $response = $this->actingAs($this->user, 'sanctum')->postJson('/api/v1/areas', $areaData);
@@ -43,12 +52,17 @@ class AreaControllerTest extends TestCase
         $response->assertStatus(201)
                  ->assertJsonFragment(['nombre' => 'Nueva Area']);
 
-        $this->assertDatabaseHas('areas', ['nombre' => 'Nueva Area']);
+        $this->assertDatabaseHas('areas', [
+            'nombre' => 'Nueva Area',
+            'institucion_id' => $this->institucion->id
+        ]);
     }
 
     public function test_can_show_area()
     {
-        $area = Area::factory()->create();
+        $area = Area::factory()->create([
+            'institucion_id' => $this->institucion->id
+        ]);
 
         $response = $this->actingAs($this->user, 'sanctum')->getJson('/api/v1/areas/' . $area->id);
 
@@ -58,7 +72,10 @@ class AreaControllerTest extends TestCase
 
     public function test_can_update_area()
     {
-        $area = Area::factory()->create();
+        $area = Area::factory()->create([
+            'institucion_id' => $this->institucion->id
+        ]);
+        
         $updatedData = [
             'nombre' => 'Area Actualizada',
         ];
@@ -73,7 +90,9 @@ class AreaControllerTest extends TestCase
 
     public function test_can_delete_area()
     {
-        $area = Area::factory()->create();
+        $area = Area::factory()->create([
+            'institucion_id' => $this->institucion->id
+        ]);
 
         $response = $this->actingAs($this->user, 'sanctum')->deleteJson('/api/v1/areas/' . $area->id);
 

@@ -73,13 +73,17 @@ class AreaController extends Controller
      */
     public function index(Request $request)
     {
+        $user = auth()->user();
+        
+        if (!$user) {
+            abort(401, 'Usuario no autenticado');
+        }
+        
         $query = Area::query()
             ->with('institucion')
+            ->where('institucion_id', $user->institucion_id)
             ->when($request->search, function ($query, $search) {
                 $query->where('nombre', 'like', "%{$search}%");
-            })
-            ->when($request->institucion_id, function ($query, $institucionId) {
-                $query->where('institucion_id', $institucionId);
             });
 
         $areas = $query->paginate($request->per_page ?? 10);
@@ -118,9 +122,19 @@ class AreaController extends Controller
      */
     public function store(StoreAreaRequest $request)
     {
-        $area = Area::create($request->validated());
+        $user = auth()->user();
+        
+        if (!$user) {
+            abort(401, 'Usuario no autenticado');
+        }
+        
+        // Asegurar que el área se crea para la institución del usuario
+        $data = $request->validated();
+        $data['institucion_id'] = $user->institucion_id;
+        
+        $area = Area::create($data);
 
-        return new AreaResource($area->load('institucion'));
+        return new AreaResource($area->load(['institucion', 'asignaturas']));
     }
 
     /**
@@ -157,7 +171,18 @@ class AreaController extends Controller
      */
     public function show(Area $area)
     {
-        return new AreaResource($area->load('institucion'));
+        $user = auth()->user();
+        
+        if (!$user) {
+            abort(401, 'Usuario no autenticado');
+        }
+        
+        // Verificar que el área pertenece a la institución del usuario
+        if ($area->institucion_id !== $user->institucion_id) {
+            abort(403, 'No tienes permisos para acceder a esta área');
+        }
+        
+        return new AreaResource($area->load(['institucion', 'asignaturas']));
     }
 
     /**
@@ -202,9 +227,20 @@ class AreaController extends Controller
      */
     public function update(UpdateAreaRequest $request, Area $area)
     {
+        $user = auth()->user();
+        
+        if (!$user) {
+            abort(401, 'Usuario no autenticado');
+        }
+        
+        // Verificar que el área pertenece a la institución del usuario
+        if ($area->institucion_id !== $user->institucion_id) {
+            abort(403, 'No tienes permisos para editar esta área');
+        }
+        
         $area->update($request->validated());
 
-        return new AreaResource($area->load('institucion'));
+        return new AreaResource($area->load(['institucion', 'asignaturas']));
     }
 
     /**
@@ -240,6 +276,17 @@ class AreaController extends Controller
      */
     public function destroy(Area $area)
     {
+        $user = auth()->user();
+        
+        if (!$user) {
+            abort(401, 'Usuario no autenticado');
+        }
+        
+        // Verificar que el área pertenece a la institución del usuario
+        if ($area->institucion_id !== $user->institucion_id) {
+            abort(403, 'No tienes permisos para eliminar esta área');
+        }
+        
         $area->delete();
 
         return response()->noContent();

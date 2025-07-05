@@ -7,6 +7,7 @@ import { Badge } from '../components/ui/Badge';
 import { useAlertContext } from '../contexts/AlertContext';
 import { useConfirm } from '../hooks/useConfirm';
 import ConfirmDialog from '../components/ui/ConfirmDialog';
+import { MatriculaEstudianteModal } from '../components/grupos/MatriculaEstudianteModal';
 
 interface Grupo {
   id: number;
@@ -22,10 +23,15 @@ interface Grupo {
   estado: string;
   estudiantes?: Array<{
     id: number;
-    nombre: string;
-    apellido: string;
+    nombre?: string;
+    apellido?: string;
     email?: string;
     estado: string;
+    user?: {
+      nombre: string;
+      apellido: string;
+      email?: string;
+    };
   }>;
 }
 
@@ -37,22 +43,27 @@ const GroupDetailPage = () => {
   const [grupo, setGrupo] = useState<Grupo | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showMatriculaModal, setShowMatriculaModal] = useState(false);
+
+    const fetchGrupo = async () => {
+    try {
+      const response = await axiosClient.get(`/grupos/${id}`);
+      console.log('Datos del grupo recibidos:', response.data);
+      setGrupo(response.data.data || response.data);
+      setError(null);
+    } catch (err: any) {
+      console.error('Error al cargar grupo:', err);
+      setError(err.response?.data?.message || 'Error al cargar el grupo');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEstudianteMatriculado = () => {
+    fetchGrupo(); // Recargar datos del grupo
+  };
 
   useEffect(() => {
-    const fetchGrupo = async () => {
-      try {
-        const response = await axiosClient.get(`/grupos/${id}`);
-        console.log('Datos del grupo recibidos:', response.data);
-        setGrupo(response.data.data || response.data);
-        setError(null);
-      } catch (err: any) {
-        console.error('Error al cargar grupo:', err);
-        setError(err.response?.data?.message || 'Error al cargar el grupo');
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchGrupo();
   }, [id]);
 
@@ -219,21 +230,21 @@ const GroupDetailPage = () => {
         </Card>
       </div>
 
-      {/* Estudiantes Asociados */}
+      {/* Estudiantes Matriculados */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-gray-900">Estudiantes Asociados</h3>
+            <h3 className="text-lg font-semibold text-gray-900">Estudiantes Matriculados</h3>
             <Button
               variant="secondary"
-              onClick={() => navigate('/estudiantes/crear')}
+              onClick={() => setShowMatriculaModal(true)}
               leftIcon={
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
               }
             >
-              Crear Estudiante
+              Matricular Estudiante
             </Button>
           </div>
         </CardHeader>
@@ -265,20 +276,21 @@ const GroupDetailPage = () => {
                           <div className="flex-shrink-0 h-10 w-10">
                             <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
                               <span className="text-sm font-medium text-gray-700">
-                                {estudiante.nombre.charAt(0)}{estudiante.apellido.charAt(0)}
+                                {(estudiante.user?.nombre || estudiante.nombre || '').charAt(0)}
+                                {(estudiante.user?.apellido || estudiante.apellido || '').charAt(0)}
                               </span>
                             </div>
                           </div>
                           <div className="ml-4">
                             <div className="text-sm font-medium text-gray-900">
-                              {estudiante.nombre} {estudiante.apellido}
+                              {estudiante.user?.nombre || estudiante.nombre || 'Sin nombre'} {estudiante.user?.apellido || estudiante.apellido || 'Sin apellido'}
                             </div>
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-500">
-                          {estudiante.email || 'Sin email'}
+                          {estudiante.user?.email || estudiante.email || 'Sin email'}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -307,21 +319,21 @@ const GroupDetailPage = () => {
               <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
               </svg>
-              <h3 className="mt-2 text-sm font-medium text-gray-900">No hay estudiantes</h3>
+              <h3 className="mt-2 text-sm font-medium text-gray-900">No hay estudiantes matriculados</h3>
               <p className="mt-1 text-sm text-gray-500">
-                Este grupo no tiene estudiantes asociados.
+                Este grupo no tiene estudiantes matriculados.
               </p>
               <div className="mt-6">
                 <Button
                   variant="primary"
-                  onClick={() => navigate('/estudiantes/crear')}
+                  onClick={() => setShowMatriculaModal(true)}
                   leftIcon={
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                     </svg>
                   }
                 >
-                  Crear Estudiante
+                  Matricular Estudiante
                 </Button>
               </div>
             </div>
@@ -372,6 +384,14 @@ const GroupDetailPage = () => {
           </div>
         </CardBody>
       </Card>
+
+      {/* Modal de Matriculación */}
+      <MatriculaEstudianteModal
+        isOpen={showMatriculaModal}
+        onClose={() => setShowMatriculaModal(false)}
+        grupoId={Number(id)}
+        onEstudianteMatriculado={handleEstudianteMatriculado}
+      />
 
       {/* ConfirmDialog */}
       <ConfirmDialog

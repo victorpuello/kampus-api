@@ -11,64 +11,68 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        // Crear usuario administrador
-        $admin = new User([
-            'nombre' => 'Admin',
-            'apellido' => 'Sistema',
-            'username' => 'admin',
-            'email' => 'admin@example.com',
-            'password' => Hash::make('123456'),
-            'institucion_id' => 1,
-            'estado' => 'activo',
-        ]);
+        // Crear usuario administrador o actualizar si ya existe
+        $admin = User::firstOrNew(['email' => 'admin@example.com']);
+        $admin->nombre = 'Admin';
+        $admin->apellido = 'Sistema';
+        $admin->username = 'admin';
+        $admin->password = '123456';
+        $admin->institucion_id = 1;
+        $admin->estado = 'activo';
         $admin->save();
 
         // Asignar rol de administrador
-        $admin->roles()->attach(Role::where('nombre', 'Administrador')->first());
+        $adminRole = Role::where('nombre', 'Administrador')->first();
+        if ($adminRole && !$admin->roles()->where('role_id', $adminRole->id)->exists()) {
+            $admin->roles()->attach($adminRole->id);
+        }
 
         // Crear usuario docente
-        $docente = new User([
-            'nombre' => 'Juan',
-            'apellido' => 'Pérez',
-            'username' => 'jperez',
-            'email' => 'jperez@example.com',
-            'password' => Hash::make('password'),
-            'institucion_id' => 1,
-            'estado' => 'activo',
-        ]);
+        $docente = User::firstOrNew(['email' => 'jperez@example.com']);
+        $docente->nombre = 'Juan';
+        $docente->apellido = 'Pérez';
+        $docente->username = 'jperez';
+        $docente->password = Hash::make('password');
+        $docente->institucion_id = 1;
+        $docente->estado = 'activo';
         $docente->save();
 
         // Asignar rol de docente
-        $docente->roles()->attach(Role::where('nombre', 'Docente')->first());
+        $docenteRole = Role::where('nombre', 'Docente')->first();
+        if ($docenteRole && !$docente->roles()->where('role_id', $docenteRole->id)->exists()) {
+            $docente->roles()->attach($docenteRole->id);
+        }
 
         // Crear usuario estudiante
-        $estudiante = new User([
-            'nombre' => 'María',
-            'apellido' => 'González',
-            'username' => 'mgonzalez',
-            'email' => 'mgonzalez@example.com',
-            'password' => Hash::make('password'),
-            'institucion_id' => 1,
-            'estado' => 'activo',
-        ]);
+        $estudiante = User::firstOrNew(['email' => 'mgonzalez@example.com']);
+        $estudiante->nombre = 'María';
+        $estudiante->apellido = 'González';
+        $estudiante->username = 'mgonzalez';
+        $estudiante->password = Hash::make('password');
+        $estudiante->institucion_id = 1;
+        $estudiante->estado = 'activo';
         $estudiante->save();
 
         // Asignar rol de estudiante
-        $estudiante->roles()->attach(Role::where('nombre', 'Estudiante')->first());
+        $estudianteRole = Role::where('nombre', 'Estudiante')->first();
+        if ($estudianteRole && !$estudiante->roles()->where('role_id', $estudianteRole->id)->exists()) {
+            $estudiante->roles()->attach($estudianteRole->id);
+        }
 
         // Crear usuario acudiente
-        $acudiente = new User([
-            'nombre' => 'Carlos',
-            'apellido' => 'Rodríguez',
-            'username' => 'crodriguez',
-            'email' => 'crodriguez@example.com',
-            'password' => Hash::make('password'),
-            'institucion_id' => 1,
-            'estado' => 'activo',
-        ]);
+        $acudiente = User::firstOrNew(['email' => 'crodriguez@example.com']);
+        $acudiente->nombre = 'Carlos';
+        $acudiente->apellido = 'Rodríguez';
+        $acudiente->username = 'crodriguez';
+        $acudiente->password = Hash::make('password');
+        $acudiente->institucion_id = 1;
+        $acudiente->estado = 'activo';
         $acudiente->save();
 
         // Asignar rol de acudiente
-        $acudiente->roles()->attach(Role::where('nombre', 'Acudiente')->first());
+        $acudienteRole = Role::where('nombre', 'Acudiente')->first();
+        if ($acudienteRole && !$acudiente->roles()->where('role_id', $acudienteRole->id)->exists()) {
+            $acudiente->roles()->attach($acudienteRole->id);
+        }
     }
 } 

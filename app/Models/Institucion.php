@@ -181,6 +181,90 @@ class Institucion extends Model
     }
 
     /**
+     * Obtiene los grupos asociados a esta institución a través de sus grados.
+     */
+    public function grupos()
+    {
+        return $this->hasManyThrough(Grupo::class, Grado::class);
+    }
+
+    /**
+     * Obtiene los estudiantes asociados a esta institución a través de los grupos y grados.
+     */
+    public function estudiantes()
+    {
+        return $this->hasManyThrough(Estudiante::class, Grupo::class, 'grado_id', 'grupo_id', 'id', 'id');
+    }
+
+    /**
+     * Obtiene los grupos de esta institución para un año académico específico.
+     *
+     * @param int $anioId
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
+     */
+    public function gruposPorAnio($anioId)
+    {
+        return $this->grupos()->where('anio_id', $anioId);
+    }
+
+    /**
+     * Obtiene los grados con sus grupos para un año académico específico.
+     *
+     * @param int|null $anioId
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function gradosConGrupos($anioId = null)
+    {
+        $query = $this->grados()->with('grupos');
+        if ($anioId) {
+            $query->whereHas('grupos', function ($q) use ($anioId) {
+                $q->where('anio_id', $anioId);
+            });
+        }
+        return $query;
+    }
+
+    /**
+     * Obtiene los grados con grupos activos para un año académico específico.
+     *
+     * @param int $anioId
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function gradosConGruposActivos($anioId)
+    {
+        return $this->grados()->whereHas('grupos', function ($q) use ($anioId) {
+            $q->where('anio_id', $anioId);
+        })->with(['grupos' => function ($q) use ($anioId) {
+            $q->where('anio_id', $anioId);
+        }]);
+    }
+
+    /**
+     * Obtiene estadísticas de grupos por nivel educativo para un año específico.
+     *
+     * @param int $anioId
+     * @return array
+     */
+    public function estadisticasGruposPorNivel($anioId)
+    {
+        $estadisticas = [];
+        $niveles = Grado::getNivelesDisponibles();
+        
+        foreach ($niveles as $nivel) {
+            $count = $this->grupos()
+                ->whereHas('grado', function ($q) use ($nivel) {
+                    $q->where('nivel', $nivel);
+                })
+                ->where('anio_id', $anioId)
+                ->count();
+            
+            $estadisticas[$nivel] = $count;
+        }
+        
+        return $estadisticas;
+    }
+
+    /**
      * Mutador para el campo escudo - asigna imagen por defecto si está vacío
      */
     public function setEscudoAttribute($value)

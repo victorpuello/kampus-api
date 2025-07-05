@@ -14,10 +14,15 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property int $id
  * @property int|null $user_id
  * @property string $codigo_estudiantil
+ * @property int|null $grupo_id
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\User|null $user
+ * @property-read \App\Models\Grupo|null $grupo
+ * @property-read \App\Models\Grado|null $grado
+ * @property-read \App\Models\Sede|null $sede
+ * @property-read \App\Models\Institucion|null $institucion
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Acudiente> $acudientes
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\HistorialGrupo> $historialGrupos
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Observador> $observador
@@ -51,6 +56,7 @@ class Estudiante extends Model
     protected $fillable = [
         'user_id',
         'codigo_estudiantil',
+        'grupo_id',
         'fecha_nacimiento',
         'genero',
         'direccion',
@@ -74,6 +80,38 @@ class Estudiante extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Obtiene el grupo al que pertenece el estudiante.
+     */
+    public function grupo()
+    {
+        return $this->belongsTo(Grupo::class);
+    }
+
+    /**
+     * Obtiene el grado de forma más directa a través del grupo.
+     */
+    public function getGradoAttribute()
+    {
+        return $this->grupo ? $this->grupo->grado : null;
+    }
+
+    /**
+     * Obtiene la sede de forma más directa a través del grupo.
+     */
+    public function getSedeAttribute()
+    {
+        return $this->grupo ? $this->grupo->sede : null;
+    }
+
+    /**
+     * Obtiene la institución de forma más directa a través del grupo.
+     */
+    public function getInstitucionAttribute()
+    {
+        return $this->grupo ? $this->grupo->institucion : null;
     }
 
     /**
@@ -125,17 +163,62 @@ class Estudiante extends Model
     }
 
     /**
-     * Obtiene la institución del estudiante a través del usuario.
+     * Obtiene el nombre completo del estudiante con su ubicación académica.
      */
-    public function institucion()
+    public function getUbicacionAcademicaAttribute()
     {
-        return $this->hasOneThrough(
-            Institucion::class,
-            User::class,
-            'id', // Foreign key en users
-            'id', // Foreign key en instituciones
-            'user_id', // Local key en estudiantes
-            'institucion_id' // Local key en users
-        );
+        if (!$this->grupo) {
+            return "Sin asignar";
+        }
+        
+        return "{$this->grupo->sede->nombre} - {$this->grupo->grado->nombre} - {$this->grupo->nombre}";
+    }
+
+    /**
+     * Scope para filtrar estudiantes por grupo.
+     */
+    public function scopePorGrupo($query, $grupoId)
+    {
+        return $query->where('grupo_id', $grupoId);
+    }
+
+    /**
+     * Scope para filtrar estudiantes por grado.
+     */
+    public function scopePorGrado($query, $gradoId)
+    {
+        return $query->whereHas('grupo', function ($q) use ($gradoId) {
+            $q->where('grado_id', $gradoId);
+        });
+    }
+
+    /**
+     * Scope para filtrar estudiantes por sede.
+     */
+    public function scopePorSede($query, $sedeId)
+    {
+        return $query->whereHas('grupo', function ($q) use ($sedeId) {
+            $q->where('sede_id', $sedeId);
+        });
+    }
+
+    /**
+     * Scope para filtrar estudiantes por institución.
+     */
+    public function scopePorInstitucion($query, $institucionId)
+    {
+        return $query->whereHas('grupo.sede', function ($q) use ($institucionId) {
+            $q->where('institucion_id', $institucionId);
+        });
+    }
+
+    /**
+     * Scope para filtrar estudiantes por año académico.
+     */
+    public function scopePorAnio($query, $anioId)
+    {
+        return $query->whereHas('grupo', function ($q) use ($anioId) {
+            $q->where('anio_id', $anioId);
+        });
     }
 }

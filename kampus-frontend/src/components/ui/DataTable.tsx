@@ -44,6 +44,13 @@ export interface DataTableProps<T> {
   selectable?: boolean;
   onSelectionChange?: (selectedItems: T[]) => void;
   bulkActions?: ActionButton<T[]>[];
+  serverSidePagination?: boolean;
+  currentPage?: number;
+  totalPages?: number;
+  totalItems?: number;
+  onPageChange?: (page: number) => void;
+  onItemsPerPageChange?: (perPage: number) => void;
+  onSearch?: (search: string) => void;
 }
 
 // Definir el tipo base para elementos con ID
@@ -72,17 +79,29 @@ export const DataTable = <T extends BaseItem>({
   selectable = false,
   onSelectionChange,
   bulkActions = [],
+  serverSidePagination = false,
+  currentPage = 1,
+  totalPages = 1,
+  totalItems = 0,
+  onPageChange,
+  onItemsPerPageChange,
+  onSearch,
 }: DataTableProps<T>) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
-  const [currentPage, setCurrentPage] = useState(1);
+  const [clientCurrentPage, setClientCurrentPage] = useState(1);
   const [itemsPerPageState, setItemsPerPageState] = useState(itemsPerPage);
   const [selectedItems, setSelectedItems] = useState<T[]>([]);
 
-  // Filtrar datos por término de búsqueda
+  // Usar paginación del servidor o del cliente
+  const effectiveCurrentPage = serverSidePagination ? currentPage : clientCurrentPage;
+  const effectiveTotalPages = serverSidePagination ? totalPages : Math.ceil(data.length / itemsPerPageState);
+  const effectiveTotalItems = serverSidePagination ? totalItems : data.length;
+
+  // Filtrar datos por término de búsqueda (solo para paginación del cliente)
   const filteredData = useMemo(() => {
-    if (!searchTerm || searchKeys.length === 0) return data;
+    if (serverSidePagination || !searchTerm || searchKeys.length === 0) return data;
 
     return data.filter((item) =>
       searchKeys.some((key) => {
@@ -98,11 +117,11 @@ export const DataTable = <T extends BaseItem>({
         return String(value).toLowerCase().includes(searchTerm.toLowerCase());
       })
     );
-  }, [data, searchTerm, searchKeys]);
+  }, [data, searchTerm, searchKeys, serverSidePagination]);
 
-  // Ordenar datos
+  // Ordenar datos (solo para paginación del cliente)
   const sortedData = useMemo(() => {
-    if (!sortable || !sortColumn) return filteredData;
+    if (serverSidePagination || !sortable || !sortColumn) return filteredData;
 
     const column = columns.find((col) => col.key === sortColumn);
     if (!column) return filteredData;
@@ -121,21 +140,21 @@ export const DataTable = <T extends BaseItem>({
         return bString.localeCompare(aString);
       }
     });
-  }, [filteredData, sortColumn, sortDirection, sortable, columns]);
+  }, [filteredData, sortColumn, sortDirection, sortable, columns, serverSidePagination]);
 
-  // Paginar datos
+  // Paginar datos (solo para paginación del cliente)
   const paginatedData = useMemo(() => {
+    if (serverSidePagination) return data;
     if (!pagination) return sortedData;
 
-    const startIndex = (currentPage - 1) * itemsPerPageState;
+    const startIndex = (effectiveCurrentPage - 1) * itemsPerPageState;
     const endIndex = startIndex + itemsPerPageState;
     return sortedData.slice(startIndex, endIndex);
-  }, [sortedData, currentPage, itemsPerPageState, pagination]);
+  }, [data, sortedData, effectiveCurrentPage, itemsPerPageState, pagination, serverSidePagination]);
 
   // Calcular información de paginación
-  const totalPages = Math.ceil(sortedData.length / itemsPerPageState);
-  const startItem = (currentPage - 1) * itemsPerPageState + 1;
-  const endItem = Math.min(currentPage * itemsPerPageState, sortedData.length);
+  const startItem = (effectiveCurrentPage - 1) * itemsPerPageState + 1;
+  const endItem = Math.min(effectiveCurrentPage * itemsPerPageState, effectiveTotalItems);
 
   // Manejar ordenamiento
   const handleSort = (columnKey: string) => {
@@ -164,15 +183,46 @@ export const DataTable = <T extends BaseItem>({
     }
   };
 
+  // Manejar búsqueda
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+    if (serverSidePagination && onSearch) {
+      onSearch(value);
+    } else {
+      setClientCurrentPage(1);
+    }
+  };
+
+  // Manejar cambio de página
+  const handlePageChange = (page: number) => {
+    if (serverSidePagination && onPageChange) {
+      onPageChange(page);
+    } else {
+      setClientCurrentPage(page);
+    }
+  };
+
+  // Manejar cambio de elementos por página
+  const handleItemsPerPageChange = (perPage: number) => {
+    setItemsPerPageState(perPage);
+    if (serverSidePagination && onItemsPerPageChange) {
+      onItemsPerPageChange(perPage);
+    } else {
+      setClientCurrentPage(1);
+    }
+  };
+
   // Notificar cambios en la selección
   React.useEffect(() => {
     onSelectionChange?.(selectedItems);
   }, [selectedItems, onSelectionChange]);
 
-  // Resetear página cuando cambian los filtros
+  // Resetear página cuando cambian los filtros (solo para paginación del cliente)
   React.useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm, sortColumn, sortDirection]);
+    if (!serverSidePagination) {
+      setClientCurrentPage(1);
+    }
+  }, [searchTerm, sortColumn, sortDirection, serverSidePagination]);
 
   if (loading) {
     return (
@@ -204,7 +254,7 @@ export const DataTable = <T extends BaseItem>({
             <Input
               placeholder={searchPlaceholder}
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => handleSearchChange(e.target.value)}
               leftIcon={
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -237,7 +287,7 @@ export const DataTable = <T extends BaseItem>({
       {/* Información de resultados */}
       <div className="flex items-center justify-between text-sm text-gray-500">
         <span>
-          Mostrando {startItem} a {endItem} de {sortedData.length} resultados
+          Mostrando {startItem} a {endItem} de {effectiveTotalItems} resultados
         </span>
         {pagination && (
           <div className="flex items-center gap-2">
@@ -245,8 +295,7 @@ export const DataTable = <T extends BaseItem>({
             <select
               value={itemsPerPageState}
               onChange={(e) => {
-                setItemsPerPageState(Number(e.target.value));
-                setCurrentPage(1);
+                handleItemsPerPageChange(Number(e.target.value));
               }}
               className="border border-gray-300 rounded-md px-2 py-1 text-sm"
             >
@@ -411,43 +460,43 @@ export const DataTable = <T extends BaseItem>({
       </div>
 
       {/* Paginación */}
-      {pagination && totalPages > 1 && (
+      {pagination && effectiveTotalPages > 1 && (
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm text-gray-700">
             <span>
-              Página {currentPage} de {totalPages}
+              Página {effectiveCurrentPage} de {effectiveTotalPages}
             </span>
           </div>
           <div className="flex items-center space-x-2">
             <Button
               variant="secondary"
               size="sm"
-              onClick={() => setCurrentPage(currentPage - 1)}
-              disabled={currentPage === 1}
+              onClick={() => handlePageChange(effectiveCurrentPage - 1)}
+              disabled={effectiveCurrentPage === 1}
             >
               Anterior
             </Button>
             
             {/* Números de página */}
             <div className="flex items-center space-x-1">
-              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+              {Array.from({ length: Math.min(5, effectiveTotalPages) }, (_, i) => {
                 let pageNumber;
-                if (totalPages <= 5) {
+                if (effectiveTotalPages <= 5) {
                   pageNumber = i + 1;
-                } else if (currentPage <= 3) {
+                } else if (effectiveCurrentPage <= 3) {
                   pageNumber = i + 1;
-                } else if (currentPage >= totalPages - 2) {
-                  pageNumber = totalPages - 4 + i;
+                } else if (effectiveCurrentPage >= effectiveTotalPages - 2) {
+                  pageNumber = effectiveTotalPages - 4 + i;
                 } else {
-                  pageNumber = currentPage - 2 + i;
+                  pageNumber = effectiveCurrentPage - 2 + i;
                 }
 
                 return (
                   <Button
                     key={pageNumber}
-                    variant={currentPage === pageNumber ? 'primary' : 'secondary'}
+                    variant={effectiveCurrentPage === pageNumber ? 'primary' : 'secondary'}
                     size="sm"
-                    onClick={() => setCurrentPage(pageNumber)}
+                    onClick={() => handlePageChange(pageNumber)}
                     className="w-8 h-8 p-0"
                   >
                     {pageNumber}
@@ -459,8 +508,8 @@ export const DataTable = <T extends BaseItem>({
             <Button
               variant="secondary"
               size="sm"
-              onClick={() => setCurrentPage(currentPage + 1)}
-              disabled={currentPage === totalPages}
+              onClick={() => handlePageChange(effectiveCurrentPage + 1)}
+              disabled={effectiveCurrentPage === effectiveTotalPages}
             >
               Siguiente
             </Button>

@@ -88,7 +88,7 @@ class GrupoController extends Controller
     public function index(Request $request)
     {
         $query = Grupo::query()
-            ->with(['anio', 'grado', 'directorDocente.user'])
+            ->with(['anio', 'grado', 'sede', 'directorDocente.user'])
             ->when($request->search, function ($query, $search) {
                 $query->where('nombre', 'like', "%{$search}%");
             })
@@ -138,9 +138,15 @@ class GrupoController extends Controller
      */
     public function store(StoreGrupoRequest $request)
     {
-        $grupo = Grupo::create($request->validated());
+        try {
+            $grupo = Grupo::create($request->validated());
 
-        return new GrupoResource($grupo->load(['anio', 'grado', 'directorDocente.user']));
+            return new GrupoResource($grupo->load(['anio', 'grado', 'sede', 'directorDocente.user']));
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 422);
+        }
     }
 
     /**
@@ -177,7 +183,7 @@ class GrupoController extends Controller
      */
     public function show(Grupo $grupo)
     {
-        return new GrupoResource($grupo->load(['anio', 'grado', 'directorDocente.user']));
+        return new GrupoResource($grupo->load(['anio', 'grado', 'sede', 'directorDocente.user', 'estudiantes.user']));
     }
 
     /**
@@ -222,9 +228,15 @@ class GrupoController extends Controller
      */
     public function update(UpdateGrupoRequest $request, Grupo $grupo)
     {
-        $grupo->update($request->validated());
+        try {
+            $grupo->update($request->validated());
 
-        return new GrupoResource($grupo->load(['anio', 'grado', 'directorDocente.user']));
+            return new GrupoResource($grupo->load(['anio', 'grado', 'sede', 'directorDocente.user']));
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 422);
+        }
     }
 
     /**

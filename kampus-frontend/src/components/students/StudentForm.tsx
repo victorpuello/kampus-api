@@ -14,6 +14,24 @@ interface Guardian {
   apellido: string;
 }
 
+interface Grupo {
+  id: number;
+  nombre: string;
+  sede: {
+    id: number;
+    nombre: string;
+    institucion: {
+      id: number;
+      nombre: string;
+    };
+  };
+  grado: {
+    id: number;
+    nombre: string;
+    nivel: string;
+  };
+}
+
 interface StudentFormProps {
   studentId?: number;
 }
@@ -25,6 +43,8 @@ const StudentForm = ({ studentId }: StudentFormProps) => {
   const [error, setError] = useState<string | null>(null);
   const [institutions, setInstitutions] = useState<Institution[]>([]);
   const [guardians, setGuardians] = useState<Guardian[]>([]);
+  const [grupos, setGrupos] = useState<Grupo[]>([]);
+  const [selectedInstitution, setSelectedInstitution] = useState<string>('');
   const [formData, setFormData] = useState({
     nombre: '',
     apellido: '',
@@ -37,6 +57,7 @@ const StudentForm = ({ studentId }: StudentFormProps) => {
     email: '',
     estado: 'activo',
     institucion_id: '',
+    grupo_id: '',
     acudiente_id: '',
     password: ''
   });
@@ -74,9 +95,11 @@ const StudentForm = ({ studentId }: StudentFormProps) => {
             email: student.user?.email || '',
             estado: student.user?.estado || 'activo',
             institucion_id: student.user?.institucion_id?.toString() || '',
+            grupo_id: student.grupo_id?.toString() || '',
             acudiente_id: student.acudiente?.id?.toString() || '',
             password: ''
           });
+          setSelectedInstitution(student.user?.institucion_id?.toString() || '');
         } catch (err: any) {
           setError(err.response?.data?.message || 'Error al cargar el estudiante');
         }
@@ -85,6 +108,24 @@ const StudentForm = ({ studentId }: StudentFormProps) => {
       fetchStudent();
     }
   }, [studentId]);
+
+  // Cargar grupos cuando se selecciona una institución
+  useEffect(() => {
+    const fetchGrupos = async () => {
+      if (selectedInstitution) {
+        try {
+          const response = await axiosClient.get(`/grupos?institucion_id=${selectedInstitution}`);
+          setGrupos(response.data.data || response.data);
+        } catch (err: any) {
+          console.error('Error al cargar grupos:', err);
+        }
+      } else {
+        setGrupos([]);
+      }
+    };
+
+    fetchGrupos();
+  }, [selectedInstitution]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -118,10 +159,21 @@ const StudentForm = ({ studentId }: StudentFormProps) => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    
+    // Si se cambia la institución, limpiar el grupo seleccionado
+    if (name === 'institucion_id') {
+      setSelectedInstitution(value);
+      setFormData(prev => ({
+        ...prev,
+        [name]: value,
+        grupo_id: '' // Limpiar grupo cuando cambia institución
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
   };
 
   return (
@@ -311,6 +363,29 @@ const StudentForm = ({ studentId }: StudentFormProps) => {
             {institutions.map(institution => (
               <option key={institution.id} value={institution.id}>
                 {institution.nombre}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label htmlFor="grupo_id" className="block text-sm font-medium text-gray-700">
+            Grupo
+          </label>
+          <select
+            name="grupo_id"
+            id="grupo_id"
+            value={formData.grupo_id}
+            onChange={handleChange}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            disabled={!selectedInstitution}
+          >
+            <option value="">
+              {selectedInstitution ? 'Seleccione un grupo' : 'Primero seleccione una institución'}
+            </option>
+            {grupos.map(grupo => (
+              <option key={grupo.id} value={grupo.id}>
+                {grupo.sede.nombre} - {grupo.grado.nombre} - {grupo.nombre}
               </option>
             ))}
           </select>

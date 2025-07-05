@@ -9,10 +9,9 @@ use Illuminate\Foundation\Http\FormRequest;
  * @OA\Schema(
  *     schema="StoreGradoRequest",
  *     title="Solicitud para Crear Grado",
- *     required={"nombre", "nivel", "institucion_id"},
+ *     required={"nombre", "nivel"},
  *     @OA\Property(property="nombre", type="string", maxLength=255, description="Nombre del grado (ej. Primero, Undécimo)"),
  *     @OA\Property(property="nivel", type="string", enum={"Preescolar", "Básica Primaria", "Básica Secundaria", "Educación Media"}, description="Nivel educativo del grado"),
- *     @OA\Property(property="institucion_id", type="integer", description="ID de la institución a la que pertenece el grado"),
  * )
  */
 class StoreGradoRequest extends FormRequest
@@ -32,10 +31,18 @@ class StoreGradoRequest extends FormRequest
      */
     public function rules(): array
     {
+        $user = auth()->user();
+        
+        if (!$user) {
+            return [
+                'nombre' => 'required|string|max:255',
+                'nivel' => 'required|string|in:' . implode(',', Grado::getNivelesDisponibles()),
+            ];
+        }
+        
         return [
-            'nombre' => 'required|string|max:255|unique:grados',
+            'nombre' => 'required|string|max:255|unique:grados,nombre,NULL,id,institucion_id,' . $user->institucion_id,
             'nivel' => 'required|string|in:' . implode(',', Grado::getNivelesDisponibles()),
-            'institucion_id' => 'required|integer|exists:instituciones,id',
         ];
     }
 

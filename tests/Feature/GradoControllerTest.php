@@ -13,16 +13,27 @@ class GradoControllerTest extends TestCase
     use RefreshDatabase;
 
     protected $user;
+    protected $institucion;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->user = User::factory()->create();
+        
+        // Crear institución
+        $this->institucion = Institucion::factory()->create();
+        
+        // Crear usuario con la institución
+        $this->user = User::factory()->create([
+            'institucion_id' => $this->institucion->id
+        ]);
     }
 
     public function test_can_list_grados()
     {
-        Grado::factory()->count(3)->create();
+        // Crear grados para la institución del usuario
+        Grado::factory()->count(3)->create([
+            'institucion_id' => $this->institucion->id
+        ]);
 
         $response = $this->actingAs($this->user, 'sanctum')->getJson('/api/v1/grados');
 
@@ -32,11 +43,9 @@ class GradoControllerTest extends TestCase
 
     public function test_can_create_grado()
     {
-        $institucion = Institucion::factory()->create();
         $gradoData = [
             'nombre' => 'Nuevo Grado',
-            'nivel' => 1,
-            'institucion_id' => $institucion->id,
+            'nivel' => 'Básica Primaria',
         ];
 
         $response = $this->actingAs($this->user, 'sanctum')->postJson('/api/v1/grados', $gradoData);
@@ -44,12 +53,17 @@ class GradoControllerTest extends TestCase
         $response->assertStatus(201)
                  ->assertJsonFragment(['nombre' => 'Nuevo Grado']);
 
-        $this->assertDatabaseHas('grados', ['nombre' => 'Nuevo Grado']);
+        $this->assertDatabaseHas('grados', [
+            'nombre' => 'Nuevo Grado',
+            'institucion_id' => $this->institucion->id
+        ]);
     }
 
     public function test_can_show_grado()
     {
-        $grado = Grado::factory()->create();
+        $grado = Grado::factory()->create([
+            'institucion_id' => $this->institucion->id
+        ]);
 
         $response = $this->actingAs($this->user, 'sanctum')->getJson('/api/v1/grados/' . $grado->id);
 
@@ -59,10 +73,13 @@ class GradoControllerTest extends TestCase
 
     public function test_can_update_grado()
     {
-        $grado = Grado::factory()->create();
+        $grado = Grado::factory()->create([
+            'institucion_id' => $this->institucion->id
+        ]);
+        
         $updatedData = [
             'nombre' => 'Grado Actualizado',
-            'nivel' => 2,
+            'nivel' => 'Básica Secundaria',
         ];
 
         $response = $this->actingAs($this->user, 'sanctum')->putJson('/api/v1/grados/' . $grado->id, $updatedData);
@@ -70,12 +87,14 @@ class GradoControllerTest extends TestCase
         $response->assertStatus(200)
                  ->assertJsonFragment(['nombre' => 'Grado Actualizado']);
 
-        $this->assertDatabaseHas('grados', ['id' => $grado->id, 'nombre' => 'Grado Actualizado', 'nivel' => 2]);
+        $this->assertDatabaseHas('grados', ['id' => $grado->id, 'nombre' => 'Grado Actualizado', 'nivel' => 'Básica Secundaria']);
     }
 
     public function test_can_delete_grado()
     {
-        $grado = Grado::factory()->create();
+        $grado = Grado::factory()->create([
+            'institucion_id' => $this->institucion->id
+        ]);
 
         $response = $this->actingAs($this->user, 'sanctum')->deleteJson('/api/v1/grados/' . $grado->id);
 

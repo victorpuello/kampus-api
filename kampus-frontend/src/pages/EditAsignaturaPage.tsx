@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axiosClient from '../api/axiosClient';
 import { useAlertContext } from '../contexts/AlertContext';
+import { useAuth } from '../hooks/useAuth';
 import { Card, CardHeader, CardBody } from '../components/ui/Card';
 import { AsignaturaForm } from '../components/asignaturas/AsignaturaForm';
 import type { AsignaturaFormValues } from '../components/asignaturas/AsignaturaForm';
@@ -10,6 +11,7 @@ const EditAsignaturaPage = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { showSuccess, showError } = useAlertContext();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
   const [errors, setErrors] = useState<Partial<Record<keyof AsignaturaFormValues, string>>>({});
@@ -20,6 +22,7 @@ const EditAsignaturaPage = () => {
     descripcion: '',
     creditos: 3,
     area_id: 0,
+    porcentaje_area: 0,
     estado: 'activo',
     grados: [],
   };
@@ -33,12 +36,20 @@ const EditAsignaturaPage = () => {
         const response = await axiosClient.get(`/asignaturas/${id}`);
         const asignatura = response.data.data || response.data;
         
+        // Verificar que la asignatura pertenece a la institución del usuario
+        if (asignatura.area?.institucion_id !== user?.institucion?.id) {
+          showError('No tienes permisos para editar esta asignatura', 'Error de Permisos');
+          navigate('/asignaturas');
+          return;
+        }
+        
         setValues({
           nombre: asignatura.nombre,
           codigo: asignatura.codigo || '',
           descripcion: asignatura.descripcion || '',
           creditos: asignatura.creditos || 3,
           area_id: asignatura.area_id || asignatura.area?.id || 0,
+          porcentaje_area: asignatura.porcentaje_area || 0,
           estado: asignatura.estado,
           grados: asignatura.grados?.map((g: any) => g.id) || asignatura.grados || [],
         });
@@ -50,10 +61,10 @@ const EditAsignaturaPage = () => {
       }
     };
 
-    if (id) {
+    if (id && user?.institucion?.id) {
       fetchAsignatura();
     }
-  }, [id, navigate, showError]);
+  }, [id, navigate, showError, user?.institucion?.id]);
 
   const handleSubmit = async (formValues: AsignaturaFormValues) => {
     setLoading(true);

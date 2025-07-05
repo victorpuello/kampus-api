@@ -187,4 +187,27 @@ class User extends Authenticatable
         $permiso = $map[$ability] ?? $ability;
         return $this->hasPermissionTo($permiso);
     }
+
+    /**
+     * Devuelve una colección de todos los permisos únicos del usuario a través de sus roles.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function getAllPermissions()
+    {
+        return $this->roles
+            ->load('permissions')
+            ->pluck('permissions')
+            ->flatten()
+            ->unique('id')
+            ->values();
+    }
+
+    /**
+     * Alias para hasPermissionTo (compatibilidad)
+     */
+    public function hasPermission($permission)
+    {
+        return $this->hasPermissionTo($permission);
+    }
 }

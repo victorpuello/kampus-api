@@ -20,6 +20,7 @@ return new class extends Migration
                   ->references('id')
                   ->on('instituciones')
                   ->onDelete('cascade');
+            $table->unique(['institucion_id', 'nombre'], 'institucion_nombre_unique');
         });
     }
 

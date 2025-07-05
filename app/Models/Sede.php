@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Institucion $institucion
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Grupo> $grupos
  * @method static \Database\Factories\SedeFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|Sede newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Sede newQuery()
@@ -58,5 +59,75 @@ class Sede extends Model
     public function institucion()
     {
         return $this->belongsTo(Institucion::class);
+    }
+
+    /**
+     * Obtiene los grupos asociados a esta sede.
+     */
+    public function grupos()
+    {
+        return $this->hasMany(Grupo::class);
+    }
+
+    /**
+     * Obtiene los grupos de esta sede para un año académico específico.
+     *
+     * @param int $anioId
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function gruposPorAnio($anioId)
+    {
+        return $this->grupos()->where('anio_id', $anioId);
+    }
+
+    /**
+     * Obtiene los grupos de esta sede para un grado específico.
+     *
+     * @param int $gradoId
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function gruposPorGrado($gradoId)
+    {
+        return $this->grupos()->where('grado_id', $gradoId);
+    }
+
+    /**
+     * Obtiene estadísticas de grupos por nivel educativo para un año específico.
+     *
+     * @param int $anioId
+     * @return array
+     */
+    public function estadisticasGruposPorNivel($anioId)
+    {
+        $estadisticas = [];
+        $niveles = Grado::getNivelesDisponibles();
+        
+        foreach ($niveles as $nivel) {
+            $count = $this->grupos()
+                ->whereHas('grado', function ($q) use ($nivel) {
+                    $q->where('nivel', $nivel);
+                })
+                ->where('anio_id', $anioId)
+                ->count();
+            
+            $estadisticas[$nivel] = $count;
+        }
+        
+        return $estadisticas;
+    }
+
+    /**
+     * Obtiene el total de estudiantes en esta sede para un año específico.
+     *
+     * @param int $anioId
+     * @return int
+     */
+    public function totalEstudiantesPorAnio($anioId)
+    {
+        return $this->grupos()
+            ->where('anio_id', $anioId)
+            ->withCount('estudiantes')
+            ->get()
+            ->sum('estudiantes_count');
     }
 }

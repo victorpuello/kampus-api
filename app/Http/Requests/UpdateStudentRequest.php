@@ -21,6 +21,7 @@ use Illuminate\Foundation\Http\FormRequest;
  *     @OA\Property(property="direccion", type="string", maxLength=255, description="Dirección del estudiante"),
  *     @OA\Property(property="telefono", type="string", maxLength=20, description="Teléfono del estudiante"),
  *     @OA\Property(property="institucion_id", type="integer", description="ID de la institución a la que pertenece el estudiante"),
+ *     @OA\Property(property="grupo_id", type="integer", description="ID del grupo al que pertenece el estudiante"),
  *     @OA\Property(property="acudiente_id", type="integer", description="ID del acudiente del estudiante"),
  *     @OA\Property(property="estado", type="string", enum={"activo", "inactivo"}, description="Estado del estudiante"),
  * )
@@ -61,6 +62,7 @@ class UpdateStudentRequest extends FormRequest
             'direccion' => 'sometimes|string|max:255',
             'telefono' => 'sometimes|string|max:20',
             'institucion_id' => 'sometimes|integer|exists:instituciones,id',
+            'grupo_id' => 'sometimes|integer|exists:grupos,id',
             'acudiente_id' => 'sometimes|integer|exists:acudientes,id',
             'estado' => 'sometimes|string|in:activo,inactivo',
         ];
