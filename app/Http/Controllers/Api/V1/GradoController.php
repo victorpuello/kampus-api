@@ -244,4 +244,35 @@ class GradoController extends Controller
 
         return response()->noContent();
     }
+
+    /**
+     * @OA\Get(
+     *     path="/v1/grados/niveles",
+     *     summary="Obtiene la lista de niveles educativos disponibles",
+     *     tags={"Grados"},
+     *     security={{"sanctum":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Lista de niveles obtenida exitosamente",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(type="string", example="Preescolar")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="No autenticado",
+     *     )
+     * )
+     */
+    public function niveles()
+    {
+        return response()->json([
+            'data' => Grado::getNivelesDisponibles()
+        ]);
+    }
 }

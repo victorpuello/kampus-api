@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  *
  * @property int $id
  * @property string $nombre
- * @property int $nivel
+ * @property string $nivel
  * @property int $institucion_id
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -34,6 +34,14 @@ class Grado extends Model
     use HasFactory, SoftDeletes;
 
     /**
+     * Constantes para los niveles educativos
+     */
+    const NIVEL_PREESCOLAR = 'Preescolar';
+    const NIVEL_BASICA_PRIMARIA = 'Básica Primaria';
+    const NIVEL_BASICA_SECUNDARIA = 'Básica Secundaria';
+    const NIVEL_EDUCACION_MEDIA = 'Educación Media';
+
+    /**
      * La tabla asociada con el modelo.
      *
      * @var string
@@ -50,6 +58,41 @@ class Grado extends Model
         'nivel',
         'institucion_id',
     ];
+
+    /**
+     * Los atributos que deben ser convertidos a tipos nativos.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'nivel' => 'string',
+    ];
+
+    /**
+     * Obtiene todos los niveles disponibles.
+     *
+     * @return array<string>
+     */
+    public static function getNivelesDisponibles(): array
+    {
+        return [
+            self::NIVEL_PREESCOLAR,
+            self::NIVEL_BASICA_PRIMARIA,
+            self::NIVEL_BASICA_SECUNDARIA,
+            self::NIVEL_EDUCACION_MEDIA,
+        ];
+    }
+
+    /**
+     * Verifica si el nivel es válido.
+     *
+     * @param string $nivel
+     * @return bool
+     */
+    public static function isNivelValido(string $nivel): bool
+    {
+        return in_array($nivel, self::getNivelesDisponibles());
+    }
 
     /**
      * Obtiene la institución a la que pertenece el grado.

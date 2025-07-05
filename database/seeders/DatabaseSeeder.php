@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             DocenteSeeder::class,
             EstudianteSeeder::class,
             AcudienteSeeder::class,
+            GradoSeeder::class,
         ]);
     }
 }

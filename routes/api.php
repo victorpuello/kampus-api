@@ -155,6 +155,9 @@ Route::prefix('v1')->group(function () {
         /**
          * Rutas para la gestión de grados académicos (CRUD).
          */
+        // Ruta específica para obtener niveles educativos disponibles (debe ir antes del resource)
+        Route::get('grados/niveles', [GradoController::class, 'niveles']);
+        
         Route::apiResource('grados', GradoController::class);
 
         // Rutas de áreas
