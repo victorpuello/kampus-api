@@ -47,8 +47,12 @@ class FranjaHoraria extends Model
      */
     protected $fillable = [
         'institucion_id',
+        'nombre',
+        'descripcion',
         'hora_inicio',
         'hora_fin',
+        'duracion_minutos',
+        'estado',
     ];
 
     /**
@@ -59,6 +63,7 @@ class FranjaHoraria extends Model
     protected $casts = [
         'hora_inicio' => 'datetime',
         'hora_fin' => 'datetime',
+        'duracion_minutos' => 'integer',
     ];
 
     /**

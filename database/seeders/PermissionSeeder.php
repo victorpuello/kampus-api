@@ -55,6 +55,7 @@ class PermissionSeeder extends Seeder
             ['nombre' => 'crear_grupos', 'descripcion' => 'Crear nuevos grupos'],
             ['nombre' => 'editar_grupos', 'descripcion' => 'Modificar grupos'],
             ['nombre' => 'eliminar_grupos', 'descripcion' => 'Eliminar grupos'],
+            ['nombre' => 'matricular_estudiantes', 'descripcion' => 'Matricular estudiantes en grupos'],
             
             // Areas
             ['nombre' => 'ver_areas', 'descripcion' => 'Ver lista de áreas'],
@@ -67,6 +68,18 @@ class PermissionSeeder extends Seeder
             ['nombre' => 'crear_asignaturas', 'descripcion' => 'Crear nuevas asignaturas'],
             ['nombre' => 'editar_asignaturas', 'descripcion' => 'Modificar asignaturas'],
             ['nombre' => 'eliminar_asignaturas', 'descripcion' => 'Eliminar asignaturas'],
+            
+            // Asignaciones
+            ['nombre' => 'ver_asignaciones', 'descripcion' => 'Ver lista de asignaciones'],
+            ['nombre' => 'crear_asignaciones', 'descripcion' => 'Crear nuevas asignaciones'],
+            ['nombre' => 'editar_asignaciones', 'descripcion' => 'Modificar asignaciones'],
+            ['nombre' => 'eliminar_asignaciones', 'descripcion' => 'Eliminar asignaciones'],
+            
+            // Franjas Horarias
+            ['nombre' => 'ver_franjas_horarias', 'descripcion' => 'Ver lista de franjas horarias'],
+            ['nombre' => 'crear_franjas_horarias', 'descripcion' => 'Crear nuevas franjas horarias'],
+            ['nombre' => 'editar_franjas_horarias', 'descripcion' => 'Modificar franjas horarias'],
+            ['nombre' => 'eliminar_franjas_horarias', 'descripcion' => 'Eliminar franjas horarias'],
             
             // Sedes
             ['nombre' => 'ver_sedes', 'descripcion' => 'Ver lista de sedes'],

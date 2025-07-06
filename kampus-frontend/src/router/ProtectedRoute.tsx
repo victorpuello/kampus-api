@@ -2,12 +2,9 @@ import { Navigate, Outlet } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 
 const ProtectedRoute = () => {
-  const { isAuthenticated, token, user } = useAuth()
+  const { isAuthenticated } = useAuth()
   
-  console.log('🛡️ ProtectedRoute ejecutándose...')
-  console.log('   isAuthenticated:', isAuthenticated)
-  console.log('   token:', token ? 'Presente' : 'Ausente')
-  console.log('   user:', user ? `${user.nombre} ${user.apellido}` : 'Ausente')
+  console.log('🛡️ ProtectedRoute - isAuthenticated:', isAuthenticated)
 
   if (!isAuthenticated) {
     console.log('❌ Usuario no autenticado, redirigiendo a login')

@@ -12,11 +12,18 @@ class GrupoFactory extends Factory
 {
     public function definition(): array
     {
+        // Crear una institución primero
+        $institucion = \App\Models\Institucion::factory()->create();
+        
+        // Crear sede y grado de la misma institución
+        $sede = Sede::factory()->create(['institucion_id' => $institucion->id]);
+        $grado = Grado::factory()->create(['institucion_id' => $institucion->id]);
+        
         return [
             'nombre' => fake()->word(),
-            'sede_id' => Sede::factory(),
+            'sede_id' => $sede->id,
             'anio_id' => Anio::factory(),
-            'grado_id' => Grado::factory(),
+            'grado_id' => $grado->id,
             'director_docente_id' => Docente::factory(),
         ];
     }

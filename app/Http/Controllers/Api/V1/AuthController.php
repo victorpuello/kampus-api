@@ -126,5 +126,55 @@ class AuthController extends Controller
             'user' => new UserResource($request->user()->load('roles.permissions', 'institucion')),
         ]);
     }
+
+    /**
+     * Verificar la validez del token actual
+     */
+    public function verifyToken(Request $request)
+    {
+        try {
+            $user = $request->user();
+            
+            if (!$user) {
+                return response()->json([
+                    'valid' => false,
+                    'message' => 'Token inválido'
+                ], 401);
+            }
+            
+            $token = $user->currentAccessToken();
+            
+            // Verificar si el token expira pronto (menos de 1 hora)
+            $shouldRefresh = false;
+            if ($token && $token->expires_at) {
+                $minutesUntilExpiry = $token->expires_at->diffInMinutes(now());
+                $shouldRefresh = $minutesUntilExpiry < 60;
+            }
+            
+            $response = [
+                'valid' => true,
+                'user' => new UserResource($user),
+                'should_refresh' => $shouldRefresh,
+                'expires_at' => $token ? $token->expires_at : null,
+            ];
+            
+            // Si debe renovarse, crear un nuevo token
+            if ($shouldRefresh) {
+                $newToken = $user->createToken('auth-token', $token->abilities ?? ['*']);
+                $response['new_token'] = $newToken->plainTextToken;
+                
+                // Eliminar el token anterior
+                $token->delete();
+            }
+            
+            return response()->json($response);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'valid' => false,
+                'message' => 'Error al verificar token: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
  

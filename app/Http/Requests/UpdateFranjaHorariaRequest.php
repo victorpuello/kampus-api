@@ -31,9 +31,13 @@ class UpdateFranjaHorariaRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'nombre' => 'sometimes|string|max:255',
+            'descripcion' => 'nullable|string',
             'hora_inicio' => 'sometimes|date_format:H:i',
             'hora_fin' => 'sometimes|date_format:H:i|after:hora_inicio',
-            'institucion_id' => 'sometimes|integer|exists:instituciones,id',
+            'duracion_minutos' => 'nullable|integer|min:1',
+            'estado' => 'nullable|string|in:activo,inactivo,pendiente',
+            'institucion_id' => 'nullable|integer|exists:instituciones,id',
         ];
     }
 }

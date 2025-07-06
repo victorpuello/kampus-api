@@ -105,6 +105,31 @@ Route::prefix('v1')->group(function () {
          */
         Route::get('/me', [AuthController::class, 'me']);
         
+        /**
+         * @OA\Get(
+         *     path="/v1/verify-token",
+         *     summary="Verifica la validez del token actual y lo renueva si es necesario",
+         *     tags={"Autenticación"},
+         *     security={{"sanctum":{}}},
+         *     @OA\Response(
+         *         response=200,
+         *         description="Token válido",
+         *         @OA\JsonContent(
+         *             @OA\Property(property="valid", type="boolean", example=true),
+         *             @OA\Property(property="user", type="object", ref="#/components/schemas/UserResource"),
+         *             @OA\Property(property="should_refresh", type="boolean", example=false),
+         *             @OA\Property(property="expires_at", type="string", format="date-time", nullable=true),
+         *             @OA\Property(property="new_token", type="string", nullable=true),
+         *         )
+         *     ),
+         *     @OA\Response(
+         *         response=401,
+         *         description="Token inválido",
+         *     )
+         * )
+         */
+        Route::get('/verify-token', [AuthController::class, 'verifyToken']);
+        
         // Rutas de usuarios
         /**
          * Rutas para la gestión de usuarios (CRUD).
@@ -147,6 +172,15 @@ Route::prefix('v1')->group(function () {
 
         // Ruta específica para obtener sedes de una institución
         Route::get('instituciones/{institucion}/sedes', [InstitucionController::class, 'sedes']);
+
+        // Rutas anidadas de franjas horarias bajo instituciones
+        Route::prefix('instituciones/{institucion}')->group(function () {
+            Route::get('franjas-horarias', [FranjaHorariaController::class, 'indexForInstitucion']);
+            Route::post('franjas-horarias', [FranjaHorariaController::class, 'storeForInstitucion']);
+            Route::get('franjas-horarias/{franja_horaria}', [FranjaHorariaController::class, 'showForInstitucion']);
+            Route::put('franjas-horarias/{franja_horaria}', [FranjaHorariaController::class, 'updateForInstitucion']);
+            Route::delete('franjas-horarias/{franja_horaria}', [FranjaHorariaController::class, 'destroyForInstitucion']);
+        });
 
         // Rutas de sedes
         /**
@@ -210,6 +244,11 @@ Route::prefix('v1')->group(function () {
          * Rutas para la gestión de asignaciones (CRUD).
          */
         Route::apiResource('asignaciones', AsignacionController::class);
+        
+        // Rutas especializadas de asignaciones
+        Route::get('asignaciones/grupo/{grupoId}', [AsignacionController::class, 'porGrupo']);
+        Route::get('asignaciones/docente/{docenteId}', [AsignacionController::class, 'porDocente']);
+        Route::get('asignaciones/conflictos', [AsignacionController::class, 'conflictos']);
 
         // Rutas de periodos
         /**

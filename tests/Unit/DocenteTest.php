@@ -55,15 +55,28 @@ class DocenteTest extends TestCase
         $docente = Docente::factory()->create();
         $anio = Anio::factory()->create();
         $area = Area::factory()->create();
-        $grado = Grado::factory()->create();
+        
+        // Crear una institución primero
+        $institucion = Institucion::factory()->create();
+        
+        // Crear grado y sede de la misma institución
+        $grado = Grado::factory()->create(['institucion_id' => $institucion->id]);
+        $sede = \App\Models\Sede::factory()->create(['institucion_id' => $institucion->id]);
+        
         $asignatura = Asignatura::factory()->create(['area_id' => $area->id]);
-        $grupo = Grupo::factory()->create(['anio_id' => $anio->id, 'grado_id' => $grado->id]);
+        
+        // Crear grupo manualmente con la misma institución
+        $grupo = Grupo::factory()->create([
+            'anio_id' => $anio->id,
+            'grado_id' => $grado->id,
+            'sede_id' => $sede->id
+        ]);
 
         $asignacion = Asignacion::factory()->create([
             'docente_id' => $docente->id,
             'asignatura_id' => $asignatura->id,
             'grupo_id' => $grupo->id,
-            'anio_id' => $anio->id,
+            'anio_academico_id' => $anio->id,
         ]);
 
         $this->assertTrue($docente->asignaciones->contains($asignacion));

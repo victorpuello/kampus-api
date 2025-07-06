@@ -31,6 +31,11 @@ class GrupoResource extends JsonResource
         return [
             'id' => $this->id,
             'nombre' => $this->nombre,
+            'descripcion' => $this->descripcion,
+            'estado' => $this->estado,
+            'estudiantes_count' => $this->whenLoaded('estudiantes', function () {
+                return $this->estudiantes->count();
+            }),
             'anio' => new AnioResource($this->whenLoaded('anio')),
             'grado' => new GradoResource($this->whenLoaded('grado')),
             'sede' => new SedeResource($this->whenLoaded('sede')),

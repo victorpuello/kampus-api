@@ -27,8 +27,15 @@ class FranjaHorariaResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'hora_inicio' => $this->hora_inicio,
-            'hora_fin' => $this->hora_fin,
+            'nombre' => $this->nombre,
+            'descripcion' => $this->descripcion,
+            'hora_inicio' => $this->hora_inicio ? $this->hora_inicio->format('H:i') : null,
+            'hora_fin' => $this->hora_fin ? $this->hora_fin->format('H:i') : null,
+            'duracion_minutos' => $this->duracion_minutos,
+            'estado' => $this->estado,
+            'institucion_id' => $this->institucion_id,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
             'institucion' => new InstitucionResource($this->whenLoaded('institucion')),
         ];
     }

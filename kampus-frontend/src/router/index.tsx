@@ -57,6 +57,11 @@ import AnioPeriodosListPage from '../pages/AnioPeriodosListPage'
 import AnioPeriodoDetailPage from '../pages/AnioPeriodoDetailPage'
 import AnioCreatePeriodoPage from '../pages/AnioCreatePeriodoPage'
 import AnioEditPeriodoPage from '../pages/AnioEditPeriodoPage'
+import AsignacionesListPage from '../pages/AsignacionesListPage'
+import InstitutionFranjasHorariasPage from '../pages/InstitutionFranjasHorariasPage'
+import InstitutionFranjaHorariaDetailPage from '../pages/InstitutionFranjaHorariaDetailPage'
+import InstitutionFranjaHorariaCreatePage from '../pages/InstitutionFranjaHorariaCreatePage'
+import InstitutionFranjaHorariaEditPage from '../pages/InstitutionFranjaHorariaEditPage'
 
 
 export const router = createBrowserRouter([
@@ -385,6 +390,38 @@ export const router = createBrowserRouter([
         element: <DashboardLayout><InstitutionSedeEditPage /></DashboardLayout>
       },
       {
+        path: 'instituciones/:institutionId/franjas-horarias',
+        element: (
+          <PermissionRoute permission="ver_franjas_horarias">
+            <DashboardLayout><InstitutionFranjasHorariasPage /></DashboardLayout>
+          </PermissionRoute>
+        )
+      },
+      {
+        path: 'instituciones/:institutionId/franjas-horarias/crear',
+        element: (
+          <PermissionRoute permission="crear_franjas_horarias">
+            <DashboardLayout><InstitutionFranjaHorariaCreatePage /></DashboardLayout>
+          </PermissionRoute>
+        )
+      },
+      {
+        path: 'instituciones/:institutionId/franjas-horarias/:id',
+        element: (
+          <PermissionRoute permission="ver_franjas_horarias">
+            <DashboardLayout><InstitutionFranjaHorariaDetailPage /></DashboardLayout>
+          </PermissionRoute>
+        )
+      },
+      {
+        path: 'instituciones/:institutionId/franjas-horarias/:id/editar',
+        element: (
+          <PermissionRoute permission="editar_franjas_horarias">
+            <DashboardLayout><InstitutionFranjaHorariaEditPage /></DashboardLayout>
+          </PermissionRoute>
+        )
+      },
+      {
         path: 'sedes',
         element: (
           <PermissionRoute permission="ver_sedes">
@@ -480,7 +517,14 @@ export const router = createBrowserRouter([
           </PermissionRoute>
         )
       },
-
+      {
+        path: 'asignaciones',
+        element: (
+          <PermissionRoute permission="ver_asignaciones">
+            <DashboardLayout><AsignacionesListPage /></DashboardLayout>
+          </PermissionRoute>
+        )
+      },
     ],
   }
 ]) 

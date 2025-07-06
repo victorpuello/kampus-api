@@ -32,6 +32,17 @@ axiosClient.interceptors.request.use(
 axiosClient.interceptors.response.use(
   (response) => {
     console.log('✅ Respuesta exitosa:', response.status, response.config.url)
+    
+    // Verificar si hay un nuevo token en los headers
+    const newToken = response.headers['x-new-token']
+    if (newToken) {
+      console.log('🔄 Nuevo token recibido, actualizando store')
+      useAuthStore.setState((state) => ({
+        ...state,
+        token: newToken,
+      }))
+    }
+    
     return response
   },
   async (error) => {
@@ -43,13 +54,15 @@ axiosClient.interceptors.response.use(
     if (error.response?.status === 401) {
       console.log('🔒 Error de autenticación detectado, limpiando sesión')
       
-      // Limpiar el store de autenticación
-      useAuthStore.getState().logout()
+      // Limpiar el store de autenticación de forma síncrona
+      useAuthStore.setState({
+        user: null,
+        token: null,
+        isAuthenticated: false,
+      })
       
-      // Redirigir al login si estamos en el navegador
-      if (typeof window !== 'undefined') {
-        window.location.href = '/login'
-      }
+      // No usar window.location.href para evitar recargas de página
+      // La redirección se manejará por el ProtectedRoute
     }
     
     return Promise.reject(error)

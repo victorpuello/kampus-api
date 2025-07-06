@@ -20,6 +20,19 @@ use Illuminate\Http\JsonResponse;
 class RoleController extends Controller
 {
     /**
+     * Constructor del controlador.
+     * Aplica middleware de permisos a los recursos de roles.
+     */
+    public function __construct()
+    {
+        $this->middleware(\App\Http\Middleware\CheckPermission::class . ':ver_roles')->only(['index', 'show', 'getAllRoles', 'getRolePermissions']);
+        $this->middleware(\App\Http\Middleware\CheckPermission::class . ':asignar_permisos')->only(['assignRoles']);
+        $this->middleware(\App\Http\Middleware\CheckPermission::class . ':crear_roles')->only(['store']);
+        $this->middleware(\App\Http\Middleware\CheckPermission::class . ':editar_roles')->only(['update']);
+        $this->middleware(\App\Http\Middleware\CheckPermission::class . ':eliminar_roles')->only(['destroy']);
+    }
+
+    /**
      * @OA\Get(
      *     path="/v1/users/{user}/roles",
      *     summary="Obtiene los roles de un usuario específico",
@@ -52,17 +65,7 @@ class RoleController extends Controller
      */
     public function index(Request $request, $userId): JsonResponse
     {
-        $user = auth()->user();
-        
-        if (!$user) {
-            abort(401, 'Usuario no autenticado');
-        }
-
-        // Verificar permisos para ver roles de usuarios
-        if (!$user->hasPermissionTo('ver_roles')) {
-            abort(403, 'No tienes permisos para ver roles');
-        }
-
+        // Permiso verificado por middleware
         $roles = Role::with('permissions')->get();
 
         return response()->json(RoleResource::collection($roles));
@@ -101,16 +104,7 @@ class RoleController extends Controller
      */
     public function show(Request $request, $userId, $roleId): JsonResponse
     {
-        $user = auth()->user();
-        
-        if (!$user) {
-            abort(401, 'Usuario no autenticado');
-        }
-
-        if (!$user->hasPermissionTo('ver_roles')) {
-            abort(403, 'No tienes permisos para ver roles');
-        }
-
+        // Permiso verificado por middleware
         $role = Role::with('permissions')->findOrFail($roleId);
 
         return response()->json(new RoleResource($role));
@@ -152,16 +146,7 @@ class RoleController extends Controller
      */
     public function assignRoles(Request $request, $userId): JsonResponse
     {
-        $user = auth()->user();
-        
-        if (!$user) {
-            abort(401, 'Usuario no autenticado');
-        }
-
-        if (!$user->hasPermissionTo('asignar_permisos')) {
-            abort(403, 'No tienes permisos para asignar roles');
-        }
-
+        // Permiso verificado por middleware
         $request->validate([
             'role_ids' => 'required|array',
             'role_ids.*' => 'integer|exists:roles,id'
@@ -194,16 +179,7 @@ class RoleController extends Controller
      */
     public function getAllRoles(): JsonResponse
     {
-        $user = auth()->user();
-        
-        if (!$user) {
-            abort(401, 'Usuario no autenticado');
-        }
-
-        if (!$user->hasPermissionTo('ver_roles')) {
-            abort(403, 'No tienes permisos para ver roles');
-        }
-
+        // Permiso verificado por middleware
         $roles = Role::with('permissions')->get();
 
         return response()->json(RoleResource::collection($roles));
@@ -229,27 +205,19 @@ class RoleController extends Controller
      *             type="array",
      *             @OA\Items(ref="#/components/schemas/PermissionResource")
      *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Rol no encontrado",
      *     )
      * )
      */
     public function getRolePermissions($roleId): JsonResponse
     {
-        $user = auth()->user();
-        
-        if (!$user) {
-            abort(401, 'Usuario no autenticado');
-        }
-
-        if (!$user->hasPermissionTo('ver_permisos')) {
-            abort(403, 'No tienes permisos para ver permisos');
-        }
-
+        // Permiso verificado por middleware
         $role = Role::with('permissions')->findOrFail($roleId);
 
-        return response()->json([
-            'role' => new RoleResource($role),
-            'permissions' => $role->permissions
-        ]);
+        return response()->json($role->permissions);
     }
 
     /**
@@ -270,32 +238,19 @@ class RoleController extends Controller
      *     @OA\Response(
      *         response=422,
      *         description="Error de validación",
-     *     ),
-     *     @OA\Response(
-     *         response=401,
-     *         description="No autenticado",
-     *     ),
-     *     @OA\Response(
-     *         response=403,
-     *         description="Acceso denegado",
      *     )
      * )
      */
     public function store(StoreRoleRequest $request)
     {
-        $user = auth()->user();
-        
-        if (!$user) {
-            abort(401, 'Usuario no autenticado');
-        }
-        
-        // Verificar permiso para crear roles
-        if (!$user->hasPermissionTo('crear_roles')) {
-            abort(403, 'No tienes permisos para crear roles');
-        }
-        
+        // Permiso verificado por middleware
         $data = $request->validated();
+        
         $role = Role::create($data);
+
+        if ($request->has('permission_ids')) {
+            $role->permissions()->sync($request->permission_ids);
+        }
 
         return new RoleResource($role->load('permissions'));
     }
@@ -323,38 +278,25 @@ class RoleController extends Controller
      *         @OA\JsonContent(ref="#/components/schemas/RoleResource")
      *     ),
      *     @OA\Response(
-     *         response=422,
-     *         description="Error de validación",
-     *     ),
-     *     @OA\Response(
      *         response=404,
      *         description="Rol no encontrado",
      *     ),
      *     @OA\Response(
-     *         response=401,
-     *         description="No autenticado",
-     *     ),
-     *     @OA\Response(
-     *         response=403,
-     *         description="Acceso denegado",
+     *         response=422,
+     *         description="Error de validación",
      *     )
      * )
      */
     public function update(UpdateRoleRequest $request, Role $role)
     {
-        $user = auth()->user();
-        
-        if (!$user) {
-            abort(401, 'Usuario no autenticado');
-        }
-        
-        // Verificar permiso para editar roles
-        if (!$user->hasPermissionTo('editar_roles')) {
-            abort(403, 'No tienes permisos para editar roles');
-        }
-        
+        // Permiso verificado por middleware
         $data = $request->validated();
+        
         $role->update($data);
+
+        if ($request->has('permission_ids')) {
+            $role->permissions()->sync($request->permission_ids);
+        }
 
         return new RoleResource($role->load('permissions'));
     }
@@ -382,39 +324,14 @@ class RoleController extends Controller
      *     @OA\Response(
      *         response=404,
      *         description="Rol no encontrado",
-     *     ),
-     *     @OA\Response(
-     *         response=401,
-     *         description="No autenticado",
-     *     ),
-     *     @OA\Response(
-     *         response=403,
-     *         description="Acceso denegado",
      *     )
      * )
      */
     public function destroy(Role $role)
     {
-        $user = auth()->user();
-        
-        if (!$user) {
-            abort(401, 'Usuario no autenticado');
-        }
-        
-        // Verificar permiso para eliminar roles
-        if (!$user->hasPermissionTo('eliminar_roles')) {
-            abort(403, 'No tienes permisos para eliminar roles');
-        }
-        
-        // Verificar que el rol no esté siendo usado por usuarios
-        if ($role->users()->count() > 0) {
-            abort(400, 'No se puede eliminar el rol porque está siendo usado por usuarios');
-        }
-        
+        // Permiso verificado por middleware
         $role->delete();
 
-        return response()->json([
-            'message' => 'Rol eliminado exitosamente'
-        ]);
+        return response()->json(['message' => 'Rol eliminado exitosamente']);
     }
 } 

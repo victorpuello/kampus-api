@@ -29,7 +29,10 @@ class GradoResource extends JsonResource
             'id' => $this->id,
             'nombre' => $this->nombre,
             'nivel' => $this->nivel,
+            'descripcion' => $this->descripcion,
+            'estado' => $this->estado,
             'institucion' => new InstitucionResource($this->whenLoaded('institucion')),
+            'grupos' => GrupoResource::collection($this->whenLoaded('grupos')),
         ];
     }
 }

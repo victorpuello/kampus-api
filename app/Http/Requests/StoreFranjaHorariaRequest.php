@@ -32,9 +32,13 @@ class StoreFranjaHorariaRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'nombre' => 'required|string|max:255',
+            'descripcion' => 'nullable|string',
             'hora_inicio' => 'required|date_format:H:i',
             'hora_fin' => 'required|date_format:H:i|after:hora_inicio',
-            'institucion_id' => 'required|integer|exists:instituciones,id',
+            'duracion_minutos' => 'nullable|integer|min:1',
+            'estado' => 'nullable|string|in:activo,inactivo,pendiente',
+            'institucion_id' => 'nullable|integer|exists:instituciones,id',
         ];
     }
 }

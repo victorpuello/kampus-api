@@ -4,7 +4,6 @@ import { useAuthStore } from '../../store/authStore'
 import { Button } from '../ui/Button'
 import { Input } from '../ui/Input'
 import { Card, CardHeader, CardBody } from '../ui/Card'
-import { useAlertContext } from '../../contexts/AlertContext'
 
 interface LoginFormProps {
   onSuccess?: () => void
@@ -15,14 +14,15 @@ const LoginForm = ({ onSuccess, redirectTo = '/dashboard' }: LoginFormProps) => 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
   
   const navigate = useNavigate()
   const { login } = useAuthStore()
-  const { showSuccess, showError } = useAlertContext()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
+    setError('')
 
     try {
       console.log('🚀 Iniciando login con el nuevo microservicio...')
@@ -31,7 +31,6 @@ const LoginForm = ({ onSuccess, redirectTo = '/dashboard' }: LoginFormProps) => 
       await login(email, password)
       
       console.log('✅ Login exitoso con el nuevo sistema de tokens')
-      showSuccess('Inicio de sesión exitoso', 'Bienvenido al sistema')
       
       // Llamar callback de éxito si existe
       if (onSuccess) {
@@ -44,7 +43,7 @@ const LoginForm = ({ onSuccess, redirectTo = '/dashboard' }: LoginFormProps) => 
     } catch (err: any) {
       console.error('❌ Error en login:', err)
       const errorMessage = err.message || 'Credenciales inválidas'
-      showError(errorMessage, 'Error de autenticación')
+      setError(errorMessage)
     } finally {
       setLoading(false)
     }
@@ -62,6 +61,12 @@ const LoginForm = ({ onSuccess, redirectTo = '/dashboard' }: LoginFormProps) => 
       </CardHeader>
       <CardBody>
         <form onSubmit={handleSubmit} className="space-y-6">
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-md text-sm">
+              {error}
+            </div>
+          )}
+          
           <Input
             label="Correo Electrónico"
             type="email"

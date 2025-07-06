@@ -27,6 +27,7 @@ const UserForm = ({ userId }: UserFormProps) => {
   const navigate = useNavigate();
   const { showSuccess, showError } = useAlertContext();
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [institutions, setInstitutions] = useState<Institution[]>([]);
   const [roles, setRoles] = useState<Role[]>([]);
@@ -46,14 +47,17 @@ const UserForm = ({ userId }: UserFormProps) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setInitialLoading(true);
         const [institutionsRes, rolesRes] = await Promise.all([
           axiosClient.get('/instituciones'),
           axiosClient.get('/roles')
         ]);
-        setInstitutions(institutionsRes.data.data);
-        setRoles(rolesRes.data.data);
+        setInstitutions(institutionsRes.data.data || []);
+        setRoles(rolesRes.data.data || []);
       } catch (err: any) {
         setError(err.response?.data?.message || 'Error al cargar los datos');
+      } finally {
+        setInitialLoading(false);
       }
     };
 
@@ -74,7 +78,7 @@ const UserForm = ({ userId }: UserFormProps) => {
             numero_documento: user.numero_documento || '',
             estado: user.estado || 'activo',
             institucion_id: user.institucion_id?.toString() || '',
-            roles: user.roles?.map((role: any) => role.id) || []
+            roles: user.roles && user.roles.length > 0 ? user.roles.map((role: any) => role.id) : []
           });
         } catch (err: any) {
           setError(err.response?.data?.message || 'Error al cargar el usuario');
@@ -125,7 +129,7 @@ const UserForm = ({ userId }: UserFormProps) => {
     const selectedOptions = Array.from(e.target.selectedOptions, option => Number(option.value));
     setFormData(prev => ({
       ...prev,
-      roles: selectedOptions
+      roles: selectedOptions || []
     }));
   };
 
@@ -145,15 +149,23 @@ const UserForm = ({ userId }: UserFormProps) => {
     { value: 'inactivo', label: 'Inactivo' }
   ];
 
-  const institutionOptions = institutions.map(inst => ({
+  const institutionOptions = institutions?.map(inst => ({
     value: inst.id,
     label: inst.nombre
-  }));
+  })) || [];
 
-  const roleOptions = roles.map(role => ({
+  const roleOptions = roles?.map(role => ({
     value: role.id,
     label: role.nombre
-  }));
+  })) || [];
+
+  if (initialLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+      </div>
+    );
+  }
 
   return (
     <FormContainer onSubmit={handleSubmit} error={error}>
@@ -254,16 +266,16 @@ const UserForm = ({ userId }: UserFormProps) => {
           id="roles"
           required
           multiple
-          value={formData.roles.map(String)}
+          value={formData.roles?.map(String) || []}
           onChange={handleRoleChange}
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           size={4}
         >
-          {roleOptions.map((role) => (
+          {roleOptions?.map((role) => (
             <option key={role.value} value={role.value}>
               {role.label}
             </option>
-          ))}
+          )) || []}
         </select>
         <p className="mt-1 text-sm text-gray-500">
           Mantenga presionado Ctrl (Cmd en Mac) para seleccionar múltiples roles

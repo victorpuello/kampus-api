@@ -214,6 +214,9 @@ const InstitutionDetailPage: React.FC = () => {
         description="Información completa de la institución educativa"
       >
         <div className="flex space-x-3">
+          <Link to={`/instituciones/${institution?.id}/franjas-horarias`}>
+            <Button variant="secondary">Franjas Horarias</Button>
+          </Link>
           <Link to={`/instituciones/${institution?.id}/sedes`}>
             <Button variant="secondary">Ver Sedes</Button>
           </Link>

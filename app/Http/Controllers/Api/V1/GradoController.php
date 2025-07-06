@@ -19,11 +19,14 @@ class GradoController extends Controller
 {
     /**
      * Constructor del controlador.
-     * Aplica políticas de autorización a los recursos de grado.
+     * Aplica middleware de permisos a los recursos de grado.
      */
     public function __construct()
     {
-        // Removido parent::__construct() que no está disponible en el controlador base
+        $this->middleware(\App\Http\Middleware\CheckPermission::class . ':ver_grados')->only(['index', 'show', 'niveles']);
+        $this->middleware(\App\Http\Middleware\CheckPermission::class . ':crear_grados')->only(['store']);
+        $this->middleware(\App\Http\Middleware\CheckPermission::class . ':editar_grados')->only(['update']);
+        $this->middleware(\App\Http\Middleware\CheckPermission::class . ':eliminar_grados')->only(['destroy']);
     }
 
     /**
@@ -73,11 +76,8 @@ class GradoController extends Controller
      */
     public function index(Request $request)
     {
+        // Permiso verificado por middleware
         $user = auth()->user();
-        
-        if (!$user) {
-            abort(401, 'Usuario no autenticado');
-        }
         
         $query = Grado::query()
             ->with('institucion')
@@ -122,11 +122,8 @@ class GradoController extends Controller
      */
     public function store(StoreGradoRequest $request)
     {
+        // Permiso verificado por middleware
         $user = auth()->user();
-        
-        if (!$user) {
-            abort(401, 'Usuario no autenticado');
-        }
         
         // Asegurar que el grado se crea para la institución del usuario
         $data = $request->validated();
@@ -171,18 +168,15 @@ class GradoController extends Controller
      */
     public function show(Grado $grado)
     {
+        // Permiso verificado por middleware
         $user = auth()->user();
-        
-        if (!$user) {
-            abort(401, 'Usuario no autenticado');
-        }
         
         // Verificar que el grado pertenece a la institución del usuario
         if ($grado->institucion_id !== $user->institucion_id) {
             abort(403, 'No tienes permisos para acceder a este grado');
         }
         
-        return new GradoResource($grado->load('institucion'));
+        return new GradoResource($grado->load(['institucion', 'grupos']));
     }
 
     /**
@@ -227,11 +221,8 @@ class GradoController extends Controller
      */
     public function update(UpdateGradoRequest $request, Grado $grado)
     {
+        // Permiso verificado por middleware
         $user = auth()->user();
-        
-        if (!$user) {
-            abort(401, 'Usuario no autenticado');
-        }
         
         // Verificar que el grado pertenece a la institución del usuario
         if ($grado->institucion_id !== $user->institucion_id) {
@@ -276,11 +267,8 @@ class GradoController extends Controller
      */
     public function destroy(Grado $grado)
     {
+        // Permiso verificado por middleware
         $user = auth()->user();
-        
-        if (!$user) {
-            abort(401, 'Usuario no autenticado');
-        }
         
         // Verificar que el grado pertenece a la institución del usuario
         if ($grado->institucion_id !== $user->institucion_id) {

@@ -1,19 +1,10 @@
-import { useEffect, type ReactNode } from 'react'
-import { useAuth } from '../hooks/useAuth'
+import { type ReactNode } from 'react'
 
 interface AuthProviderProps {
   children: ReactNode
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const { checkAuth } = useAuth()
-
-  useEffect(() => {
-    // Verificar la autenticación al cargar la aplicación
-    console.log('🔍 Verificando autenticación inicial...')
-    const isAuthenticated = checkAuth()
-    console.log('Estado de autenticación:', isAuthenticated)
-  }, [checkAuth])
-
+  // Eliminado el useEffect que verificaba la autenticación constantemente
   return <>{children}</>
 } 

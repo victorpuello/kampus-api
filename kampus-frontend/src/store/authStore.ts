@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import axiosClient from '../api/axiosClient'
+import { SESSION_CONFIG } from '../config/session'
 
 interface User {
   id: number
@@ -27,8 +28,11 @@ interface AuthState {
   user: User | null
   token: string | null
   isAuthenticated: boolean
+  lastActivity: number | null
   login: (email: string, password: string) => Promise<void>
   logout: () => void
+  updateActivity: () => void
+  checkInactivity: () => boolean
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -37,6 +41,7 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       token: null,
       isAuthenticated: false,
+      lastActivity: null,
 
       login: async (email: string, password: string) => {
         console.log('🚀 Iniciando login con:', email)
@@ -81,37 +86,26 @@ export const useAuthStore = create<AuthState>()(
             user: null,
             token: null,
             isAuthenticated: false,
+            lastActivity: null,
           })
           console.log('✅ Estado limpiado')
         }
       },
+
+      updateActivity: () => {
+        set({ lastActivity: Date.now() })
+      },
+
+      checkInactivity: () => {
+        const { lastActivity } = get()
+        if (!lastActivity) return false
+        
+        const timeSinceLastActivity = Date.now() - lastActivity
+        return timeSinceLastActivity > SESSION_CONFIG.MAX_INACTIVITY_TIME
+      },
     }),
     {
       name: 'auth-storage',
-      // Agregar migración para manejar cambios en la estructura del store
-      migrate: (persistedState: any, version: number) => {
-        console.log('🔄 Migrando estado de auth, versión:', version)
-        console.log('📦 Estado persistido:', persistedState)
-        
-        // Si no hay estado persistido, devolver el estado por defecto
-        if (!persistedState) {
-          return {
-            user: null,
-            token: null,
-            isAuthenticated: false,
-          }
-        }
-        
-        // Si hay estado persistido, asegurarse de que tenga la estructura correcta
-        return {
-          user: persistedState.user || null,
-          token: persistedState.token || null,
-          isAuthenticated: persistedState.isAuthenticated || false,
-        }
-      },
     }
   )
-)
-
-// Log del estado inicial después de la persistencia
-console.log('Estado inicial del store (después de persist):', useAuthStore.getState()) 
+) 

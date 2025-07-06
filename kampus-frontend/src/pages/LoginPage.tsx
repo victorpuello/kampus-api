@@ -1,13 +1,13 @@
+import { Navigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import LoginForm from '../components/auth/LoginForm'
 
 const LoginPage = () => {
   const { isAuthenticated } = useAuth()
 
-  // Si ya está autenticado, redirigir al dashboard
+  // Si ya está autenticado, redirigir al dashboard usando React Router
   if (isAuthenticated) {
-    window.location.href = '/dashboard'
-    return null
+    return <Navigate to="/dashboard" replace />
   }
 
   return (

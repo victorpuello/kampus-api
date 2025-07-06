@@ -16,8 +16,12 @@ class FranjaHorariaFactory extends Factory
         $horaFin = date('H:i', strtotime($horaInicio . ' +1 hour'));
 
         return [
+            'nombre' => $this->faker->words(2, true),
+            'descripcion' => $this->faker->optional()->sentence(),
             'hora_inicio' => $horaInicio,
             'hora_fin' => $horaFin,
+            'duracion_minutos' => 60,
+            'estado' => $this->faker->randomElement(['activo', 'inactivo', 'pendiente']),
             'institucion_id' => Institucion::factory(),
         ];
     }

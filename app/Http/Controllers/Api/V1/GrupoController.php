@@ -7,6 +7,8 @@ use App\Http\Requests\StoreGrupoRequest;
 use App\Http\Requests\UpdateGrupoRequest;
 use App\Http\Resources\GrupoResource;
 use App\Models\Grupo;
+use App\Models\Grado;
+use App\Models\Anio;
 use Illuminate\Http\Request;
 
 /**
@@ -19,11 +21,15 @@ class GrupoController extends Controller
 {
     /**
      * Constructor del controlador.
-     * Aplica políticas de autorización a los recursos de grupo.
+     * Aplica middleware de permisos a los recursos de grupo.
      */
     public function __construct()
     {
-        // Removido parent::__construct() que no está disponible en el controlador base
+        $this->middleware(\App\Http\Middleware\CheckPermission::class . ':ver_grupos')->only(['index', 'show', 'getEstudiantes']);
+        $this->middleware(\App\Http\Middleware\CheckPermission::class . ':crear_grupos')->only(['store']);
+        $this->middleware(\App\Http\Middleware\CheckPermission::class . ':editar_grupos')->only(['update']);
+        $this->middleware(\App\Http\Middleware\CheckPermission::class . ':eliminar_grupos')->only(['destroy']);
+        $this->middleware(\App\Http\Middleware\CheckPermission::class . ':matricular_estudiantes')->only(['matricularEstudiante', 'desmatricularEstudiante']);
     }
 
     /**
@@ -87,19 +93,22 @@ class GrupoController extends Controller
      */
     public function index(Request $request)
     {
+        // Permiso verificado por middleware
+        $user = auth()->user();
+        
         $query = Grupo::query()
-            ->with(['anio', 'grado', 'sede', 'directorDocente.user'])
+            ->with(['grado.institucion', 'anio'])
+            ->whereHas('grado', function ($query) use ($user) {
+                $query->where('institucion_id', $user->institucion_id);
+            })
             ->when($request->search, function ($query, $search) {
                 $query->where('nombre', 'like', "%{$search}%");
-            })
-            ->when($request->anio_id, function ($query, $anioId) {
-                $query->where('anio_id', $anioId);
             })
             ->when($request->grado_id, function ($query, $gradoId) {
                 $query->where('grado_id', $gradoId);
             })
-            ->when($request->director_docente_id, function ($query, $directorDocenteId) {
-                $query->where('director_docente_id', $directorDocenteId);
+            ->when($request->anio_id, function ($query, $anioId) {
+                $query->where('anio_id', $anioId);
             });
 
         $grupos = $query->paginate($request->per_page ?? 10);
@@ -138,15 +147,26 @@ class GrupoController extends Controller
      */
     public function store(StoreGrupoRequest $request)
     {
-        try {
-            $grupo = Grupo::create($request->validated());
-
-            return new GrupoResource($grupo->load(['anio', 'grado', 'sede', 'directorDocente.user']));
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => $e->getMessage()
-            ], 422);
+        // Permiso verificado por middleware
+        $user = auth()->user();
+        
+        $data = $request->validated();
+        
+        // Verificar que el grado pertenece a la institución del usuario
+        $grado = Grado::findOrFail($data['grado_id']);
+        if ($grado->institucion_id !== $user->institucion_id) {
+            abort(403, 'No tienes permisos para crear grupos en este grado');
         }
+        
+        // Verificar que el año académico pertenece a la institución del usuario
+        $anio = Anio::findOrFail($data['anio_id']);
+        if ($anio->institucion_id !== $user->institucion_id) {
+            abort(403, 'No tienes permisos para crear grupos en este año académico');
+        }
+        
+        $grupo = Grupo::create($data);
+
+        return new GrupoResource($grupo->load(['grado.institucion', 'anio']));
     }
 
     /**
@@ -183,7 +203,15 @@ class GrupoController extends Controller
      */
     public function show(Grupo $grupo)
     {
-        return new GrupoResource($grupo->load(['anio', 'grado', 'sede', 'directorDocente.user', 'estudiantes.user']));
+        // Permiso verificado por middleware
+        $user = auth()->user();
+        
+        // Verificar que el grupo pertenece a la institución del usuario
+        if ($grupo->grado->institucion_id !== $user->institucion_id) {
+            abort(403, 'No tienes permisos para acceder a este grupo');
+        }
+        
+        return new GrupoResource($grupo->load(['grado.institucion', 'anio', 'estudiantes']));
     }
 
     /**
@@ -228,15 +256,17 @@ class GrupoController extends Controller
      */
     public function update(UpdateGrupoRequest $request, Grupo $grupo)
     {
-        try {
-            $grupo->update($request->validated());
-
-            return new GrupoResource($grupo->load(['anio', 'grado', 'sede', 'directorDocente.user']));
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => $e->getMessage()
-            ], 422);
+        // Permiso verificado por middleware
+        $user = auth()->user();
+        
+        // Verificar que el grupo pertenece a la institución del usuario
+        if ($grupo->grado->institucion_id !== $user->institucion_id) {
+            abort(403, 'No tienes permisos para editar este grupo');
         }
+        
+        $grupo->update($request->validated());
+
+        return new GrupoResource($grupo->load(['grado.institucion', 'anio']));
     }
 
     /**
@@ -272,6 +302,14 @@ class GrupoController extends Controller
      */
     public function destroy(Grupo $grupo)
     {
+        // Permiso verificado por middleware
+        $user = auth()->user();
+        
+        // Verificar que el grupo pertenece a la institución del usuario
+        if ($grupo->grado->institucion_id !== $user->institucion_id) {
+            abort(403, 'No tienes permisos para eliminar este grupo');
+        }
+        
         $grupo->delete();
 
         return response()->noContent();

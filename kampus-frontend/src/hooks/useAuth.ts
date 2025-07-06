@@ -1,11 +1,11 @@
-import { useEffect } from 'react'
+import { useCallback } from 'react'
 import { useAuthStore } from '../store/authStore'
 
 export const useAuth = () => {
   const { token, user, isAuthenticated, login, logout } = useAuthStore()
 
-  // Verificar si el token existe y es válido
-  const checkAuth = () => {
+  // Verificar si el token existe y es válido - memoizada para evitar recreaciones
+  const checkAuth = useCallback(() => {
     console.log('🔍 Verificando autenticación...')
     console.log('Token:', token ? 'Presente' : 'Ausente')
     console.log('Usuario:', user ? 'Presente' : 'Ausente')
@@ -23,24 +23,9 @@ export const useAuth = () => {
     
     console.log('✅ Autenticación válida')
     return true
-  }
+  }, [token, user, isAuthenticated])
 
-  // Efecto para verificar la autenticación al cargar
-  useEffect(() => {
-    console.log('🔄 Efecto de verificación de auth ejecutándose...')
-    const isValid = checkAuth()
-    
-    if (!isAuthenticated && isValid) {
-      console.log('🔄 Actualizando estado: no autenticado -> autenticado')
-      // Si hay token pero no está marcado como autenticado, actualizar el estado
-      useAuthStore.setState({ isAuthenticated: true })
-    } else if (isAuthenticated && !isValid) {
-      console.log('🔄 Limpiando estado: autenticado -> no autenticado')
-      // Si está marcado como autenticado pero no hay token válido, limpiar
-      logout()
-    }
-  }, [token, user, isAuthenticated, logout])
-
+  // Estado de autenticación simplificado
   const currentAuthState = isAuthenticated && checkAuth()
   
   console.log('🎯 Estado final de autenticación:', currentAuthState)

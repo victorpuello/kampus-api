@@ -7,6 +7,7 @@ use App\Http\Requests\StoreAsignaturaRequest;
 use App\Http\Requests\UpdateAsignaturaRequest;
 use App\Http\Resources\AsignaturaResource;
 use App\Models\Asignatura;
+use App\Models\Area;
 use Illuminate\Http\Request;
 
 /**
@@ -19,11 +20,14 @@ class AsignaturaController extends Controller
 {
     /**
      * Constructor del controlador.
-     * Aplica políticas de autorización a los recursos de asignatura.
+     * Aplica middleware de permisos a los recursos de asignatura.
      */
     public function __construct()
     {
-        // Removido parent::__construct() que no está disponible en el controlador base
+        $this->middleware(\App\Http\Middleware\CheckPermission::class . ':ver_asignaturas')->only(['index', 'show']);
+        $this->middleware(\App\Http\Middleware\CheckPermission::class . ':crear_asignaturas')->only(['store']);
+        $this->middleware(\App\Http\Middleware\CheckPermission::class . ':editar_asignaturas')->only(['update']);
+        $this->middleware(\App\Http\Middleware\CheckPermission::class . ':eliminar_asignaturas')->only(['destroy']);
     }
 
     /**
@@ -53,6 +57,13 @@ class AsignaturaController extends Controller
      *         required=false,
      *         @OA\Schema(type="integer")
      *     ),
+     *     @OA\Parameter(
+     *         name="institucion_id",
+     *         in="query",
+     *         description="ID de la institución para filtrar asignaturas",
+     *         required=false,
+     *         @OA\Schema(type="integer")
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="Lista de asignaturas obtenida exitosamente",
@@ -73,11 +84,8 @@ class AsignaturaController extends Controller
      */
     public function index(Request $request)
     {
+        // Permiso verificado por middleware
         $user = auth()->user();
-        
-        if (!$user) {
-            abort(401, 'Usuario no autenticado');
-        }
         
         $query = Asignatura::query()
             ->with(['area.institucion'])
@@ -87,11 +95,8 @@ class AsignaturaController extends Controller
             ->when($request->search, function ($query, $search) {
                 $query->where('nombre', 'like', "%{$search}%");
             })
-            ->when($request->area_id, function ($query, $areaId) use ($user) {
-                $query->where('area_id', $areaId)
-                      ->whereHas('area', function ($subQuery) use ($user) {
-                          $subQuery->where('institucion_id', $user->institucion_id);
-                      });
+            ->when($request->area_id, function ($query, $areaId) {
+                $query->where('area_id', $areaId);
             });
 
         $asignaturas = $query->paginate($request->per_page ?? 10);
@@ -130,19 +135,18 @@ class AsignaturaController extends Controller
      */
     public function store(StoreAsignaturaRequest $request)
     {
+        // Permiso verificado por middleware
         $user = auth()->user();
         
-        if (!$user) {
-            abort(401, 'Usuario no autenticado');
-        }
+        $data = $request->validated();
         
-        // Verificar que el área seleccionada pertenece a la institución del usuario
-        $area = \App\Models\Area::find($request->area_id);
-        if (!$area || $area->institucion_id !== $user->institucion_id) {
+        // Verificar que el área pertenece a la institución del usuario
+        $area = Area::findOrFail($data['area_id']);
+        if ($area->institucion_id !== $user->institucion_id) {
             abort(403, 'No tienes permisos para crear asignaturas en esta área');
         }
         
-        $asignatura = Asignatura::create($request->validated());
+        $asignatura = Asignatura::create($data);
 
         return new AsignaturaResource($asignatura->load(['area.institucion']));
     }
@@ -181,11 +185,8 @@ class AsignaturaController extends Controller
      */
     public function show(Asignatura $asignatura)
     {
+        // Permiso verificado por middleware
         $user = auth()->user();
-        
-        if (!$user) {
-            abort(401, 'Usuario no autenticado');
-        }
         
         // Verificar que la asignatura pertenece a la institución del usuario
         if ($asignatura->area->institucion_id !== $user->institucion_id) {
@@ -237,11 +238,8 @@ class AsignaturaController extends Controller
      */
     public function update(UpdateAsignaturaRequest $request, Asignatura $asignatura)
     {
+        // Permiso verificado por middleware
         $user = auth()->user();
-        
-        if (!$user) {
-            abort(401, 'Usuario no autenticado');
-        }
         
         // Verificar que la asignatura pertenece a la institución del usuario
         if ($asignatura->area->institucion_id !== $user->institucion_id) {
@@ -250,7 +248,7 @@ class AsignaturaController extends Controller
         
         // Si se está cambiando el área, verificar que la nueva área también pertenece a la institución
         if ($request->has('area_id') && $request->area_id !== $asignatura->area_id) {
-            $newArea = \App\Models\Area::find($request->area_id);
+            $newArea = Area::find($request->area_id);
             if (!$newArea || $newArea->institucion_id !== $user->institucion_id) {
                 abort(403, 'No tienes permisos para asignar esta área');
             }
@@ -294,11 +292,8 @@ class AsignaturaController extends Controller
      */
     public function destroy(Asignatura $asignatura)
     {
+        // Permiso verificado por middleware
         $user = auth()->user();
-        
-        if (!$user) {
-            abort(401, 'Usuario no autenticado');
-        }
         
         // Verificar que la asignatura pertenece a la institución del usuario
         if ($asignatura->area->institucion_id !== $user->institucion_id) {

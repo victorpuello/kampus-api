@@ -19,11 +19,14 @@ class AreaController extends Controller
 {
     /**
      * Constructor del controlador.
-     * Aplica políticas de autorización a los recursos de área.
+     * Aplica middleware de permisos a los recursos de área.
      */
     public function __construct()
     {
-        // Removido parent::__construct() que no está disponible en el controlador base
+        $this->middleware(\App\Http\Middleware\CheckPermission::class . ':ver_areas')->only(['index', 'show']);
+        $this->middleware(\App\Http\Middleware\CheckPermission::class . ':crear_areas')->only(['store']);
+        $this->middleware(\App\Http\Middleware\CheckPermission::class . ':editar_areas')->only(['update']);
+        $this->middleware(\App\Http\Middleware\CheckPermission::class . ':eliminar_areas')->only(['destroy']);
     }
 
     /**
@@ -73,11 +76,8 @@ class AreaController extends Controller
      */
     public function index(Request $request)
     {
+        // Permiso verificado por middleware
         $user = auth()->user();
-        
-        if (!$user) {
-            abort(401, 'Usuario no autenticado');
-        }
         
         $query = Area::query()
             ->with('institucion')
@@ -122,11 +122,8 @@ class AreaController extends Controller
      */
     public function store(StoreAreaRequest $request)
     {
+        // Permiso verificado por middleware
         $user = auth()->user();
-        
-        if (!$user) {
-            abort(401, 'Usuario no autenticado');
-        }
         
         // Asegurar que el área se crea para la institución del usuario
         $data = $request->validated();
@@ -134,7 +131,7 @@ class AreaController extends Controller
         
         $area = Area::create($data);
 
-        return new AreaResource($area->load(['institucion', 'asignaturas']));
+        return new AreaResource($area->load('institucion'));
     }
 
     /**
@@ -171,18 +168,15 @@ class AreaController extends Controller
      */
     public function show(Area $area)
     {
+        // Permiso verificado por middleware
         $user = auth()->user();
-        
-        if (!$user) {
-            abort(401, 'Usuario no autenticado');
-        }
         
         // Verificar que el área pertenece a la institución del usuario
         if ($area->institucion_id !== $user->institucion_id) {
             abort(403, 'No tienes permisos para acceder a esta área');
         }
         
-        return new AreaResource($area->load(['institucion', 'asignaturas']));
+        return new AreaResource($area->load('institucion'));
     }
 
     /**
@@ -227,11 +221,8 @@ class AreaController extends Controller
      */
     public function update(UpdateAreaRequest $request, Area $area)
     {
+        // Permiso verificado por middleware
         $user = auth()->user();
-        
-        if (!$user) {
-            abort(401, 'Usuario no autenticado');
-        }
         
         // Verificar que el área pertenece a la institución del usuario
         if ($area->institucion_id !== $user->institucion_id) {
@@ -276,11 +267,8 @@ class AreaController extends Controller
      */
     public function destroy(Area $area)
     {
+        // Permiso verificado por middleware
         $user = auth()->user();
-        
-        if (!$user) {
-            abort(401, 'Usuario no autenticado');
-        }
         
         // Verificar que el área pertenece a la institución del usuario
         if ($area->institucion_id !== $user->institucion_id) {
