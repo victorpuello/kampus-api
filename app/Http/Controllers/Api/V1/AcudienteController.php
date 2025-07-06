@@ -32,28 +32,36 @@ class AcudienteController extends Controller
      *     summary="Obtiene una lista paginada de acudientes",
      *     tags={"Acudientes"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(
      *         name="per_page",
      *         in="query",
      *         description="Número de acudientes por página",
      *         required=false,
+     *
      *         @OA\Schema(type="integer", default=10)
      *     ),
+     *
      *     @OA\Parameter(
      *         name="search",
      *         in="query",
      *         description="Término de búsqueda para filtrar acudientes por nombre, email o teléfono",
      *         required=false,
+     *
      *         @OA\Schema(type="string")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Lista de acudientes obtenida exitosamente",
+     *
      *         @OA\JsonContent(
      *             type="array",
+     *
      *             @OA\Items(ref="#/components/schemas/AcudienteResource")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="No autenticado",
@@ -85,15 +93,20 @@ class AcudienteController extends Controller
      *     summary="Crea un nuevo acudiente",
      *     tags={"Acudientes"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(ref="#/components/schemas/StoreAcudienteRequest")
      *     ),
+     *
      *     @OA\Response(
      *         response=201,
      *         description="Acudiente creado exitosamente",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/AcudienteResource")
      *     ),
+     *
      *     @OA\Response(
      *         response=422,
      *         description="Error de validación",
@@ -121,18 +134,23 @@ class AcudienteController extends Controller
      *     summary="Obtiene los detalles de un acudiente específico",
      *     tags={"Acudientes"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(
      *         name="acudiente",
      *         in="path",
      *         description="ID del acudiente",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Detalles del acudiente obtenidos exitosamente",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/AcudienteResource")
      *     ),
+     *
      *     @OA\Response(
      *         response=404,
      *         description="Acudiente no encontrado",
@@ -158,22 +176,29 @@ class AcudienteController extends Controller
      *     summary="Actualiza un acudiente existente",
      *     tags={"Acudientes"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(
      *         name="acudiente",
      *         in="path",
      *         description="ID del acudiente a actualizar",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(ref="#/components/schemas/UpdateAcudienteRequest")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Acudiente actualizado exitosamente",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/AcudienteResource")
      *     ),
+     *
      *     @OA\Response(
      *         response=422,
      *         description="Error de validación",
@@ -205,13 +230,16 @@ class AcudienteController extends Controller
      *     summary="Elimina (soft delete) un acudiente",
      *     tags={"Acudientes"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(
      *         name="acudiente",
      *         in="path",
      *         description="ID del acudiente a eliminar",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(
      *         response=204,
      *         description="Acudiente eliminado exitosamente (sin contenido)",

@@ -3,12 +3,12 @@
 namespace Database\Seeders;
 
 use App\Models\Acudiente;
-use App\Models\User;
 use App\Models\Estudiante;
 use App\Models\Institucion;
+use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class AcudienteSeeder extends Seeder
 {
@@ -16,7 +16,7 @@ class AcudienteSeeder extends Seeder
     {
         // Buscar o crear una institución demo
         $institucion = Institucion::first();
-        if (!$institucion) {
+        if (! $institucion) {
             $institucion = Institucion::create([
                 'nombre' => 'Institución Demo',
                 'direccion' => 'Calle Falsa 123',
@@ -39,7 +39,7 @@ class AcudienteSeeder extends Seeder
             'email' => 'juan.perez@example.com',
             'password' => Hash::make('password123'),
             'estado' => 'activo',
-            'institucion_id' => $institucion->id
+            'institucion_id' => $institucion->id,
         ]);
 
         Acudiente::create([
@@ -57,7 +57,7 @@ class AcudienteSeeder extends Seeder
             'email' => 'maria.gonzalez@example.com',
             'password' => Hash::make('password123'),
             'estado' => 'activo',
-            'institucion_id' => $institucion->id
+            'institucion_id' => $institucion->id,
         ]);
 
         Acudiente::create([
@@ -110,7 +110,7 @@ class AcudienteSeeder extends Seeder
 
             $acudiente = Acudiente::create([
                 'user_id' => $user->id,
-                'nombre' => $acudienteData['nombre'] . ' ' . $acudienteData['apellido'],
+                'nombre' => $acudienteData['nombre'].' '.$acudienteData['apellido'],
                 'telefono' => $acudienteData['telefono'],
                 'email' => $acudienteData['email'],
             ]);
@@ -122,4 +122,4 @@ class AcudienteSeeder extends Seeder
             }
         }
     }
-} 
+}

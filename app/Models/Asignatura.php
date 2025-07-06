@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Asignatura> $prerequisitos
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Asignacion> $asignaciones
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\DefinitivaAsignatura> $definitivasAsignatura
+ *
  * @method static \Database\Factories\AsignaturaFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|Asignatura newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Asignatura newQuery()
@@ -29,11 +30,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|Asignatura query()
  * @method static \Illuminate\Database\Eloquent\Builder|Asignatura withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Asignatura withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class Asignatura extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
+    use SoftDeletes;
 
     /**
      * La tabla asociada con el modelo.
@@ -83,5 +86,16 @@ class Asignatura extends Model
     public function definitivasAsignatura()
     {
         return $this->hasMany(DefinitivaAsignatura::class);
+    }
+
+    /**
+     * Obtiene los grados donde se imparte esta asignatura a través de las asignaciones.
+     */
+    public function grados()
+    {
+        return $this->belongsToMany(Grado::class, 'asignaciones', 'asignatura_id', 'grupo_id')
+            ->join('grupos', 'grupos.id', '=', 'asignaciones.grupo_id')
+            ->select('grados.*')
+            ->distinct();
     }
 }

@@ -20,9 +20,9 @@ return new class extends Migration
             $table->softDeletes();
 
             $table->foreign('institucion_id')
-                  ->references('id')
-                  ->on('instituciones')
-                  ->onDelete('cascade');
+                ->references('id')
+                ->on('instituciones')
+                ->onDelete('cascade');
         });
     }
 
@@ -30,4 +30,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('comunicados');
     }
-}; 
+};

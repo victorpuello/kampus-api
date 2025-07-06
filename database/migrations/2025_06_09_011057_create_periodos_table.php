@@ -11,14 +11,16 @@ return new class extends Migration
         Schema::create('periodos', function (Blueprint $table) {
             $table->unsignedBigInteger('id')->autoIncrement();
             $table->string('nombre', 255);
+            $table->date('fecha_inicio');
+            $table->date('fecha_fin');
             $table->unsignedBigInteger('anio_id');
             $table->softDeletes();
             $table->timestamps();
 
             $table->foreign('anio_id')
-                  ->references('id')
-                  ->on('anios')
-                  ->onDelete('restrict');
+                ->references('id')
+                ->on('anios')
+                ->onDelete('restrict');
         });
     }
 
@@ -26,4 +28,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('periodos');
     }
-}; 
+};

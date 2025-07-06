@@ -2,10 +2,10 @@
 
 namespace Tests\Unit;
 
+use App\Models\Institucion;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
-use App\Models\Institucion;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -18,20 +18,22 @@ use Tests\TestCase;
  */
 class PermissionTest extends TestCase
 {
-    use RefreshDatabase, WithFaker;
+    use RefreshDatabase;
+    use WithFaker;
 
     protected $permission;
+
     protected $institution;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->institution = Institucion::factory()->create();
-        
+
         $this->permission = Permission::factory()->create([
             'nombre' => 'ver_usuarios',
-            'descripcion' => 'Permite ver la lista de usuarios'
+            'descripcion' => 'Permite ver la lista de usuarios',
         ]);
     }
 
@@ -55,9 +57,9 @@ class PermissionTest extends TestCase
     public function test_permission_requires_unique_name()
     {
         $permission1 = Permission::factory()->create(['nombre' => 'test.permission']);
-        
+
         $this->expectException(\Illuminate\Database\QueryException::class);
-        
+
         Permission::factory()->create(['nombre' => 'test.permission']);
     }
 
@@ -68,12 +70,12 @@ class PermissionTest extends TestCase
     {
         $permission = Permission::factory()->create([
             'nombre' => 'test.permission',
-            'descripcion' => null
+            'descripcion' => null,
         ]);
 
         $this->assertDatabaseHas('permissions', [
             'id' => $permission->id,
-            'descripcion' => null
+            'descripcion' => null,
         ]);
     }
 
@@ -84,7 +86,7 @@ class PermissionTest extends TestCase
     {
         $permission = Permission::factory()->create([
             'nombre' => 'test.permission',
-            'descripcion' => 'Test Description'
+            'descripcion' => 'Test Description',
         ]);
 
         $this->assertEquals('test.permission', $permission->nombre);
@@ -99,7 +101,7 @@ class PermissionTest extends TestCase
     public function test_permission_can_have_roles()
     {
         $role = Role::factory()->create();
-        
+
         $this->permission->roles()->attach($role);
 
         $this->assertTrue($this->permission->roles->contains($role));
@@ -129,7 +131,7 @@ class PermissionTest extends TestCase
     public function test_permission_can_check_if_assigned_to_specific_role()
     {
         $role = Role::factory()->create(['nombre' => 'Admin']);
-        
+
         $this->permission->roles()->attach($role);
 
         $this->assertTrue($this->permission->roles()->where('nombre', 'Admin')->exists());
@@ -276,13 +278,13 @@ class PermissionTest extends TestCase
     public function test_permission_deletion_removes_role_relationships()
     {
         $role = Role::factory()->create();
-        
+
         $this->permission->roles()->attach($role);
 
         // Verificar que existe la relación
         $this->assertDatabaseHas('role_has_permissions', [
             'role_id' => $role->id,
-            'permission_id' => $this->permission->id
+            'permission_id' => $this->permission->id,
         ]);
 
         // Eliminar el permiso
@@ -291,7 +293,7 @@ class PermissionTest extends TestCase
         // Verificar que se eliminó la relación
         $this->assertDatabaseMissing('role_has_permissions', [
             'role_id' => $role->id,
-            'permission_id' => $this->permission->id
+            'permission_id' => $this->permission->id,
         ]);
     }
 
@@ -303,7 +305,7 @@ class PermissionTest extends TestCase
     public function test_permission_can_be_found_by_name()
     {
         $permission = Permission::where('nombre', 'ver_usuarios')->first();
-        
+
         $this->assertNotNull($permission);
         $this->assertEquals('ver_usuarios', $permission->nombre);
     }
@@ -349,7 +351,7 @@ class PermissionTest extends TestCase
     public function test_permission_name_is_required()
     {
         $this->expectException(\Illuminate\Database\QueryException::class);
-        
+
         Permission::factory()->create(['nombre' => null]);
     }
 
@@ -362,7 +364,7 @@ class PermissionTest extends TestCase
         // Verificamos que podemos crear un permiso con un nombre de 100 caracteres
         $validName = str_repeat('a', 100);
         $permission = Permission::factory()->create(['nombre' => $validName]);
-        
+
         $this->assertEquals(100, strlen($permission->nombre));
         $this->assertDatabaseHas('permissions', ['nombre' => $validName]);
     }
@@ -373,10 +375,10 @@ class PermissionTest extends TestCase
     public function test_permission_description_can_be_long()
     {
         $longDescription = str_repeat('a', 1000);
-        
+
         $permission = Permission::factory()->create([
             'nombre' => 'test.permission',
-            'descripcion' => $longDescription
+            'descripcion' => $longDescription,
         ]);
 
         $this->assertEquals($longDescription, $permission->descripcion);
@@ -403,12 +405,12 @@ class PermissionTest extends TestCase
         foreach ($systemPermissions as $name => $description) {
             $permission = Permission::factory()->create([
                 'nombre' => $name,
-                'descripcion' => $description
+                'descripcion' => $description,
             ]);
 
             $this->assertDatabaseHas('permissions', [
                 'nombre' => $name,
-                'descripcion' => $description
+                'descripcion' => $description,
             ]);
         }
     }
@@ -420,7 +422,7 @@ class PermissionTest extends TestCase
     {
         $permission = Permission::factory()->create([
             'nombre' => 'ver_estudiantes',
-            'descripcion' => 'Permite ver la lista de estudiantes'
+            'descripcion' => 'Permite ver la lista de estudiantes',
         ]);
 
         $this->assertStringContainsString('ver', $permission->nombre);
@@ -438,7 +440,7 @@ class PermissionTest extends TestCase
         Permission::factory()->create(['nombre' => 'unique.permission']);
 
         $this->expectException(\Illuminate\Database\QueryException::class);
-        
+
         Permission::factory()->create(['nombre' => 'unique.permission']);
     }
 
@@ -470,4 +472,4 @@ class PermissionTest extends TestCase
 
         $this->assertGreaterThan($originalUpdatedAt, $permission->fresh()->updated_at);
     }
-} 
+}

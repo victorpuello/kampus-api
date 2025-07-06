@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Nota extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
+    use SoftDeletes;
 
     protected $table = 'notas';
 
@@ -44,4 +45,4 @@ class Nota extends Model
     {
         return $this->belongsTo(Periodo::class);
     }
-} 
+}

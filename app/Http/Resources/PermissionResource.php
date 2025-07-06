@@ -10,6 +10,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *     schema="PermissionResource",
  *     title="Recurso de Permiso",
  *     description="Representación de un permiso en la API",
+ *
  *     @OA\Property(property="id", type="integer", description="ID del permiso"),
  *     @OA\Property(property="nombre", type="string", description="Nombre del permiso"),
  *     @OA\Property(property="descripcion", type="string", description="Descripción del permiso"),

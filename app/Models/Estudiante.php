@@ -28,6 +28,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Observador> $observador
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Nota> $notas
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Inasistencia> $inasistencias
+ *
  * @method static \Database\Factories\EstudianteFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|Estudiante newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Estudiante newQuery()
@@ -35,11 +36,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|Estudiante query()
  * @method static \Illuminate\Database\Eloquent\Builder|Estudiante withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Estudiante withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class Estudiante extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
+    use SoftDeletes;
 
     /**
      * La tabla asociada con el modelo.
@@ -167,10 +170,10 @@ class Estudiante extends Model
      */
     public function getUbicacionAcademicaAttribute()
     {
-        if (!$this->grupo) {
-            return "Sin asignar";
+        if (! $this->grupo) {
+            return 'Sin asignar';
         }
-        
+
         return "{$this->grupo->sede->nombre} - {$this->grupo->grado->nombre} - {$this->grupo->nombre}";
     }
 

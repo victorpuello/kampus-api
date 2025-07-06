@@ -3,13 +3,13 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 /**
  * @OA\Schema(
  *     schema="StoreInstitucionRequest",
  *     title="Solicitud para Crear Institución",
  *     required={"nombre", "siglas"},
+ *
  *     @OA\Property(property="nombre", type="string", maxLength=255, description="Nombre completo de la institución"),
  *     @OA\Property(property="siglas", type="string", maxLength=10, description="Siglas únicas de la institución"),
  * )
@@ -47,15 +47,13 @@ class StoreInstitucionRequest extends FormRequest
                 'image',
                 'mimes:jpg,jpeg,png,gif,webp',
                 'max:5120', // 5MB
-                'dimensions:min_width=100,min_height=100,max_width=2000,max_height=2000'
+                'dimensions:min_width=100,min_height=100,max_width=2000,max_height=2000',
             ],
         ];
     }
 
     /**
      * Get custom messages for validator errors.
-     *
-     * @return array
      */
     public function messages(): array
     {
@@ -63,11 +61,11 @@ class StoreInstitucionRequest extends FormRequest
             'nombre.required' => 'El nombre de la institución es obligatorio.',
             'nombre.min' => 'El nombre debe tener al menos 3 caracteres.',
             'nombre.max' => 'El nombre no puede tener más de 255 caracteres.',
-            
+
             'siglas.required' => 'Las siglas son obligatorias.',
             'siglas.min' => 'Las siglas deben tener al menos 2 caracteres.',
             'siglas.max' => 'Las siglas no pueden tener más de 10 caracteres.',
-            
+
             'slogan.max' => 'El slogan no puede tener más de 255 caracteres.',
             'dane.max' => 'El código DANE no puede tener más de 20 caracteres.',
             'resolucion_aprobacion.max' => 'La resolución de aprobación no puede tener más de 100 caracteres.',
@@ -76,7 +74,7 @@ class StoreInstitucionRequest extends FormRequest
             'email.email' => 'El email debe tener un formato válido.',
             'email.max' => 'El email no puede tener más de 255 caracteres.',
             'rector.max' => 'El nombre del rector no puede tener más de 255 caracteres.',
-            
+
             'escudo.file' => 'El escudo debe ser un archivo.',
             'escudo.image' => 'El escudo debe ser una imagen.',
             'escudo.mimes' => 'El escudo debe ser una imagen en formato: jpg, jpeg, png, gif o webp.',
@@ -87,8 +85,6 @@ class StoreInstitucionRequest extends FormRequest
 
     /**
      * Get custom attributes for validator errors.
-     *
-     * @return array
      */
     public function attributes(): array
     {

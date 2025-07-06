@@ -2,10 +2,10 @@
 
 namespace Tests\Feature;
 
-use App\Models\Role;
-use App\Models\Permission;
-use App\Models\User;
 use App\Models\Institucion;
+use App\Models\Permission;
+use App\Models\Role;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -18,58 +18,65 @@ use Tests\TestCase;
  */
 class RolePermissionSystemTest extends TestCase
 {
-    use RefreshDatabase, WithFaker;
+    use RefreshDatabase;
+    use WithFaker;
 
     protected $institution;
+
     protected $adminUser;
+
     protected $teacherUser;
+
     protected $studentUser;
+
     protected $adminRole;
+
     protected $teacherRole;
+
     protected $studentRole;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->institution = Institucion::factory()->create();
-        
+
         // Crear roles del sistema
         $this->adminRole = Role::factory()->create([
             'nombre' => 'Administrador',
-            'descripcion' => 'Acceso total al sistema'
+            'descripcion' => 'Acceso total al sistema',
         ]);
-        
+
         $this->teacherRole = Role::factory()->create([
             'nombre' => 'Docente',
-            'descripcion' => 'Gestiona sus clases y estudiantes'
+            'descripcion' => 'Gestiona sus clases y estudiantes',
         ]);
-        
+
         $this->studentRole = Role::factory()->create([
             'nombre' => 'Estudiante',
-            'descripcion' => 'Acceso a sus notas y actividades'
+            'descripcion' => 'Acceso a sus notas y actividades',
         ]);
-        
+
         // Crear usuarios
         $this->adminUser = User::factory()->create([
             'email' => 'admin@example.com',
             'password' => '123456',
             'institucion_id' => $this->institution->id,
-            'estado' => 'activo'
+            'estado' => 'activo',
         ]);
-        
+
         $this->teacherUser = User::factory()->create([
             'email' => 'teacher@example.com',
             'password' => '123456',
             'institucion_id' => $this->institution->id,
-            'estado' => 'activo'
+            'estado' => 'activo',
         ]);
-        
+
         $this->studentUser = User::factory()->create([
             'email' => 'student@example.com',
             'password' => '123456',
             'institucion_id' => $this->institution->id,
-            'estado' => 'activo'
+            'estado' => 'activo',
         ]);
     }
 
@@ -84,7 +91,7 @@ class RolePermissionSystemTest extends TestCase
         $this->assertDatabaseHas('roles', ['nombre' => 'Administrador']);
         $this->assertDatabaseHas('roles', ['nombre' => 'Docente']);
         $this->assertDatabaseHas('roles', ['nombre' => 'Estudiante']);
-        
+
         // Verificar que los usuarios existen
         $this->assertDatabaseHas('users', ['email' => 'admin@example.com']);
         $this->assertDatabaseHas('users', ['email' => 'teacher@example.com']);
@@ -114,7 +121,7 @@ class RolePermissionSystemTest extends TestCase
         foreach ($permissions as $name => $description) {
             $permission = Permission::factory()->create([
                 'nombre' => $name,
-                'descripcion' => $description
+                'descripcion' => $description,
             ]);
             $createdPermissions[$name] = $permission;
         }
@@ -123,25 +130,25 @@ class RolePermissionSystemTest extends TestCase
         $adminPermissions = [
             'ver_usuarios', 'crear_usuarios', 'editar_usuarios', 'eliminar_usuarios',
             'ver_estudiantes', 'crear_estudiantes', 'editar_estudiantes',
-            'ver_notas', 'crear_notas', 'editar_notas'
+            'ver_notas', 'crear_notas', 'editar_notas',
         ];
-        
+
         $this->adminRole->permissions()->attach(
             collect($createdPermissions)->only($adminPermissions)->pluck('id')->toArray()
         );
 
         // Asignar permisos al rol de docente
         $teacherPermissions = [
-            'ver_estudiantes', 'ver_notas', 'crear_notas', 'editar_notas'
+            'ver_estudiantes', 'ver_notas', 'crear_notas', 'editar_notas',
         ];
-        
+
         $this->teacherRole->permissions()->attach(
             collect($createdPermissions)->only($teacherPermissions)->pluck('id')->toArray()
         );
 
         // Asignar permisos al rol de estudiante
         $studentPermissions = ['ver_notas'];
-        
+
         $this->studentRole->permissions()->attach(
             collect($createdPermissions)->only($studentPermissions)->pluck('id')->toArray()
         );
@@ -197,10 +204,10 @@ class RolePermissionSystemTest extends TestCase
 
         // Verificar por nombre
         $this->assertTrue($this->adminUser->hasRole('Administrador'));
-        
+
         // Verificar por ID
         $this->assertTrue($this->adminUser->hasRole($this->adminRole->id));
-        
+
         // Verificar que no tiene un rol inexistente
         $this->assertFalse($this->adminUser->hasRole('RolInexistente'));
         $this->assertFalse($this->adminUser->hasRole(999));
@@ -356,7 +363,7 @@ class RolePermissionSystemTest extends TestCase
         foreach ($academicPermissions as $name => $description) {
             $permissions[$name] = Permission::factory()->create([
                 'nombre' => $name,
-                'descripcion' => $description
+                'descripcion' => $description,
             ]);
         }
 
@@ -383,8 +390,10 @@ class RolePermissionSystemTest extends TestCase
 
         // Verificar permisos del administrador
         foreach ($academicPermissions as $permission => $description) {
-            $this->assertTrue($this->adminUser->hasPermissionTo($permission), 
-                "El administrador debería tener el permiso: {$permission}");
+            $this->assertTrue(
+                $this->adminUser->hasPermissionTo($permission),
+                "El administrador debería tener el permiso: {$permission}"
+            );
         }
 
         // Verificar permisos del docente
@@ -408,7 +417,7 @@ class RolePermissionSystemTest extends TestCase
         // Crear un nuevo permiso dinámicamente
         $newPermission = Permission::factory()->create([
             'nombre' => 'nuevo_permiso',
-            'descripcion' => 'Nuevo permiso agregado dinámicamente'
+            'descripcion' => 'Nuevo permiso agregado dinámicamente',
         ]);
 
         // Asignar el nuevo permiso al rol de administrador
@@ -481,7 +490,7 @@ class RolePermissionSystemTest extends TestCase
         // Verificar que existen las relaciones
         $this->assertDatabaseHas('user_has_roles', [
             'user_id' => $this->adminUser->id,
-            'role_id' => $this->adminRole->id
+            'role_id' => $this->adminRole->id,
         ]);
 
         // Eliminar el usuario administrador con force delete
@@ -490,10 +499,10 @@ class RolePermissionSystemTest extends TestCase
         // Verificar que se eliminaron las relaciones
         $this->assertDatabaseMissing('user_has_roles', [
             'user_id' => $this->adminUser->id,
-            'role_id' => $this->adminRole->id
+            'role_id' => $this->adminRole->id,
         ]);
 
         // Verificar que el rol sigue existiendo
         $this->assertDatabaseHas('roles', ['id' => $this->adminRole->id]);
     }
-} 
+}

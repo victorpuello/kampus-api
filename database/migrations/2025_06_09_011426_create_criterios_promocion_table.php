@@ -18,9 +18,9 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('anio_id')
-                  ->references('id')
-                  ->on('anios')
-                  ->onDelete('cascade');
+                ->references('id')
+                ->on('anios')
+                ->onDelete('cascade');
         });
     }
 
@@ -28,4 +28,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('criterios_promocion');
     }
-}; 
+};

@@ -15,12 +15,13 @@ class CheckPermission
         }
 
         $user = auth()->user();
-        if (!$user) {
+        if (! $user) {
             abort(401, 'Usuario no autenticado');
         }
-        if (!$user->hasPermissionTo($permission)) {
-            abort(403, 'No tienes permisos para ' . $permission);
+        if (! $user->hasPermissionTo($permission)) {
+            abort(403, 'No tienes permisos para '.$permission);
         }
+
         return $next($request);
     }
-} 
+}

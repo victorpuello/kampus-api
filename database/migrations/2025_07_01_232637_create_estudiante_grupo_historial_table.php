@@ -17,14 +17,14 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('estudiante_id')
-                  ->references('id')
-                  ->on('estudiantes')
-                  ->onDelete('cascade');
-                  
+                ->references('id')
+                ->on('estudiantes')
+                ->onDelete('cascade');
+
             $table->foreign('grupo_id')
-                  ->references('id')
-                  ->on('grupos')
-                  ->onDelete('restrict');
+                ->references('id')
+                ->on('grupos')
+                ->onDelete('restrict');
         });
     }
 
@@ -32,4 +32,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('estudiante_grupo_historial');
     }
-}; 
+};

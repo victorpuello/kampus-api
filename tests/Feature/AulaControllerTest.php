@@ -27,7 +27,7 @@ class AulaControllerTest extends TestCase
         $response = $this->actingAs($this->user, 'sanctum')->getJson('/api/v1/aulas');
 
         $response->assertStatus(200)
-                 ->assertJsonCount(3, 'data');
+            ->assertJsonCount(3, 'data');
     }
 
     public function test_can_create_aula()
@@ -35,6 +35,7 @@ class AulaControllerTest extends TestCase
         $institucion = Institucion::factory()->create();
         $aulaData = [
             'nombre' => 'Nueva Aula',
+            'tipo' => 'Salón',
             'capacidad' => 30,
             'institucion_id' => $institucion->id,
         ];
@@ -42,7 +43,7 @@ class AulaControllerTest extends TestCase
         $response = $this->actingAs($this->user, 'sanctum')->postJson('/api/v1/aulas', $aulaData);
 
         $response->assertStatus(201)
-                 ->assertJsonFragment(['nombre' => 'Nueva Aula']);
+            ->assertJsonFragment(['nombre' => 'Nueva Aula']);
 
         $this->assertDatabaseHas('aulas', ['nombre' => 'Nueva Aula']);
     }
@@ -51,10 +52,10 @@ class AulaControllerTest extends TestCase
     {
         $aula = Aula::factory()->create();
 
-        $response = $this->actingAs($this->user, 'sanctum')->getJson('/api/v1/aulas/' . $aula->id);
+        $response = $this->actingAs($this->user, 'sanctum')->getJson('/api/v1/aulas/'.$aula->id);
 
         $response->assertStatus(200)
-                 ->assertJsonFragment(['nombre' => $aula->nombre]);
+            ->assertJsonFragment(['nombre' => $aula->nombre]);
     }
 
     public function test_can_update_aula()
@@ -62,13 +63,14 @@ class AulaControllerTest extends TestCase
         $aula = Aula::factory()->create();
         $updatedData = [
             'nombre' => 'Aula Actualizada',
+            'tipo' => 'Laboratorio',
             'capacidad' => 35,
         ];
 
-        $response = $this->actingAs($this->user, 'sanctum')->putJson('/api/v1/aulas/' . $aula->id, $updatedData);
+        $response = $this->actingAs($this->user, 'sanctum')->putJson('/api/v1/aulas/'.$aula->id, $updatedData);
 
         $response->assertStatus(200)
-                 ->assertJsonFragment(['nombre' => 'Aula Actualizada']);
+            ->assertJsonFragment(['nombre' => 'Aula Actualizada']);
 
         $this->assertDatabaseHas('aulas', ['id' => $aula->id, 'nombre' => 'Aula Actualizada', 'capacidad' => 35]);
     }
@@ -77,7 +79,7 @@ class AulaControllerTest extends TestCase
     {
         $aula = Aula::factory()->create();
 
-        $response = $this->actingAs($this->user, 'sanctum')->deleteJson('/api/v1/aulas/' . $aula->id);
+        $response = $this->actingAs($this->user, 'sanctum')->deleteJson('/api/v1/aulas/'.$aula->id);
 
         $response->assertStatus(204);
 

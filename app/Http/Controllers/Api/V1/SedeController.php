@@ -23,35 +23,45 @@ class SedeController extends Controller
      *     summary="Obtiene una lista paginada de sedes",
      *     tags={"Sedes"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(
      *         name="per_page",
      *         in="query",
      *         description="Número de sedes por página",
      *         required=false,
+     *
      *         @OA\Schema(type="integer", default=10)
      *     ),
+     *
      *     @OA\Parameter(
      *         name="search",
      *         in="query",
      *         description="Término de búsqueda para filtrar sedes por nombre",
      *         required=false,
+     *
      *         @OA\Schema(type="string")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="institucion_id",
      *         in="query",
      *         description="ID de la institución para filtrar sedes",
      *         required=false,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Lista de sedes obtenida exitosamente",
+     *
      *         @OA\JsonContent(
      *             type="array",
+     *
      *             @OA\Items(ref="#/components/schemas/SedeResource")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="No autenticado",
@@ -83,15 +93,20 @@ class SedeController extends Controller
      *     summary="Crea una nueva sede",
      *     tags={"Sedes"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(ref="#/components/schemas/StoreSedeRequest")
      *     ),
+     *
      *     @OA\Response(
      *         response=201,
      *         description="Sede creada exitosamente",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/SedeResource")
      *     ),
+     *
      *     @OA\Response(
      *         response=422,
      *         description="Error de validación",
@@ -119,18 +134,23 @@ class SedeController extends Controller
      *     summary="Obtiene los detalles de una sede específica",
      *     tags={"Sedes"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(
      *         name="sede",
      *         in="path",
      *         description="ID de la sede",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Detalles de la sede obtenidos exitosamente",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/SedeResource")
      *     ),
+     *
      *     @OA\Response(
      *         response=404,
      *         description="Sede no encontrada",
@@ -156,22 +176,29 @@ class SedeController extends Controller
      *     summary="Actualiza una sede existente",
      *     tags={"Sedes"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(
      *         name="sede",
      *         in="path",
      *         description="ID de la sede a actualizar",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(ref="#/components/schemas/UpdateSedeRequest")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Sede actualizada exitosamente",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/SedeResource")
      *     ),
+     *
      *     @OA\Response(
      *         response=422,
      *         description="Error de validación",
@@ -203,15 +230,18 @@ class SedeController extends Controller
      *     summary="Elimina una sede",
      *     tags={"Sedes"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(
      *         name="sede",
      *         in="path",
      *         description="ID de la sede a eliminar",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(
-     *         response=200,
+     *         response=204,
      *         description="Sede eliminada exitosamente",
      *     ),
      *     @OA\Response(
@@ -232,6 +262,6 @@ class SedeController extends Controller
     {
         $sede->delete();
 
-        return response()->json(['message' => 'Sede eliminada exitosamente']);
+        return response()->noContent();
     }
 }

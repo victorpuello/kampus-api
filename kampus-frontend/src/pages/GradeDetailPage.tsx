@@ -13,12 +13,12 @@ interface Grado {
   nombre: string;
   descripcion?: string;
   nivel?: string;
-  estado: string;
+  estado?: string;
   grupos?: Array<{
     id: number;
     nombre: string;
     descripcion?: string;
-    estado: string;
+    capacidad?: number;
     estudiantes_count?: number;
   }>;
 }
@@ -165,14 +165,7 @@ const GradeDetailPage = () => {
                   {grado.descripcion || 'Sin descripción'}
                 </span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-sm font-medium text-gray-500">Estado:</span>
-                <Badge
-                  variant={grado.estado === 'activo' ? 'success' : 'error'}
-                >
-                  {grado.estado}
-                </Badge>
-              </div>
+
             </div>
           </CardBody>
         </Card>
@@ -188,12 +181,7 @@ const GradeDetailPage = () => {
                 <span className="text-sm font-medium text-gray-500">Total de Grupos:</span>
                 <span className="text-sm text-gray-900">{grado.grupos?.length || 0}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-sm font-medium text-gray-500">Grupos Activos:</span>
-                <span className="text-sm text-gray-900">
-                  {grado.grupos?.filter(g => g.estado === 'activo').length || 0}
-                </span>
-              </div>
+
             </div>
           </CardBody>
         </Card>
@@ -230,10 +218,10 @@ const GradeDetailPage = () => {
                       Descripción
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Estudiantes
+                      Capacidad
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Estado
+                      Estudiantes
                     </th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Acciones
@@ -253,15 +241,13 @@ const GradeDetailPage = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-500">
-                          {grupo.estudiantes_count || 0} estudiantes
+                          {grupo.capacidad || 35} estudiantes
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <Badge
-                          variant={grupo.estado === 'activo' ? 'success' : 'error'}
-                        >
-                          {grupo.estado}
-                        </Badge>
+                        <div className="text-sm text-gray-500">
+                          {grupo.estudiantes_count || 0} estudiantes
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <Button

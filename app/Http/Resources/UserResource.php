@@ -10,6 +10,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *     schema="UserResource",
  *     title="Recurso de Usuario",
  *     description="Representación de un usuario en la API",
+ *
  *     @OA\Property(property="id", type="integer", description="ID del usuario"),
  *     @OA\Property(property="nombre", type="string", description="Nombre del usuario"),
  *     @OA\Property(property="apellido", type="string", description="Apellido del usuario"),

@@ -11,6 +11,7 @@ use Illuminate\Foundation\Http\FormRequest;
  *     required={
  *         "nombre", "fecha_inicio", "fecha_fin", "institucion_id", "estado"
  *     },
+ *
  *     @OA\Property(property="nombre", type="string", maxLength=255, description="Nombre del año académico (ej. 2024-2025)"),
  *     @OA\Property(property="fecha_inicio", type="string", format="date", description="Fecha de inicio del año académico"),
  *     @OA\Property(property="fecha_fin", type="string", format="date", description="Fecha de fin del año académico"),

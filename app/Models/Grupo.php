@@ -28,6 +28,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Estudiante> $estudiantes
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Asignacion> $asignaciones
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Horario> $horarios
+ *
  * @method static \Database\Factories\GrupoFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|Grupo newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Grupo newQuery()
@@ -35,11 +36,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|Grupo query()
  * @method static \Illuminate\Database\Eloquent\Builder|Grupo withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Grupo withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class Grupo extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
+    use SoftDeletes;
 
     /**
      * La tabla asociada con el modelo.

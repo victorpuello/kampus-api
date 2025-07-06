@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Competencia extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
+    use SoftDeletes;
 
     protected $table = 'competencias';
 
@@ -26,4 +27,4 @@ class Competencia extends Model
     {
         return $this->hasMany(Nota::class);
     }
-} 
+}

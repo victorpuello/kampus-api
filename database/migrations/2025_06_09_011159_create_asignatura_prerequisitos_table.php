@@ -11,18 +11,18 @@ return new class extends Migration
         Schema::create('asignatura_prerequisitos', function (Blueprint $table) {
             $table->unsignedBigInteger('asignatura_id');
             $table->unsignedBigInteger('prerequisito_id');
-            
+
             $table->primary(['asignatura_id', 'prerequisito_id']);
-            
+
             $table->foreign('asignatura_id')
-                  ->references('id')
-                  ->on('asignaturas')
-                  ->onDelete('cascade');
-                  
+                ->references('id')
+                ->on('asignaturas')
+                ->onDelete('cascade');
+
             $table->foreign('prerequisito_id')
-                  ->references('id')
-                  ->on('asignaturas')
-                  ->onDelete('cascade');
+                ->references('id')
+                ->on('asignaturas')
+                ->onDelete('cascade');
         });
     }
 
@@ -30,4 +30,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('asignatura_prerequisitos');
     }
-}; 
+};

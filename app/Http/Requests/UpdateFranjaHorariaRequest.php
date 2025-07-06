@@ -8,6 +8,7 @@ use Illuminate\Foundation\Http\FormRequest;
  * @OA\Schema(
  *     schema="UpdateFranjaHorariaRequest",
  *     title="Solicitud para Actualizar Franja Horaria",
+ *
  *     @OA\Property(property="hora_inicio", type="string", format="time", description="Hora de inicio de la franja horaria (HH:MM)"),
  *     @OA\Property(property="hora_fin", type="string", format="time", description="Hora de fin de la franja horaria (HH:MM)"),
  *     @OA\Property(property="institucion_id", type="integer", description="ID de la institución a la que pertenece la franja horaria"),

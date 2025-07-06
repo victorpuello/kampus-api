@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\Periodo;
-use App\Models\Anio;
 use App\Http\Requests\StorePeriodoRequest;
 use App\Http\Requests\UpdatePeriodoRequest;
 use App\Http\Resources\PeriodoResource;
-use Illuminate\Http\Request;
+use App\Models\Anio;
+use App\Models\Periodo;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class PeriodoController extends Controller
 {
@@ -30,8 +30,8 @@ class PeriodoController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('nombre', 'like', "%{$search}%")
-                  ->orWhere('fecha_inicio', 'like', "%{$search}%")
-                  ->orWhere('fecha_fin', 'like', "%{$search}%");
+                    ->orWhere('fecha_inicio', 'like', "%{$search}%")
+                    ->orWhere('fecha_fin', 'like', "%{$search}%");
             });
         }
 
@@ -62,15 +62,15 @@ class PeriodoController extends Controller
     {
         try {
             $periodo = Periodo::create($request->validated());
-            
+
             return response()->json([
                 'message' => 'Periodo creado exitosamente',
-                'data' => new PeriodoResource($periodo->load('anio'))
+                'data' => new PeriodoResource($periodo->load('anio')),
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Error al crear el periodo',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -81,7 +81,7 @@ class PeriodoController extends Controller
     public function show(Periodo $periodo): JsonResponse
     {
         return response()->json([
-            'data' => new PeriodoResource($periodo->load('anio'))
+            'data' => new PeriodoResource($periodo->load('anio')),
         ]);
     }
 
@@ -92,15 +92,15 @@ class PeriodoController extends Controller
     {
         try {
             $periodo->update($request->validated());
-            
+
             return response()->json([
                 'message' => 'Periodo actualizado exitosamente',
-                'data' => new PeriodoResource($periodo->load('anio'))
+                'data' => new PeriodoResource($periodo->load('anio')),
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Error al actualizar el periodo',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -112,14 +112,14 @@ class PeriodoController extends Controller
     {
         try {
             $periodo->delete();
-            
+
             return response()->json([
-                'message' => 'Periodo eliminado exitosamente'
+                'message' => 'Periodo eliminado exitosamente',
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Error al eliminar el periodo',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -136,8 +136,8 @@ class PeriodoController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('nombre', 'like', "%{$search}%")
-                  ->orWhere('fecha_inicio', 'like', "%{$search}%")
-                  ->orWhere('fecha_fin', 'like', "%{$search}%");
+                    ->orWhere('fecha_inicio', 'like', "%{$search}%")
+                    ->orWhere('fecha_fin', 'like', "%{$search}%");
             });
         }
 
@@ -169,17 +169,17 @@ class PeriodoController extends Controller
         try {
             $data = $request->validated();
             $data['anio_id'] = $anio->id;
-            
+
             $periodo = Periodo::create($data);
-            
+
             return response()->json([
                 'message' => 'Periodo creado exitosamente',
-                'data' => new PeriodoResource($periodo->load('anio'))
+                'data' => new PeriodoResource($periodo->load('anio')),
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Error al crear el periodo',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -192,12 +192,12 @@ class PeriodoController extends Controller
         // Verificar que el periodo pertenece al año académico
         if ($periodo->anio_id !== $anio->id) {
             return response()->json([
-                'message' => 'El periodo no pertenece al año académico especificado'
+                'message' => 'El periodo no pertenece al año académico especificado',
             ], 404);
         }
 
         return response()->json([
-            'data' => new PeriodoResource($periodo->load('anio'))
+            'data' => new PeriodoResource($periodo->load('anio')),
         ]);
     }
 
@@ -209,21 +209,21 @@ class PeriodoController extends Controller
         // Verificar que el periodo pertenece al año académico
         if ($periodo->anio_id !== $anio->id) {
             return response()->json([
-                'message' => 'El periodo no pertenece al año académico especificado'
+                'message' => 'El periodo no pertenece al año académico especificado',
             ], 404);
         }
 
         try {
             $periodo->update($request->validated());
-            
+
             return response()->json([
                 'message' => 'Periodo actualizado exitosamente',
-                'data' => new PeriodoResource($periodo->load('anio'))
+                'data' => new PeriodoResource($periodo->load('anio')),
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Error al actualizar el periodo',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -236,21 +236,21 @@ class PeriodoController extends Controller
         // Verificar que el periodo pertenece al año académico
         if ($periodo->anio_id !== $anio->id) {
             return response()->json([
-                'message' => 'El periodo no pertenece al año académico especificado'
+                'message' => 'El periodo no pertenece al año académico especificado',
             ], 404);
         }
 
         try {
             $periodo->delete();
-            
+
             return response()->json([
-                'message' => 'Periodo eliminado exitosamente'
+                'message' => 'Periodo eliminado exitosamente',
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Error al eliminar el periodo',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
-} 
+}

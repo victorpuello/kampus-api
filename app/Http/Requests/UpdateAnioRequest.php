@@ -8,6 +8,7 @@ use Illuminate\Foundation\Http\FormRequest;
  * @OA\Schema(
  *     schema="UpdateAnioRequest",
  *     title="Solicitud para Actualizar Año Académico",
+ *
  *     @OA\Property(property="nombre", type="string", maxLength=255, description="Nombre del año académico (ej. 2024-2025)"),
  *     @OA\Property(property="fecha_inicio", type="string", format="date", description="Fecha de inicio del año académico"),
  *     @OA\Property(property="fecha_fin", type="string", format="date", description="Fecha de fin del año académico"),
@@ -33,9 +34,9 @@ class UpdateAnioRequest extends FormRequest
     public function rules(): array
     {
         $anioId = $this->anio?->id;
-        
+
         return [
-            'nombre' => 'sometimes|string|max:255|unique:anios,nombre,' . $anioId,
+            'nombre' => 'sometimes|string|max:255|unique:anios,nombre,'.$anioId,
             'fecha_inicio' => 'sometimes|date',
             'fecha_fin' => 'sometimes|date|after:fecha_inicio',
             'institucion_id' => 'sometimes|integer|exists:instituciones,id',

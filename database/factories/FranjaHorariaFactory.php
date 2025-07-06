@@ -13,7 +13,7 @@ class FranjaHorariaFactory extends Factory
     public function definition(): array
     {
         $horaInicio = $this->faker->time('H:i', '12:00');
-        $horaFin = date('H:i', strtotime($horaInicio . ' +1 hour'));
+        $horaFin = date('H:i', strtotime($horaInicio.' +1 hour'));
 
         return [
             'nombre' => $this->faker->words(2, true),

@@ -3,11 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\HasApiTokens;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 
 /**
  * Clase User
@@ -31,6 +30,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  * @property-read \App\Models\Estudiante|null $estudiante
  * @property-read \App\Models\Acudiente|null $acudiente
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Sanctum\PersonalAccessToken> $tokens
+ *
  * @method static \Database\Factories\UserFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|User newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|User newQuery()
@@ -38,11 +38,14 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  * @method static \Illuminate\Database\Eloquent\Builder|User query()
  * @method static \Illuminate\Database\Eloquent\Builder|User withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|User withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class User extends Authenticatable
 {
-    use HasFactory, SoftDeletes, HasApiTokens;
+    use HasApiTokens;
+    use HasFactory;
+    use SoftDeletes;
 
     /**
      * La tabla asociada con el modelo.
@@ -90,7 +93,7 @@ class User extends Authenticatable
     /**
      * Establece el hash de la contraseña.
      *
-     * @param string $value
+     * @param  string  $value
      * @return void
      */
     public function setPasswordAttribute($value)
@@ -143,7 +146,7 @@ class User extends Authenticatable
     /**
      * Verifica si el usuario tiene un permiso específico a través de sus roles.
      *
-     * @param string $permission El nombre del permiso a verificar.
+     * @param  string  $permission  El nombre del permiso a verificar.
      * @return bool
      */
     public function hasPermissionTo($permission)
@@ -156,22 +159,22 @@ class User extends Authenticatable
     /**
      * Verifica si el usuario tiene un rol específico (por nombre o id).
      *
-     * @param string|int $role Nombre o id del rol
-     * @return bool
+     * @param  string|int  $role  Nombre o id del rol
      */
     public function hasRole($role): bool
     {
         if (is_numeric($role)) {
             return $this->roles()->where('id', $role)->exists();
         }
+
         return $this->roles()->where('nombre', $role)->exists();
     }
 
     /**
      * Permite verificar permisos usando el método can() de Laravel.
      *
-     * @param string $ability
-     * @param array $arguments
+     * @param  string  $ability
+     * @param  array  $arguments
      * @return bool
      */
     public function can($ability, $arguments = [])
@@ -185,6 +188,7 @@ class User extends Authenticatable
             // Agrega otros alias si es necesario
         ];
         $permiso = $map[$ability] ?? $ability;
+
         return $this->hasPermissionTo($permiso);
     }
 

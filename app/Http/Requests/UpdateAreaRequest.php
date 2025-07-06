@@ -8,6 +8,7 @@ use Illuminate\Foundation\Http\FormRequest;
  * @OA\Schema(
  *     schema="UpdateAreaRequest",
  *     title="Solicitud para Actualizar Área",
+ *
  *     @OA\Property(property="nombre", type="string", maxLength=255, description="Nombre del área académica"),
  *     @OA\Property(property="institucion_id", type="integer", description="ID de la institución a la que pertenece el área"),
  * )
@@ -30,9 +31,9 @@ class UpdateAreaRequest extends FormRequest
     public function rules(): array
     {
         $areaId = $this->area?->id;
-        
+
         return [
-            'nombre' => 'sometimes|string|max:255|unique:areas,nombre,' . $areaId,
+            'nombre' => 'sometimes|string|max:255|unique:areas,nombre,'.$areaId,
             'institucion_id' => 'sometimes|integer|exists:instituciones,id',
         ];
     }

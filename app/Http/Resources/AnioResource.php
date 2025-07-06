@@ -10,6 +10,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *     schema="AnioResource",
  *     title="Recurso de Año Académico",
  *     description="Representación de un año académico en la API",
+ *
  *     @OA\Property(property="id", type="integer", description="ID del año académico"),
  *     @OA\Property(property="nombre", type="string", description="Nombre del año académico"),
  *     @OA\Property(property="fecha_inicio", type="string", format="date", description="Fecha de inicio del año académico"),

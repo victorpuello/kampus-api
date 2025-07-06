@@ -8,6 +8,7 @@ use Illuminate\Foundation\Http\FormRequest;
  * @OA\Schema(
  *     schema="UpdateInstitucionRequest",
  *     title="Solicitud para Actualizar Institución",
+ *
  *     @OA\Property(property="nombre", type="string", maxLength=255, description="Nombre completo de la institución"),
  *     @OA\Property(property="siglas", type="string", maxLength=10, description="Siglas únicas de la institución"),
  *     @OA\Property(property="slogan", type="string", maxLength=255, description="Slogan de la institución"),
@@ -38,10 +39,10 @@ class UpdateInstitucionRequest extends FormRequest
     public function rules(): array
     {
         $institucionId = $this->institucion?->id;
-        
+
         return [
             'nombre' => 'sometimes|string|max:255|min:3',
-            'siglas' => 'sometimes|string|max:10|min:2|unique:instituciones,siglas,' . $institucionId,
+            'siglas' => 'sometimes|string|max:10|min:2|unique:instituciones,siglas,'.$institucionId,
             'slogan' => 'nullable|string|max:255',
             'dane' => 'nullable|string|max:20',
             'resolucion_aprobacion' => 'nullable|string|max:100',
@@ -55,15 +56,13 @@ class UpdateInstitucionRequest extends FormRequest
                 'image',
                 'mimes:jpg,jpeg,png,gif,webp',
                 'max:5120', // 5MB
-                'dimensions:min_width=100,min_height=100,max_width=2000,max_height=2000'
+                'dimensions:min_width=100,min_height=100,max_width=2000,max_height=2000',
             ],
         ];
     }
 
     /**
      * Get custom messages for validator errors.
-     *
-     * @return array
      */
     public function messages(): array
     {

@@ -13,7 +13,7 @@ class GradoFactory extends Factory
     public function definition(): array
     {
         return [
-            'nombre' => $this->faker->unique()->word . ' Grado',
+            'nombre' => $this->faker->unique()->word.' Grado',
             'nivel' => $this->faker->randomElement(Grado::getNivelesDisponibles()),
             'institucion_id' => Institucion::factory(),
         ];

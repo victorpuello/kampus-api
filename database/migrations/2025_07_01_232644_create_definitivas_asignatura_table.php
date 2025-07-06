@@ -17,21 +17,21 @@ return new class extends Migration
             $table->timestamps();
 
             $table->unique(['estudiante_id', 'asignatura_id', 'periodo_id'], 'definitivas_unique');
-            
+
             $table->foreign('estudiante_id')
-                  ->references('id')
-                  ->on('estudiantes')
-                  ->onDelete('cascade');
-                  
+                ->references('id')
+                ->on('estudiantes')
+                ->onDelete('cascade');
+
             $table->foreign('asignatura_id')
-                  ->references('id')
-                  ->on('asignaturas')
-                  ->onDelete('cascade');
-                  
+                ->references('id')
+                ->on('asignaturas')
+                ->onDelete('cascade');
+
             $table->foreign('periodo_id')
-                  ->references('id')
-                  ->on('periodos')
-                  ->onDelete('cascade');
+                ->references('id')
+                ->on('periodos')
+                ->onDelete('cascade');
         });
     }
 
@@ -39,4 +39,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('definitivas_asignatura');
     }
-}; 
+};

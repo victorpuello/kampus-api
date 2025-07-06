@@ -20,6 +20,9 @@ class DatabaseSeeder extends Seeder
             EstudianteSeeder::class,
             AcudienteSeeder::class,
             GradoSeeder::class,
+            AreaAsignaturaSeeder::class,
+            GrupoSeeder::class,
+            FranjaHorariaSeeder::class,
         ]);
     }
 }

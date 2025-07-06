@@ -13,7 +13,9 @@ class RouteTest extends TestCase
     use RefreshDatabase;
 
     protected $user;
+
     protected $institucion;
+
     protected $sede;
 
     protected function setUp(): void
@@ -35,22 +37,22 @@ class RouteTest extends TestCase
         // Crear institución
         $response = $this->postJson('/api/v1/instituciones', [
             'nombre' => 'Test Institution',
-            'siglas' => 'TI'
+            'siglas' => 'TI',
         ]);
         $response->assertStatus(201);
 
         // Ver institución específica
-        $response = $this->getJson('/api/v1/instituciones/' . $this->institucion->id);
+        $response = $this->getJson('/api/v1/instituciones/'.$this->institucion->id);
         $response->assertStatus(200);
 
         // Actualizar institución
-        $response = $this->putJson('/api/v1/instituciones/' . $this->institucion->id, [
-            'nombre' => 'Updated Institution'
+        $response = $this->putJson('/api/v1/instituciones/'.$this->institucion->id, [
+            'nombre' => 'Updated Institution',
         ]);
         $response->assertStatus(200);
 
         // Eliminar institución
-        $response = $this->deleteJson('/api/v1/instituciones/' . $this->institucion->id);
+        $response = $this->deleteJson('/api/v1/instituciones/'.$this->institucion->id);
         $response->assertStatus(204);
     }
 
@@ -66,22 +68,22 @@ class RouteTest extends TestCase
         $response = $this->postJson('/api/v1/sedes', [
             'institucion_id' => $this->institucion->id,
             'nombre' => 'Test Sede',
-            'direccion' => 'Test Address'
+            'direccion' => 'Test Address',
         ]);
         $response->assertStatus(201);
 
         // Ver sede específica
-        $response = $this->getJson('/api/v1/sedes/' . $this->sede->id);
+        $response = $this->getJson('/api/v1/sedes/'.$this->sede->id);
         $response->assertStatus(200);
 
         // Actualizar sede
-        $response = $this->putJson('/api/v1/sedes/' . $this->sede->id, [
-            'nombre' => 'Updated Sede'
+        $response = $this->putJson('/api/v1/sedes/'.$this->sede->id, [
+            'nombre' => 'Updated Sede',
         ]);
         $response->assertStatus(200);
 
         // Eliminar sede
-        $response = $this->deleteJson('/api/v1/sedes/' . $this->sede->id);
+        $response = $this->deleteJson('/api/v1/sedes/'.$this->sede->id);
         $response->assertStatus(204);
     }
 
@@ -93,9 +95,9 @@ class RouteTest extends TestCase
         Sede::factory()->count(2)->create(['institucion_id' => $this->institucion->id]);
 
         // Obtener sedes de una institución específica
-        $response = $this->getJson('/api/v1/instituciones/' . $this->institucion->id . '/sedes');
+        $response = $this->getJson('/api/v1/instituciones/'.$this->institucion->id.'/sedes');
         $response->assertStatus(200)
-                 ->assertJsonCount(3, 'data'); // La sede original + 2 nuevas
+            ->assertJsonCount(3, 'data'); // La sede original + 2 nuevas
     }
 
     public function test_routes_return_correct_json_structure()
@@ -105,33 +107,33 @@ class RouteTest extends TestCase
         // Verificar estructura de respuesta para instituciones
         $response = $this->getJson('/api/v1/instituciones');
         $response->assertStatus(200)
-                 ->assertJsonStructure([
-                     'data' => [
-                         '*' => [
-                             'id',
-                             'nombre',
-                             'siglas',
-                             'created_at',
-                             'updated_at'
-                         ]
-                     ]
-                 ]);
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => [
+                        'id',
+                        'nombre',
+                        'siglas',
+                        'created_at',
+                        'updated_at',
+                    ],
+                ],
+            ]);
 
         // Verificar estructura de respuesta para sedes
         $response = $this->getJson('/api/v1/sedes');
         $response->assertStatus(200)
-                 ->assertJsonStructure([
-                     'data' => [
-                         '*' => [
-                             'id',
-                             'nombre',
-                             'direccion',
-                             'institucion_id',
-                             'created_at',
-                             'updated_at'
-                         ]
-                     ]
-                 ]);
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => [
+                        'id',
+                        'nombre',
+                        'direccion',
+                        'institucion_id',
+                        'created_at',
+                        'updated_at',
+                    ],
+                ],
+            ]);
     }
 
     public function test_routes_require_authentication()
@@ -152,7 +154,7 @@ class RouteTest extends TestCase
 
         foreach ($routes as $route) {
             [$method, $path] = explode(' ', $route);
-            
+
             if ($method === 'GET') {
                 $response = $this->getJson($path);
             } elseif ($method === 'POST') {
@@ -202,15 +204,15 @@ class RouteTest extends TestCase
         // Verificar paginación en instituciones
         $response = $this->getJson('/api/v1/instituciones?page=1&per_page=10');
         $response->assertStatus(200)
-                 ->assertJsonStructure([
-                     'data',
-                     'links',
-                     'meta' => [
-                         'current_page',
-                         'per_page',
-                         'total'
-                     ]
-                 ]);
+            ->assertJsonStructure([
+                'data',
+                'links',
+                'meta' => [
+                    'current_page',
+                    'per_page',
+                    'total',
+                ],
+            ]);
 
         // Crear múltiples sedes
         Sede::factory()->count(15)->create(['institucion_id' => $this->institucion->id]);
@@ -218,15 +220,15 @@ class RouteTest extends TestCase
         // Verificar paginación en sedes
         $response = $this->getJson('/api/v1/sedes?page=1&per_page=10');
         $response->assertStatus(200)
-                 ->assertJsonStructure([
-                     'data',
-                     'links',
-                     'meta' => [
-                         'current_page',
-                         'per_page',
-                         'total'
-                     ]
-                 ]);
+            ->assertJsonStructure([
+                'data',
+                'links',
+                'meta' => [
+                    'current_page',
+                    'per_page',
+                    'total',
+                ],
+            ]);
     }
 
     public function test_routes_support_search()
@@ -240,21 +242,21 @@ class RouteTest extends TestCase
         // Buscar instituciones
         $response = $this->getJson('/api/v1/instituciones?search=San José');
         $response->assertStatus(200)
-                 ->assertJsonCount(1, 'data');
+            ->assertJsonCount(1, 'data');
 
         // Crear sedes con nombres específicos
         Sede::factory()->create([
             'institucion_id' => $this->institucion->id,
-            'nombre' => 'Sede Norte'
+            'nombre' => 'Sede Norte',
         ]);
         Sede::factory()->create([
             'institucion_id' => $this->institucion->id,
-            'nombre' => 'Sede Sur'
+            'nombre' => 'Sede Sur',
         ]);
 
         // Buscar sedes
         $response = $this->getJson('/api/v1/sedes?search=Norte');
         $response->assertStatus(200)
-                 ->assertJsonCount(1, 'data');
+            ->assertJsonCount(1, 'data');
     }
-} 
+}

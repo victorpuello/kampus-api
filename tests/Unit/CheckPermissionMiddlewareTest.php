@@ -3,19 +3,19 @@
 namespace Tests\Unit;
 
 use App\Http\Middleware\CheckPermission;
-use Illuminate\Http\Request;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
-use Tests\TestCase;
-use App\Models\User;
 use Mockery;
+use Tests\TestCase;
 
 class CheckPermissionMiddlewareTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
     }
@@ -23,11 +23,12 @@ class CheckPermissionMiddlewareTest extends TestCase
     public function test_permite_acceso_en_entorno_local()
     {
         Config::set('app.env', 'local');
-        $middleware = new CheckPermission();
+        $middleware = new CheckPermission;
         $request = Request::create('/fake', 'GET');
         $called = false;
         $next = function ($req) use (&$called) {
             $called = true;
+
             return response('ok', 200);
         };
         $response = $middleware->handle($request, $next, 'ver_asignaciones');
@@ -39,7 +40,7 @@ class CheckPermissionMiddlewareTest extends TestCase
     {
         Config::set('app.env', 'testing');
         Auth::shouldReceive('user')->andReturn(null);
-        $middleware = new CheckPermission();
+        $middleware = new CheckPermission;
         $request = Request::create('/fake', 'GET');
         $next = function ($req) {
             return response('ok', 200);
@@ -54,7 +55,7 @@ class CheckPermissionMiddlewareTest extends TestCase
         Config::set('app.env', 'testing');
         $user = User::factory()->create();
         Auth::shouldReceive('user')->andReturn($user);
-        $middleware = new CheckPermission();
+        $middleware = new CheckPermission;
         $request = Request::create('/fake', 'GET');
         $next = function ($req) {
             return response('ok', 200);
@@ -74,15 +75,16 @@ class CheckPermissionMiddlewareTest extends TestCase
             ->with('ver_asignaciones')
             ->andReturn(true);
         Auth::shouldReceive('user')->andReturn($userMock);
-        $middleware = new CheckPermission();
+        $middleware = new CheckPermission;
         $request = Request::create('/fake', 'GET');
         $called = false;
         $next = function ($req) use (&$called) {
             $called = true;
+
             return response('ok', 200);
         };
         $response = $middleware->handle($request, $next, 'ver_asignaciones');
         $this->assertTrue($called);
         $this->assertEquals(200, $response->getStatusCode());
     }
-} 
+}

@@ -24,10 +24,20 @@ interface Anio {
 
 interface AniosResponse {
   data: Anio[];
-  current_page: number;
-  last_page: number;
-  per_page: number;
-  total: number;
+  meta: {
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+    from: number;
+    to: number;
+  };
+  links: {
+    first: string;
+    last: string;
+    prev: string | null;
+    next: string | null;
+  };
 }
 
 const AcademicYearsListPage = () => {
@@ -42,8 +52,10 @@ const AcademicYearsListPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [sortColumn, setSortColumn] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
-  const fetchAnios = async (page = 1, perPage = 10, search = '') => {
+  const fetchAnios = async (page = 1, perPage = 10, search = '', sortBy?: string, sortDir?: 'asc' | 'desc') => {
     try {
       setLoading(true);
       const params = new URLSearchParams({
@@ -53,13 +65,18 @@ const AcademicYearsListPage = () => {
       if (search) {
         params.append('search', search);
       }
-      const response = await axiosClient.get(`/anios?${params.toString()}`);
+      if (sortBy) {
+        params.append('sort_by', sortBy);
+        params.append('sort_direction', sortDir || 'asc');
+      }
+      const url = `/anios?${params.toString()}`;
+      const response = await axiosClient.get(url);
       const data: AniosResponse = response.data;
       setAnios(data.data);
-      setTotalItems(data.total);
-      setTotalPages(data.last_page);
-      setCurrentPage(data.current_page);
-      setItemsPerPage(data.per_page);
+      setTotalItems(data.meta?.total || 0);
+      setTotalPages(data.meta?.last_page || 1);
+      setCurrentPage(data.meta?.current_page || 1);
+      setItemsPerPage(data.meta?.per_page || 10);
       setError(null);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Error al cargar los años académicos');
@@ -69,16 +86,26 @@ const AcademicYearsListPage = () => {
   };
 
   useEffect(() => {
-    fetchAnios(currentPage, itemsPerPage, searchTerm);
-  }, [currentPage, itemsPerPage, searchTerm]);
+    fetchAnios(currentPage, itemsPerPage, searchTerm, sortColumn || undefined, sortDirection);
+  }, [currentPage, itemsPerPage, searchTerm, sortColumn, sortDirection]);
 
-  const handlePageChange = (page: number) => setCurrentPage(page);
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
   const handleItemsPerPageChange = (perPage: number) => {
     setItemsPerPage(perPage);
     setCurrentPage(1);
   };
+
   const handleSearch = (search: string) => {
     setSearchTerm(search);
+    setCurrentPage(1);
+  };
+
+  const handleSort = (columnKey: string, direction: 'asc' | 'desc') => {
+    setSortColumn(columnKey);
+    setSortDirection(direction);
     setCurrentPage(1);
   };
 
@@ -95,7 +122,7 @@ const AcademicYearsListPage = () => {
       setConfirmLoading(true);
       await axiosClient.delete(`/anios/${anio.id}`);
       showSuccess('Año académico eliminado exitosamente', 'Éxito');
-      fetchAnios(currentPage, itemsPerPage, searchTerm);
+      fetchAnios(currentPage, itemsPerPage, searchTerm, sortColumn || undefined, sortDirection);
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Error al eliminar el año académico';
       showError(errorMessage, 'Error');
@@ -220,12 +247,14 @@ const AcademicYearsListPage = () => {
           </svg>
         }
         serverSidePagination={true}
+        serverSideSorting={true}
         currentPage={currentPage}
         totalPages={totalPages}
         totalItems={totalItems}
         onPageChange={handlePageChange}
         onItemsPerPageChange={handleItemsPerPageChange}
         onSearch={handleSearch}
+        onSort={handleSort}
       />
       <ConfirmDialog
         isOpen={dialogState.isOpen}

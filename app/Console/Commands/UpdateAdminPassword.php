@@ -28,33 +28,33 @@ class UpdateAdminPassword extends Command
     public function handle()
     {
         $email = $this->option('email');
-        
+
         $this->info("Buscando usuario administrador con email: {$email}");
-        
+
         // Buscar el usuario administrador
         $admin = User::where('email', $email)->first();
-        
-        if (!$admin) {
+
+        if (! $admin) {
             $this->error("No se encontró un usuario con el email: {$email}");
-            $this->info("Usuarios disponibles:");
-            
+            $this->info('Usuarios disponibles:');
+
             $users = User::select('id', 'nombre', 'apellido', 'email', 'username')->get();
             foreach ($users as $user) {
                 $this->line("- ID: {$user->id}, Nombre: {$user->nombre} {$user->apellido}, Email: {$user->email}, Username: {$user->username}");
             }
-            
+
             return 1;
         }
-        
+
         $this->info("Usuario encontrado: {$admin->nombre} {$admin->apellido} ({$admin->email})");
-        
+
         // Actualizar la contraseña
         $admin->password = Hash::make('123456');
         $admin->save();
-        
+
         $this->info("✅ Contraseña actualizada exitosamente a '123456'");
         $this->info("El usuario {$admin->email} ahora puede iniciar sesión con la contraseña: 123456");
-        
+
         return 0;
     }
-} 
+}

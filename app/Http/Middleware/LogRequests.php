@@ -26,7 +26,7 @@ class LogRequests
             'headers' => $request->headers->all(),
             'query_params' => $request->query(),
             'body' => $request->all(),
-            'files' => $request->allFiles()
+            'files' => $request->allFiles(),
         ]);
 
         $response = $next($request);
@@ -36,9 +36,9 @@ class LogRequests
             'status' => $response->getStatusCode(),
             'url' => $request->fullUrl(),
             'content_type' => $response->headers->get('Content-Type'),
-            'content_length' => $response->headers->get('Content-Length')
+            'content_length' => $response->headers->get('Content-Length'),
         ]);
 
         return $response;
     }
-} 
+}

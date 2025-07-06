@@ -4,8 +4,6 @@ namespace Tests\Feature;
 
 use App\Models\Grado;
 use App\Models\Institucion;
-use App\Models\Sede;
-use App\Models\Anio;
 use Database\Seeders\GradoSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -17,30 +15,30 @@ class GradoSeederTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Crear instituciones de prueba
         $this->institucionGeneral = Institucion::factory()->create([
-            'nombre' => 'Instituto General'
+            'nombre' => 'Instituto General',
         ]);
-        
+
         $this->institucionPrimaria = Institucion::factory()->create([
-            'nombre' => 'Escuela Primaria'
+            'nombre' => 'Escuela Primaria',
         ]);
-        
+
         $this->institucionSecundaria = Institucion::factory()->create([
-            'nombre' => 'Liceo Secundaria'
+            'nombre' => 'Liceo Secundaria',
         ]);
     }
 
     /** @test */
     public function puede_ejecutar_seeder_con_instituciones_existentes()
     {
-        $seeder = new GradoSeeder();
+        $seeder = new GradoSeeder;
         $seeder->run();
 
         // Verificar que se crearon grados para cada institución
         $this->assertGreaterThan(0, Grado::count());
-        
+
         foreach ([$this->institucionGeneral, $this->institucionPrimaria, $this->institucionSecundaria] as $institucion) {
             $gradosInstitucion = Grado::where('institucion_id', $institucion->id)->count();
             $this->assertGreaterThan(0, $gradosInstitucion, "La institución {$institucion->nombre} no tiene grados");
@@ -50,11 +48,11 @@ class GradoSeederTest extends TestCase
     /** @test */
     public function crea_grados_por_nivel_educativo()
     {
-        $seeder = new GradoSeeder();
+        $seeder = new GradoSeeder;
         $seeder->run();
 
         $niveles = Grado::getNivelesDisponibles();
-        
+
         foreach ($niveles as $nivel) {
             $gradosPorNivel = Grado::where('nivel', $nivel)->count();
             $this->assertGreaterThan(0, $gradosPorNivel, "No hay grados para el nivel: {$nivel}");
@@ -65,15 +63,15 @@ class GradoSeederTest extends TestCase
     public function no_crea_grados_duplicados_por_institucion()
     {
         // Ejecutar seeder dos veces
-        $seeder = new GradoSeeder();
+        $seeder = new GradoSeeder;
         $seeder->run();
-        
+
         $gradosPrimeraEjecucion = Grado::count();
-        
+
         $seeder->run();
-        
+
         $gradosSegundaEjecucion = Grado::count();
-        
+
         // El número de grados debe ser el mismo (no duplicados)
         $this->assertEquals($gradosPrimeraEjecucion, $gradosSegundaEjecucion);
     }
@@ -81,26 +79,26 @@ class GradoSeederTest extends TestCase
     /** @test */
     public function respeta_configuracion_por_tipo_de_institucion()
     {
-        $seeder = new GradoSeeder();
+        $seeder = new GradoSeeder;
         $seeder->run();
 
         // Verificar configuración general (todas las instituciones por defecto)
         $gradosGeneral = Grado::where('institucion_id', $this->institucionGeneral->id)->get();
-        
+
         // Debe tener grados de todos los niveles
         $nivelesPresentes = $gradosGeneral->pluck('nivel')->unique()->sort()->values()->toArray();
         $nivelesEsperados = collect(Grado::getNivelesDisponibles())->sort()->values()->toArray();
-        
+
         $this->assertEquals($nivelesEsperados, $nivelesPresentes);
     }
 
     /** @test */
     public function no_crea_grados_sin_institucion_cuando_no_hay_instituciones()
     {
-        // Eliminar todas las instituciones
-        Institucion::truncate();
-        
-        $seeder = new GradoSeeder();
+        // Eliminar todas las instituciones usando delete() en lugar de truncate()
+        Institucion::query()->delete();
+
+        $seeder = new GradoSeeder;
         $seeder->run();
 
         // Verificar que NO se crearon grados sin institución
@@ -112,14 +110,14 @@ class GradoSeederTest extends TestCase
     /** @test */
     public function crea_grados_con_nombres_especificos()
     {
-        $seeder = new GradoSeeder();
+        $seeder = new GradoSeeder;
         $seeder->run();
 
         $nombresEsperados = [
             'Prejardín', 'Jardín', 'Transición',
             'Grado 1º', 'Grado 2º', 'Grado 3º', 'Grado 4º', 'Grado 5º',
             'Grado 6º', 'Grado 7º', 'Grado 8º', 'Grado 9º',
-            'Grado 10º', 'Grado 11º'
+            'Grado 10º', 'Grado 11º',
         ];
 
         foreach ($nombresEsperados as $nombre) {
@@ -131,7 +129,7 @@ class GradoSeederTest extends TestCase
     /** @test */
     public function asigna_niveles_correctos_a_los_grados()
     {
-        $seeder = new GradoSeeder();
+        $seeder = new GradoSeeder;
         $seeder->run();
 
         // Verificar asignación de niveles
@@ -144,7 +142,7 @@ class GradoSeederTest extends TestCase
     /** @test */
     public function mantiene_integridad_referencial()
     {
-        $seeder = new GradoSeeder();
+        $seeder = new GradoSeeder;
         $seeder->run();
 
         // Verificar que todos los grados tienen institución_id válido
@@ -162,7 +160,7 @@ class GradoSeederTest extends TestCase
     /** @test */
     public function no_crea_grados_con_datos_invalidos()
     {
-        $seeder = new GradoSeeder();
+        $seeder = new GradoSeeder;
         $seeder->run();
 
         // Verificar que no hay grados con datos vacíos o nulos
@@ -178,11 +176,11 @@ class GradoSeederTest extends TestCase
     /** @test */
     public function distribuye_grados_equitativamente_entre_instituciones()
     {
-        $seeder = new GradoSeeder();
+        $seeder = new GradoSeeder;
         $seeder->run();
 
         $instituciones = Institucion::all();
-        
+
         foreach ($instituciones as $institucion) {
             $gradosInstitucion = Grado::where('institucion_id', $institucion->id)->count();
             $this->assertGreaterThan(0, $gradosInstitucion, "La institución {$institucion->nombre} no tiene grados");
@@ -192,8 +190,8 @@ class GradoSeederTest extends TestCase
     /** @test */
     public function puede_ejecutarse_multiples_veces_sin_errores()
     {
-        $seeder = new GradoSeeder();
-        
+        $seeder = new GradoSeeder;
+
         // Ejecutar múltiples veces
         for ($i = 0; $i < 3; $i++) {
             $seeder->run();
@@ -201,7 +199,7 @@ class GradoSeederTest extends TestCase
 
         // Verificar que no hay errores y los datos están correctos
         $this->assertGreaterThan(0, Grado::count());
-        
+
         // Verificar que no hay duplicados
         $duplicados = \DB::table('grados')
             ->select('institucion_id', 'nombre', \DB::raw('count(*) as total'))
@@ -211,4 +209,4 @@ class GradoSeederTest extends TestCase
 
         $this->assertCount(0, $duplicados, 'Se encontraron grados duplicados');
     }
-} 
+}

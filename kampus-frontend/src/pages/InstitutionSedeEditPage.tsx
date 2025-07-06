@@ -29,7 +29,7 @@ interface Sede {
 
 const InstitutionSedeEditPage: React.FC = () => {
   const navigate = useNavigate();
-  const { institutionId, id } = useParams<{ institutionId: string; id: string }>();
+  const { id, sedeId } = useParams<{ id: string; sedeId: string }>();
   const { showSuccess, showError } = useAlertContext();
   
   const [formData, setFormData] = useState<SedeFormData>({
@@ -50,7 +50,7 @@ const InstitutionSedeEditPage: React.FC = () => {
 
   useEffect(() => {
     const fetchSede = async () => {
-      if (!isValidId(id) || !isValidId(institutionId)) {
+      if (!isValidId(sedeId) || !isValidId(id)) {
         setError('ID de sede o institución inválido');
         setLoading(false);
         return;
@@ -60,7 +60,7 @@ const InstitutionSedeEditPage: React.FC = () => {
         setLoading(true);
         setError(null);
         
-        const response = await axiosClient.get(`/sedes/${id}`);
+        const response = await axiosClient.get(`/sedes/${sedeId}`);
         const sedeData: Sede = response.data.data || response.data;
         
         if (!sedeData || !sedeData.id) {
@@ -91,7 +91,7 @@ const InstitutionSedeEditPage: React.FC = () => {
     };
 
     fetchSede();
-  }, [id, institutionId, showError]);
+  }, [sedeId, id, showError]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -104,7 +104,7 @@ const InstitutionSedeEditPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!isValidId(id) || !isValidId(institutionId)) {
+    if (!isValidId(sedeId) || !isValidId(id)) {
       showError('ID de sede o institución inválido');
       return;
     }
@@ -113,13 +113,13 @@ const InstitutionSedeEditPage: React.FC = () => {
       setSaving(true);
       setError(null);
       
-      await axiosClient.put(`/sedes/${id}`, {
+      await axiosClient.put(`/sedes/${sedeId}`, {
         ...formData,
-        institucion_id: parseInt(institutionId)
+        institucion_id: parseInt(id)
       });
       
       showSuccess('Sede actualizada exitosamente');
-      navigate(`/instituciones/${institutionId}/sedes`);
+      navigate(`/instituciones/${id}/sedes`);
       
     } catch (error: any) {
       console.error('Error updating sede:', error);
@@ -140,7 +140,7 @@ const InstitutionSedeEditPage: React.FC = () => {
   };
 
   const handleCancel = () => {
-    navigate(`/instituciones/${institutionId}/sedes`);
+    navigate(`/instituciones/${id}/sedes`);
   };
 
   // Estado de carga
@@ -177,7 +177,7 @@ const InstitutionSedeEditPage: React.FC = () => {
               <div className="mt-6 flex justify-center space-x-3">
                 <Button
                   variant="primary"
-                  onClick={() => navigate(`/instituciones/${institutionId}/sedes`)}
+                  onClick={() => navigate(`/instituciones/${id}/sedes`)}
                 >
                   Volver a las sedes
                 </Button>

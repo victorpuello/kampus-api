@@ -25,37 +25,37 @@ return new class extends Migration
             $table->index(['docente_id', 'dia_semana', 'franja_horaria_id']);
             $table->index(['grupo_id', 'dia_semana', 'franja_horaria_id']);
             $table->index(['anio_academico_id', 'periodo_id']);
-            
+
             // Constraints de integridad
             $table->foreign('docente_id')
-                  ->references('id')
-                  ->on('docentes')
-                  ->onDelete('restrict');
-                  
+                ->references('id')
+                ->on('docentes')
+                ->onDelete('restrict');
+
             $table->foreign('asignatura_id')
-                  ->references('id')
-                  ->on('asignaturas')
-                  ->onDelete('restrict');
-                  
+                ->references('id')
+                ->on('asignaturas')
+                ->onDelete('restrict');
+
             $table->foreign('grupo_id')
-                  ->references('id')
-                  ->on('grupos')
-                  ->onDelete('restrict');
-                  
+                ->references('id')
+                ->on('grupos')
+                ->onDelete('restrict');
+
             $table->foreign('franja_horaria_id')
-                  ->references('id')
-                  ->on('franjas_horarias')
-                  ->onDelete('restrict');
-                  
+                ->references('id')
+                ->on('franjas_horarias')
+                ->onDelete('restrict');
+
             $table->foreign('anio_academico_id')
-                  ->references('id')
-                  ->on('anios')
-                  ->onDelete('restrict');
-                  
+                ->references('id')
+                ->on('anios')
+                ->onDelete('restrict');
+
             $table->foreign('periodo_id')
-                  ->references('id')
-                  ->on('periodos')
-                  ->onDelete('restrict');
+                ->references('id')
+                ->on('periodos')
+                ->onDelete('restrict');
         });
     }
 
@@ -63,4 +63,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('asignaciones');
     }
-}; 
+};

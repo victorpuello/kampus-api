@@ -8,6 +8,7 @@ use Illuminate\Foundation\Http\FormRequest;
  * @OA\Schema(
  *     schema="UpdateDocenteRequest",
  *     title="Solicitud para Actualizar Docente",
+ *
  *     @OA\Property(property="nombre", type="string", maxLength=255, description="Nombre del docente"),
  *     @OA\Property(property="apellido", type="string", maxLength=255, description="Apellido del docente"),
  *     @OA\Property(property="email", type="string", format="email", maxLength=255, description="Correo electrónico único del docente"),
@@ -42,12 +43,12 @@ class UpdateDocenteRequest extends FormRequest
         // Obtener el docente del parámetro de ruta
         $docente = $this->route('docente');
         $userId = $docente?->user_id;
-        
+
         return [
             'nombre' => 'sometimes|string|max:255',
             'apellido' => 'sometimes|string|max:255',
-            'email' => 'sometimes|string|email|max:255|unique:users,email,' . $userId,
-            'username' => 'sometimes|string|max:255|unique:users,username,' . $userId,
+            'email' => 'sometimes|string|email|max:255|unique:users,email,'.$userId,
+            'username' => 'sometimes|string|max:255|unique:users,username,'.$userId,
             'password' => 'sometimes|string|min:8',
             'institucion_id' => 'sometimes|integer|exists:instituciones,id',
             'estado' => 'sometimes|string|in:activo,inactivo',

@@ -31,8 +31,6 @@ class StorePeriodoRequest extends FormRequest
 
     /**
      * Get custom messages for validator errors.
-     *
-     * @return array
      */
     public function messages(): array
     {
@@ -57,12 +55,12 @@ class StorePeriodoRequest extends FormRequest
             $fechaInicio = $this->input('fecha_inicio');
             $fechaFin = $this->input('fecha_fin');
 
-            if (!$anioId || !$fechaInicio || !$fechaFin) {
+            if (! $anioId || ! $fechaInicio || ! $fechaFin) {
                 return;
             }
 
             $anio = \App\Models\Anio::find($anioId);
-            if (!$anio) {
+            if (! $anio) {
                 return;
             }
 
@@ -84,9 +82,10 @@ class StorePeriodoRequest extends FormRequest
                     ($fechaInicio <= $periodo->fecha_fin && $fechaFin >= $periodo->fecha_inicio)
                 ) {
                     $validator->errors()->add('fecha_inicio', 'Las fechas del periodo se cruzan con el periodo existente: "'.$periodo->nombre.'" ('.$periodo->fecha_inicio.' a '.$periodo->fecha_fin.').');
+
                     break;
                 }
             }
         });
     }
-} 
+}

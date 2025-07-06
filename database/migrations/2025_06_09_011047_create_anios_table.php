@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('anios', function (Blueprint $table) {
             $table->unsignedBigInteger('id')->autoIncrement();
-            $table->string('nombre', 50)->unique();
+            $table->string('nombre', 50);
             $table->date('fecha_inicio');
             $table->date('fecha_fin');
             $table->unsignedBigInteger('institucion_id');
@@ -19,9 +19,11 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('institucion_id')
-                  ->references('id')
-                  ->on('instituciones')
-                  ->onDelete('cascade');
+                ->references('id')
+                ->on('instituciones')
+                ->onDelete('cascade');
+
+            $table->unique(['nombre', 'institucion_id']);
         });
     }
 
@@ -29,4 +31,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('anios');
     }
-}; 
+};

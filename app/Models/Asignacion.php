@@ -28,6 +28,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Inasistencia> $inasistencias
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Actividad> $actividades
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\DefinitivaAsignatura> $definitivasAsignatura
+ *
  * @method static \Database\Factories\AsignacionFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|Asignacion newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Asignacion newQuery()
@@ -35,11 +36,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|Asignacion query()
  * @method static \Illuminate\Database\Eloquent\Builder|Asignacion withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Asignacion withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class Asignacion extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
+    use SoftDeletes;
 
     /**
      * La tabla asociada con el modelo.
@@ -81,11 +84,11 @@ class Asignacion extends Model
      */
     public const DIAS_SEMANA = [
         'lunes',
-        'martes', 
+        'martes',
         'miercoles',
         'jueves',
         'viernes',
-        'sabado'
+        'sabado',
     ];
 
     /**
@@ -95,7 +98,7 @@ class Asignacion extends Model
      */
     public const ESTADOS = [
         'activo',
-        'inactivo'
+        'inactivo',
     ];
 
     /**
@@ -261,7 +264,7 @@ class Asignacion extends Model
      */
     public function getNombreDocenteAttribute()
     {
-        return $this->docente ? $this->docente->user->nombre . ' ' . $this->docente->user->apellido : 'Sin docente';
+        return $this->docente ? $this->docente->user->nombre.' '.$this->docente->user->apellido : 'Sin docente';
     }
 
     /**

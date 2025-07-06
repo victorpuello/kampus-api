@@ -32,8 +32,8 @@ class StudentRequest extends FormRequest
             $rules['numero_documento'] .= '|unique:estudiantes,numero_documento';
             $rules['email'] .= '|unique:estudiantes,email';
         } else {
-            $rules['numero_documento'] .= '|unique:estudiantes,numero_documento,' . $this->route('estudiante');
-            $rules['email'] .= '|unique:estudiantes,email,' . $this->route('estudiante');
+            $rules['numero_documento'] .= '|unique:estudiantes,numero_documento,'.$this->route('estudiante');
+            $rules['email'] .= '|unique:estudiantes,email,'.$this->route('estudiante');
         }
 
         return $rules;
@@ -65,4 +65,4 @@ class StudentRequest extends FormRequest
             'acudiente_id.exists' => 'El acudiente seleccionado no existe',
         ];
     }
-} 
+}

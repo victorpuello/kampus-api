@@ -24,4 +24,4 @@ class InstitucionSeeder extends Seeder
             'siglas' => 'LM',
         ]);
     }
-} 
+}

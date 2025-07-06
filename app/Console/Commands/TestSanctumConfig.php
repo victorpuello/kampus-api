@@ -7,6 +7,7 @@ use Illuminate\Console\Command;
 class TestSanctumConfig extends Command
 {
     protected $signature = 'sanctum:test-config';
+
     protected $description = 'Probar la configuración de Sanctum según la documentación';
 
     public function handle()
@@ -15,11 +16,11 @@ class TestSanctumConfig extends Command
 
         // Verificar configuración actual
         $this->info('1. Verificando configuración actual:');
-        $this->line('APP_URL: ' . config('app.url'));
-        $this->line('SANCTUM_STATEFUL_DOMAINS: ' . config('sanctum.stateful'));
-        $this->line('SESSION_DOMAIN: ' . config('session.domain'));
-        $this->line('SESSION_SECURE_COOKIE: ' . (config('session.secure') ? 'true' : 'false'));
-        $this->line('SESSION_SAMESITE: ' . config('session.same_site'));
+        $this->line('APP_URL: '.config('app.url'));
+        $this->line('SANCTUM_STATEFUL_DOMAINS: '.config('sanctum.stateful'));
+        $this->line('SESSION_DOMAIN: '.config('session.domain'));
+        $this->line('SESSION_SECURE_COOKIE: '.(config('session.secure') ? 'true' : 'false'));
+        $this->line('SESSION_SAMESITE: '.config('session.same_site'));
 
         // URL base
         $baseUrl = 'http://kampus.test';
@@ -30,7 +31,7 @@ class TestSanctumConfig extends Command
         // 1. Obtener CSRF token
         $this->info('\n2. Obteniendo CSRF token desde /sanctum/csrf-cookie...');
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $baseUrl . '/sanctum/csrf-cookie');
+        curl_setopt($ch, CURLOPT_URL, $baseUrl.'/sanctum/csrf-cookie');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_HEADER, true);
         curl_setopt($ch, CURLOPT_COOKIEJAR, $cookieFile);
@@ -48,19 +49,20 @@ class TestSanctumConfig extends Command
         if (file_exists($cookieFile)) {
             $cookies = file_get_contents($cookieFile);
             $lines = explode("\n", $cookies);
-            
+
             foreach ($lines as $line) {
                 if (strpos($line, 'XSRF-TOKEN') !== false && strpos($line, "\t") !== false) {
                     $parts = explode("\t", $line);
                     if (count($parts) >= 7) {
                         $xsrfToken = urldecode(trim($parts[6]));
-                        $this->info('✅ Token CSRF extraído: ' . substr($xsrfToken, 0, 50) . '...');
+                        $this->info('✅ Token CSRF extraído: '.substr($xsrfToken, 0, 50).'...');
+
                         break;
                     }
                 }
             }
-            
-            if (!$xsrfToken) {
+
+            if (! $xsrfToken) {
                 $this->error('❌ No se pudo extraer el token CSRF');
             }
         } else {
@@ -70,23 +72,23 @@ class TestSanctumConfig extends Command
         // 2. Intentar login
         $this->info('\n3. Intentando login con configuración correcta...');
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $baseUrl . '/api/v1/login');
+        curl_setopt($ch, CURLOPT_URL, $baseUrl.'/api/v1/login');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
             'email' => 'admin@example.com',
-            'password' => '123456'
+            'password' => '123456',
         ]));
 
         // Headers según la documentación
         $headers = [
             'Content-Type: application/json',
             'Accept: application/json',
-            'X-Requested-With: XMLHttpRequest'
+            'X-Requested-With: XMLHttpRequest',
         ];
 
         if ($xsrfToken) {
-            $headers[] = 'X-XSRF-TOKEN: ' . $xsrfToken;
+            $headers[] = 'X-XSRF-TOKEN: '.$xsrfToken;
             $this->info('✅ Header X-XSRF-TOKEN agregado');
         }
 
@@ -110,7 +112,7 @@ class TestSanctumConfig extends Command
             $this->info('✅ Login exitoso!');
             $data = json_decode($response, true);
             if (isset($data['user'])) {
-                $this->info('Usuario: ' . $data['user']['nombre'] . ' ' . $data['user']['apellido']);
+                $this->info('Usuario: '.$data['user']['nombre'].' '.$data['user']['apellido']);
             }
         } else {
             $this->error('❌ Error en login');
@@ -135,4 +137,4 @@ class TestSanctumConfig extends Command
 
         return 0;
     }
-} 
+}

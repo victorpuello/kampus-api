@@ -9,6 +9,7 @@ use Illuminate\Foundation\Http\FormRequest;
  *     schema="StoreFranjaHorariaRequest",
  *     title="Solicitud para Crear Franja Horaria",
  *     required={"hora_inicio", "hora_fin", "institucion_id"},
+ *
  *     @OA\Property(property="hora_inicio", type="string", format="time", description="Hora de inicio de la franja horaria (HH:MM)"),
  *     @OA\Property(property="hora_fin", type="string", format="time", description="Hora de fin de la franja horaria (HH:MM)"),
  *     @OA\Property(property="institucion_id", type="integer", description="ID de la institución a la que pertenece la franja horaria"),

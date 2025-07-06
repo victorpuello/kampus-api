@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Horario extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
+    use SoftDeletes;
 
     protected $table = 'horarios';
 
@@ -38,4 +39,4 @@ class Horario extends Model
     {
         return $this->hasMany(Inasistencia::class);
     }
-} 
+}

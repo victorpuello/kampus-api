@@ -17,52 +17,52 @@ class GradoSeeder extends Seeder
             Grado::NIVEL_PREESCOLAR => [
                 'Prejardín',
                 'Jardín',
-                'Transición'
+                'Transición',
             ],
             Grado::NIVEL_BASICA_PRIMARIA => [
                 'Grado 1º',
                 'Grado 2º',
                 'Grado 3º',
                 'Grado 4º',
-                'Grado 5º'
+                'Grado 5º',
             ],
             Grado::NIVEL_BASICA_SECUNDARIA => [
                 'Grado 6º',
                 'Grado 7º',
                 'Grado 8º',
-                'Grado 9º'
+                'Grado 9º',
             ],
             Grado::NIVEL_EDUCACION_MEDIA => [
                 'Grado 10º',
-                'Grado 11º'
-            ]
+                'Grado 11º',
+            ],
         ],
         'solo_primaria' => [
             Grado::NIVEL_PREESCOLAR => [
                 'Prejardín',
                 'Jardín',
-                'Transición'
+                'Transición',
             ],
             Grado::NIVEL_BASICA_PRIMARIA => [
                 'Grado 1º',
                 'Grado 2º',
                 'Grado 3º',
                 'Grado 4º',
-                'Grado 5º'
-            ]
+                'Grado 5º',
+            ],
         ],
         'solo_secundaria' => [
             Grado::NIVEL_BASICA_SECUNDARIA => [
                 'Grado 6º',
                 'Grado 7º',
                 'Grado 8º',
-                'Grado 9º'
+                'Grado 9º',
             ],
             Grado::NIVEL_EDUCACION_MEDIA => [
                 'Grado 10º',
-                'Grado 11º'
-            ]
-        ]
+                'Grado 11º',
+            ],
+        ],
     ];
 
     /**
@@ -84,6 +84,7 @@ class GradoSeeder extends Seeder
                 echo "⚠️  No hay instituciones disponibles. Creando grados sin institución.\n";
             }
             $this->crearGradosSinInstitucion();
+
             return;
         }
 
@@ -96,7 +97,7 @@ class GradoSeeder extends Seeder
         $estadisticas = [
             'creados' => 0,
             'existentes' => 0,
-            'errores' => 0
+            'errores' => 0,
         ];
 
         foreach ($instituciones as $institucion) {
@@ -150,9 +151,9 @@ class GradoSeeder extends Seeder
                 } catch (\Exception $e) {
                     $estadisticas['errores']++;
                     if (isset($this->command)) {
-                        $this->command->error("    ❌ Error creando {$nombre}: " . $e->getMessage());
+                        $this->command->error("    ❌ Error creando {$nombre}: ".$e->getMessage());
                     } else {
-                        echo "    ❌ Error creando {$nombre}: " . $e->getMessage() . "\n";
+                        echo "    ❌ Error creando {$nombre}: ".$e->getMessage()."\n";
                     }
                 }
             }
@@ -174,10 +175,10 @@ class GradoSeeder extends Seeder
 
         // Aquí podrías agregar lógica para determinar el tipo según características de la institución
         // Por ejemplo, basado en el nombre, tipo, o configuración específica
-        
+
         // Ejemplo de lógica (puedes personalizar según tus necesidades):
         $nombre = strtolower($institucion->nombre);
-        
+
         if (str_contains($nombre, 'primaria') || str_contains($nombre, 'básica')) {
             $tipoConfiguracion = 'solo_primaria';
         } elseif (str_contains($nombre, 'secundaria') || str_contains($nombre, 'media')) {
@@ -221,19 +222,19 @@ class GradoSeeder extends Seeder
         } else {
             echo "🔧 Creando grados de ejemplo sin institución...\n";
         }
-        
+
         $gradosEjemplo = [
             ['nombre' => 'Grado 1º', 'nivel' => Grado::NIVEL_BASICA_PRIMARIA],
             ['nombre' => 'Grado 2º', 'nivel' => Grado::NIVEL_BASICA_PRIMARIA],
             ['nombre' => 'Grado 6º', 'nivel' => Grado::NIVEL_BASICA_SECUNDARIA],
             ['nombre' => 'Grado 10º', 'nivel' => Grado::NIVEL_EDUCACION_MEDIA],
         ];
-        
+
         foreach ($gradosEjemplo as $grado) {
             try {
                 // Intentar crear sin institución_id
                 Grado::create($grado);
-                
+
                 if (isset($this->command)) {
                     $this->command->line("  ✅ Creado: {$grado['nombre']} ({$grado['nivel']})");
                 } else {
@@ -256,18 +257,18 @@ class GradoSeeder extends Seeder
     {
         if (isset($this->command)) {
             $this->command->info("\n🎉 ¡Seeder de grados completado!");
-            $this->command->info("📊 Resumen final:");
+            $this->command->info('📊 Resumen final:');
             $this->command->info("  ✅ Grados creados: {$estadisticas['creados']}");
             $this->command->info("  ⏭️  Grados existentes: {$estadisticas['existentes']}");
             $this->command->info("  ❌ Errores: {$estadisticas['errores']}");
-            $this->command->info("  📚 Total procesados: " . array_sum($estadisticas));
+            $this->command->info('  📚 Total procesados: '.array_sum($estadisticas));
         } else {
             echo "\n🎉 ¡Seeder de grados completado!\n";
             echo "📊 Resumen final:\n";
             echo "  ✅ Grados creados: {$estadisticas['creados']}\n";
             echo "  ⏭️  Grados existentes: {$estadisticas['existentes']}\n";
             echo "  ❌ Errores: {$estadisticas['errores']}\n";
-            echo "  📚 Total procesados: " . array_sum($estadisticas) . "\n";
+            echo '  📚 Total procesados: '.array_sum($estadisticas)."\n";
         }
         $this->mostrarEstadisticasPorNivel();
     }

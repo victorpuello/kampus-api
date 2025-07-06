@@ -2,13 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Models\Anio;
+use App\Models\Estudiante;
 use App\Models\Grado;
+use App\Models\Grupo;
 use App\Models\Institucion;
 use App\Models\Sede;
-use App\Models\Grupo;
-use App\Models\Estudiante;
-use App\Models\Anio;
-use App\Models\Docente;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -19,30 +18,30 @@ class GradoIntegrityTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Crear datos de prueba
         $this->institucion1 = Institucion::factory()->create([
-            'nombre' => 'Instituto de Prueba 1'
+            'nombre' => 'Instituto de Prueba 1',
         ]);
-        
+
         $this->institucion2 = Institucion::factory()->create([
-            'nombre' => 'Instituto de Prueba 2'
+            'nombre' => 'Instituto de Prueba 2',
         ]);
-        
+
         $this->sede1 = Sede::factory()->create([
-            'institucion_id' => $this->institucion1->id
+            'institucion_id' => $this->institucion1->id,
         ]);
-        
+
         $this->sede2 = Sede::factory()->create([
-            'institucion_id' => $this->institucion2->id
+            'institucion_id' => $this->institucion2->id,
         ]);
-        
+
         $this->anio1 = Anio::factory()->create([
-            'institucion_id' => $this->institucion1->id
+            'institucion_id' => $this->institucion1->id,
         ]);
-        
+
         $this->anio2 = Anio::factory()->create([
-            'institucion_id' => $this->institucion2->id
+            'institucion_id' => $this->institucion2->id,
         ]);
     }
 
@@ -51,14 +50,14 @@ class GradoIntegrityTest extends TestCase
     {
         // Crear grado para institución 1
         $grado = Grado::factory()->create([
-            'institucion_id' => $this->institucion1->id
+            'institucion_id' => $this->institucion1->id,
         ]);
 
         // Crear grupo con sede de la misma institución (debe funcionar)
         $grupo = Grupo::factory()->create([
             'grado_id' => $grado->id,
             'sede_id' => $this->sede1->id,
-            'anio_id' => $this->anio1->id
+            'anio_id' => $this->anio1->id,
         ]);
 
         $this->assertDatabaseHas('grupos', ['id' => $grupo->id]);
@@ -70,7 +69,7 @@ class GradoIntegrityTest extends TestCase
         Grupo::factory()->create([
             'grado_id' => $grado->id,
             'sede_id' => $this->sede2->id, // Sede de institución diferente
-            'anio_id' => $this->anio1->id
+            'anio_id' => $this->anio1->id,
         ]);
     }
 
@@ -80,7 +79,7 @@ class GradoIntegrityTest extends TestCase
         // Crear primer grado
         $grado1 = Grado::factory()->create([
             'nombre' => 'Grado 1º',
-            'institucion_id' => $this->institucion1->id
+            'institucion_id' => $this->institucion1->id,
         ]);
 
         // Intentar crear grado duplicado en la misma institución (debe fallar)
@@ -88,7 +87,7 @@ class GradoIntegrityTest extends TestCase
 
         Grado::factory()->create([
             'nombre' => 'Grado 1º',
-            'institucion_id' => $this->institucion1->id
+            'institucion_id' => $this->institucion1->id,
         ]);
     }
 
@@ -98,12 +97,12 @@ class GradoIntegrityTest extends TestCase
         // Crear grados con el mismo nombre en diferentes instituciones
         $grado1 = Grado::factory()->create([
             'nombre' => 'Grado 1º',
-            'institucion_id' => $this->institucion1->id
+            'institucion_id' => $this->institucion1->id,
         ]);
 
         $grado2 = Grado::factory()->create([
             'nombre' => 'Grado 1º',
-            'institucion_id' => $this->institucion2->id
+            'institucion_id' => $this->institucion2->id,
         ]);
 
         $this->assertDatabaseHas('grados', ['id' => $grado1->id]);
@@ -116,17 +115,17 @@ class GradoIntegrityTest extends TestCase
     {
         // Crear grado con grupos y estudiantes
         $grado = Grado::factory()->create([
-            'institucion_id' => $this->institucion1->id
+            'institucion_id' => $this->institucion1->id,
         ]);
 
         $grupo = Grupo::factory()->create([
             'grado_id' => $grado->id,
             'sede_id' => $this->sede1->id,
-            'anio_id' => $this->anio1->id
+            'anio_id' => $this->anio1->id,
         ]);
 
         $estudiante = Estudiante::factory()->create([
-            'grupo_id' => $grupo->id
+            'grupo_id' => $grupo->id,
         ]);
 
         // Verificar que existen
@@ -150,14 +149,14 @@ class GradoIntegrityTest extends TestCase
     {
         // Crear grado
         $grado = Grado::factory()->create([
-            'institucion_id' => $this->institucion1->id
+            'institucion_id' => $this->institucion1->id,
         ]);
 
         // Crear grupo válido
         $grupo = Grupo::factory()->create([
             'grado_id' => $grado->id,
             'sede_id' => $this->sede1->id,
-            'anio_id' => $this->anio1->id
+            'anio_id' => $this->anio1->id,
         ]);
 
         // Verificar que el grupo puede acceder a su grado
@@ -177,20 +176,20 @@ class GradoIntegrityTest extends TestCase
     {
         // Crear grado
         $grado = Grado::factory()->create([
-            'institucion_id' => $this->institucion1->id
+            'institucion_id' => $this->institucion1->id,
         ]);
 
         // Crear grupos para el grado
         $grupo1 = Grupo::factory()->create([
             'grado_id' => $grado->id,
             'sede_id' => $this->sede1->id,
-            'anio_id' => $this->anio1->id
+            'anio_id' => $this->anio1->id,
         ]);
 
         $grupo2 = Grupo::factory()->create([
             'grado_id' => $grado->id,
             'sede_id' => $this->sede1->id,
-            'anio_id' => $this->anio1->id
+            'anio_id' => $this->anio1->id,
         ]);
 
         // Agregar estudiantes a los grupos
@@ -213,7 +212,7 @@ class GradoIntegrityTest extends TestCase
     {
         // Crear grado sin grupos
         $grado = Grado::factory()->create([
-            'institucion_id' => $this->institucion1->id
+            'institucion_id' => $this->institucion1->id,
         ]);
 
         // Obtener estadísticas
@@ -238,11 +237,14 @@ class GradoIntegrityTest extends TestCase
         }
 
         // Verificar que niveles inválidos no son aceptados
-        $nivelesInvalidos = ['Nivel Invalido', '', null, 'Primaria', 'Secundaria'];
-        
+        $nivelesInvalidos = ['Nivel Invalido', '', 'Primaria', 'Secundaria'];
+
         foreach ($nivelesInvalidos as $nivel) {
             $this->assertFalse(Grado::isNivelValido($nivel));
         }
+
+        // Verificar que null no es aceptado
+        $this->assertFalse(Grado::isNivelValido(null));
     }
 
     /** @test */
@@ -250,7 +252,7 @@ class GradoIntegrityTest extends TestCase
     {
         // Crear grado
         $grado = Grado::factory()->create([
-            'institucion_id' => $this->institucion1->id
+            'institucion_id' => $this->institucion1->id,
         ]);
 
         // Verificar relación con institución
@@ -261,7 +263,7 @@ class GradoIntegrityTest extends TestCase
         $grupo = Grupo::factory()->create([
             'grado_id' => $grado->id,
             'sede_id' => $this->sede1->id,
-            'anio_id' => $this->anio1->id
+            'anio_id' => $this->anio1->id,
         ]);
 
         // Verificar relación con grupos
@@ -271,7 +273,7 @@ class GradoIntegrityTest extends TestCase
 
         // Crear estudiante
         $estudiante = Estudiante::factory()->create([
-            'grupo_id' => $grupo->id
+            'grupo_id' => $grupo->id,
         ]);
 
         // Verificar relación con estudiantes
@@ -286,12 +288,12 @@ class GradoIntegrityTest extends TestCase
         // Crear grados iniciales
         $grado1 = Grado::factory()->create([
             'nombre' => 'Grado 1º',
-            'institucion_id' => $this->institucion1->id
+            'institucion_id' => $this->institucion1->id,
         ]);
 
         $grado2 = Grado::factory()->create([
             'nombre' => 'Grado 2º',
-            'institucion_id' => $this->institucion1->id
+            'institucion_id' => $this->institucion1->id,
         ]);
 
         // Verificar que no hay duplicados
@@ -323,7 +325,7 @@ class GradoIntegrityTest extends TestCase
         $grado = Grado::factory()->create([
             'nombre' => 'Grado 1º',
             'nivel' => Grado::NIVEL_BASICA_PRIMARIA,
-            'institucion_id' => $this->institucion1->id
+            'institucion_id' => $this->institucion1->id,
         ]);
 
         // Verificar que los datos son consistentes
@@ -340,4 +342,4 @@ class GradoIntegrityTest extends TestCase
         // Verificar que el nivel es uno de los válidos
         $this->assertContains($grado->nivel, Grado::getNivelesDisponibles());
     }
-} 
+}

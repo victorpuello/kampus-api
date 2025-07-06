@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Institucion $institucion
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Grupo> $grupos
+ *
  * @method static \Database\Factories\SedeFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|Sede newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Sede newQuery()
@@ -28,11 +29,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|Sede query()
  * @method static \Illuminate\Database\Eloquent\Builder|Sede withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Sede withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class Sede extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
+    use SoftDeletes;
 
     /**
      * La tabla asociada con el modelo.
@@ -72,7 +75,7 @@ class Sede extends Model
     /**
      * Obtiene los grupos de esta sede para un año académico específico.
      *
-     * @param int $anioId
+     * @param  int  $anioId
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function gruposPorAnio($anioId)
@@ -83,7 +86,7 @@ class Sede extends Model
     /**
      * Obtiene los grupos de esta sede para un grado específico.
      *
-     * @param int $gradoId
+     * @param  int  $gradoId
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function gruposPorGrado($gradoId)
@@ -94,14 +97,14 @@ class Sede extends Model
     /**
      * Obtiene estadísticas de grupos por nivel educativo para un año específico.
      *
-     * @param int $anioId
+     * @param  int  $anioId
      * @return array
      */
     public function estadisticasGruposPorNivel($anioId)
     {
         $estadisticas = [];
         $niveles = Grado::getNivelesDisponibles();
-        
+
         foreach ($niveles as $nivel) {
             $count = $this->grupos()
                 ->whereHas('grado', function ($q) use ($nivel) {
@@ -109,17 +112,17 @@ class Sede extends Model
                 })
                 ->where('anio_id', $anioId)
                 ->count();
-            
+
             $estadisticas[$nivel] = $count;
         }
-        
+
         return $estadisticas;
     }
 
     /**
      * Obtiene el total de estudiantes en esta sede para un año específico.
      *
-     * @param int $anioId
+     * @param  int  $anioId
      * @return int
      */
     public function totalEstudiantesPorAnio($anioId)

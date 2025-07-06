@@ -33,28 +33,36 @@ class FranjaHorariaController extends Controller
      *     summary="Obtiene una lista paginada de franjas horarias",
      *     tags={"Franjas Horarias"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(
      *         name="per_page",
      *         in="query",
      *         description="Número de franjas horarias por página",
      *         required=false,
+     *
      *         @OA\Schema(type="integer", default=10)
      *     ),
+     *
      *     @OA\Parameter(
      *         name="institucion_id",
      *         in="query",
      *         description="ID de la institución para filtrar franjas horarias",
      *         required=false,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Lista de franjas horarias obtenida exitosamente",
+     *
      *         @OA\JsonContent(
      *             type="array",
+     *
      *             @OA\Items(ref="#/components/schemas/FranjaHorariaResource")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="No autenticado",
@@ -84,28 +92,36 @@ class FranjaHorariaController extends Controller
      *     summary="Obtiene una lista paginada de franjas horarias de una institución específica",
      *     tags={"Franjas Horarias"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(
      *         name="institucion",
      *         in="path",
      *         description="ID de la institución",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="per_page",
      *         in="query",
      *         description="Número de franjas horarias por página",
      *         required=false,
+     *
      *         @OA\Schema(type="integer", default=10)
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Lista de franjas horarias obtenida exitosamente",
+     *
      *         @OA\JsonContent(
      *             type="array",
+     *
      *             @OA\Items(ref="#/components/schemas/FranjaHorariaResource")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="No autenticado",
@@ -135,15 +151,20 @@ class FranjaHorariaController extends Controller
      *     summary="Crea una nueva franja horaria",
      *     tags={"Franjas Horarias"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(ref="#/components/schemas/StoreFranjaHorariaRequest")
      *     ),
+     *
      *     @OA\Response(
      *         response=201,
      *         description="Franja horaria creada exitosamente",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/FranjaHorariaResource")
      *     ),
+     *
      *     @OA\Response(
      *         response=422,
      *         description="Error de validación",
@@ -171,22 +192,29 @@ class FranjaHorariaController extends Controller
      *     summary="Crea una nueva franja horaria para una institución específica",
      *     tags={"Franjas Horarias"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(
      *         name="institucion",
      *         in="path",
      *         description="ID de la institución",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(ref="#/components/schemas/StoreFranjaHorariaRequest")
      *     ),
+     *
      *     @OA\Response(
      *         response=201,
      *         description="Franja horaria creada exitosamente",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/FranjaHorariaResource")
      *     ),
+     *
      *     @OA\Response(
      *         response=422,
      *         description="Error de validación",
@@ -210,6 +238,7 @@ class FranjaHorariaController extends Controller
         $data = $request->all();
         $data['institucion_id'] = $institucionId;
         $franja = FranjaHoraria::create($data);
+
         return new FranjaHorariaResource($franja);
     }
 
@@ -219,18 +248,23 @@ class FranjaHorariaController extends Controller
      *     summary="Obtiene los detalles de una franja horaria específica",
      *     tags={"Franjas Horarias"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(
      *         name="franja_horaria",
      *         in="path",
      *         description="ID de la franja horaria",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Detalles de la franja horaria obtenidos exitosamente",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/FranjaHorariaResource")
      *     ),
+     *
      *     @OA\Response(
      *         response=404,
      *         description="Franja horaria no encontrada",
@@ -256,25 +290,32 @@ class FranjaHorariaController extends Controller
      *     summary="Obtiene los detalles de una franja horaria específica de una institución",
      *     tags={"Franjas Horarias"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(
      *         name="institucion",
      *         in="path",
      *         description="ID de la institución",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="franja_horaria",
      *         in="path",
      *         description="ID de la franja horaria",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Detalles de la franja horaria obtenidos exitosamente",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/FranjaHorariaResource")
      *     ),
+     *
      *     @OA\Response(
      *         response=404,
      *         description="Franja horaria o institución no encontrada",
@@ -305,22 +346,29 @@ class FranjaHorariaController extends Controller
      *     summary="Actualiza una franja horaria existente",
      *     tags={"Franjas Horarias"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(
      *         name="franja_horaria",
      *         in="path",
      *         description="ID de la franja horaria a actualizar",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(ref="#/components/schemas/UpdateFranjaHorariaRequest")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Franja horaria actualizada exitosamente",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/FranjaHorariaResource")
      *     ),
+     *
      *     @OA\Response(
      *         response=422,
      *         description="Error de validación",
@@ -352,29 +400,38 @@ class FranjaHorariaController extends Controller
      *     summary="Actualiza una franja horaria existente de una institución",
      *     tags={"Franjas Horarias"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(
      *         name="institucion",
      *         in="path",
      *         description="ID de la institución",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="franja_horaria",
      *         in="path",
      *         description="ID de la franja horaria a actualizar",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(ref="#/components/schemas/UpdateFranjaHorariaRequest")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Franja horaria actualizada exitosamente",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/FranjaHorariaResource")
      *     ),
+     *
      *     @OA\Response(
      *         response=422,
      *         description="Error de validación",
@@ -411,13 +468,16 @@ class FranjaHorariaController extends Controller
      *     summary="Elimina (soft delete) una franja horaria",
      *     tags={"Franjas Horarias"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(
      *         name="franja_horaria",
      *         in="path",
      *         description="ID de la franja horaria a eliminar",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(
      *         response=204,
      *         description="Franja horaria eliminada exitosamente (sin contenido)",
@@ -436,9 +496,15 @@ class FranjaHorariaController extends Controller
      *     )
      * )
      */
-    public function destroy(FranjaHoraria $franjaHoraria)
+    public function destroy($id)
     {
-        $franjaHoraria->delete();
+        $model = FranjaHoraria::find($id);
+
+        if (! $model) {
+            abort(404, 'Franja horaria no encontrada');
+        }
+
+        $model->delete();
 
         return response()->noContent();
     }
@@ -449,20 +515,25 @@ class FranjaHorariaController extends Controller
      *     summary="Elimina (soft delete) una franja horaria de una institución",
      *     tags={"Franjas Horarias"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(
      *         name="institucion",
      *         in="path",
      *         description="ID de la institución",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="franja_horaria",
      *         in="path",
      *         description="ID de la franja horaria a eliminar",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(
      *         response=204,
      *         description="Franja horaria eliminada exitosamente (sin contenido)",

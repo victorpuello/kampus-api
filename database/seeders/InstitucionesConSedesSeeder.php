@@ -198,4 +198,4 @@ class InstitucionesConSedesSeeder extends Seeder
         $this->command->info('   • Colegio Bilingüe Internacional (CBI) - 4 sedes');
         $this->command->info('   Total: 5 instituciones y 15 sedes creadas');
     }
-} 
+}

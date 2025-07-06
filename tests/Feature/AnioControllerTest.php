@@ -27,7 +27,7 @@ class AnioControllerTest extends TestCase
         $response = $this->actingAs($this->user, 'sanctum')->getJson('/api/v1/anios');
 
         $response->assertStatus(200)
-                 ->assertJsonCount(3, 'data');
+            ->assertJsonCount(3, 'data');
     }
 
     public function test_can_create_anio()
@@ -44,7 +44,7 @@ class AnioControllerTest extends TestCase
         $response = $this->actingAs($this->user, 'sanctum')->postJson('/api/v1/anios', $anioData);
 
         $response->assertStatus(201)
-                 ->assertJsonFragment(['nombre' => '2025-2026']);
+            ->assertJsonFragment(['nombre' => '2025-2026']);
 
         $this->assertDatabaseHas('anios', ['nombre' => '2025-2026']);
     }
@@ -53,10 +53,10 @@ class AnioControllerTest extends TestCase
     {
         $anio = Anio::factory()->create();
 
-        $response = $this->actingAs($this->user, 'sanctum')->getJson('/api/v1/anios/' . $anio->id);
+        $response = $this->actingAs($this->user, 'sanctum')->getJson('/api/v1/anios/'.$anio->id);
 
         $response->assertStatus(200)
-                 ->assertJsonFragment(['nombre' => $anio->nombre]);
+            ->assertJsonFragment(['nombre' => $anio->nombre]);
     }
 
     public function test_can_update_anio()
@@ -67,10 +67,10 @@ class AnioControllerTest extends TestCase
             'estado' => 'inactivo',
         ];
 
-        $response = $this->actingAs($this->user, 'sanctum')->putJson('/api/v1/anios/' . $anio->id, $updatedData);
+        $response = $this->actingAs($this->user, 'sanctum')->putJson('/api/v1/anios/'.$anio->id, $updatedData);
 
         $response->assertStatus(200)
-                 ->assertJsonFragment(['nombre' => '2025-2026 Actualizado']);
+            ->assertJsonFragment(['nombre' => '2025-2026 Actualizado']);
 
         $this->assertDatabaseHas('anios', ['id' => $anio->id, 'nombre' => '2025-2026 Actualizado', 'estado' => 'inactivo']);
     }
@@ -79,7 +79,7 @@ class AnioControllerTest extends TestCase
     {
         $anio = Anio::factory()->create();
 
-        $response = $this->actingAs($this->user, 'sanctum')->deleteJson('/api/v1/anios/' . $anio->id);
+        $response = $this->actingAs($this->user, 'sanctum')->deleteJson('/api/v1/anios/'.$anio->id);
 
         $response->assertStatus(204);
 

@@ -378,15 +378,15 @@ export const router = createBrowserRouter([
         element: <DashboardLayout><InstitutionSedesPage /></DashboardLayout>
       },
       {
-        path: 'instituciones/:institutionId/sedes/crear',
+        path: 'instituciones/:id/sedes/crear',
         element: <DashboardLayout><InstitutionSedeCreatePage /></DashboardLayout>
       },
       {
-        path: 'instituciones/:institutionId/sedes/:id',
+        path: 'instituciones/:id/sedes/:sedeId',
         element: <DashboardLayout><InstitutionSedeDetailPage /></DashboardLayout>
       },
       {
-        path: 'instituciones/:institutionId/sedes/:id/editar',
+        path: 'instituciones/:id/sedes/:sedeId/editar',
         element: <DashboardLayout><InstitutionSedeEditPage /></DashboardLayout>
       },
       {

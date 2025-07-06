@@ -44,6 +44,24 @@ interface Grupo {
   estudiantes_count?: number;
 }
 
+interface GruposResponse {
+  data: Grupo[];
+  meta: {
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+    from: number;
+    to: number;
+  };
+  links: {
+    first: string;
+    last: string;
+    prev: string | null;
+    next: string | null;
+  };
+}
+
 const GroupsListPage = () => {
   const navigate = useNavigate();
   const { showSuccess, showError } = useAlertContext();
@@ -51,13 +69,41 @@ const GroupsListPage = () => {
   const [grupos, setGrupos] = useState<Grupo[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Estados para paginación del servidor
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [sortColumn, setSortColumn] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
-  const fetchGrupos = async () => {
+  const fetchGrupos = async (page = 1, perPage = 10, search = '', sortBy?: string, sortDir?: 'asc' | 'desc') => {
     try {
       setLoading(true);
-      const response = await axiosClient.get('/grupos');
-      console.log('Datos de grupos recibidos:', response.data);
-      setGrupos(response.data.data || response.data);
+      const params = new URLSearchParams({
+        page: page.toString(),
+        per_page: perPage.toString(),
+      });
+      
+      if (search) {
+        params.append('search', search);
+      }
+
+      if (sortBy) {
+        params.append('sort_by', sortBy);
+        params.append('sort_direction', sortDir || 'asc');
+      }
+      
+      const response = await axiosClient.get(`/grupos?${params.toString()}`);
+      const data: GruposResponse = response.data;
+      
+      setGrupos(data.data);
+      setTotalItems(data.meta.total);
+      setTotalPages(data.meta.last_page);
+      setCurrentPage(data.meta.current_page);
+      setItemsPerPage(data.meta.per_page);
       setError(null);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Error al cargar los grupos');
@@ -67,8 +113,32 @@ const GroupsListPage = () => {
   };
 
   useEffect(() => {
-    fetchGrupos();
-  }, []);
+    fetchGrupos(currentPage, itemsPerPage, searchTerm, sortColumn || undefined, sortDirection);
+  }, [currentPage, itemsPerPage, searchTerm, sortColumn, sortDirection]);
+
+  // Manejar cambio de página
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  // Manejar cambio de elementos por página
+  const handleItemsPerPageChange = (perPage: number) => {
+    setItemsPerPage(perPage);
+    setCurrentPage(1); // Resetear a la primera página
+  };
+
+  // Manejar búsqueda
+  const handleSearch = (search: string) => {
+    setSearchTerm(search);
+    setCurrentPage(1); // Resetear a la primera página
+  };
+
+  // Manejar ordenamiento
+  const handleSort = (columnKey: string, direction: 'asc' | 'desc') => {
+    setSortColumn(columnKey);
+    setSortDirection(direction);
+    setCurrentPage(1);
+  };
 
   const handleDelete = async (grupo: Grupo) => {
     const confirmed = await confirm({
@@ -85,7 +155,7 @@ const GroupsListPage = () => {
       setConfirmLoading(true);
       await axiosClient.delete(`/grupos/${grupo.id}`);
       showSuccess('Grupo eliminado exitosamente', 'Éxito');
-      fetchGrupos();
+      fetchGrupos(currentPage, itemsPerPage, searchTerm, sortColumn || undefined, sortDirection);
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Error al eliminar el grupo';
       showError(errorMessage, 'Error');
@@ -112,7 +182,7 @@ const GroupsListPage = () => {
         axiosClient.delete(`/grupos/${grupo.id}`)
       ));
       showSuccess(`${selectedGrupos.length} grupos eliminados exitosamente`, 'Éxito');
-      fetchGrupos();
+      fetchGrupos(currentPage, itemsPerPage, searchTerm, sortColumn || undefined, sortDirection);
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Error al eliminar los grupos';
       showError(errorMessage, 'Error');
@@ -138,11 +208,11 @@ const GroupsListPage = () => {
           </div>
           <div className="ml-4">
             <div className="text-sm font-medium text-gray-900">
-              {grupo.nombre}
+              {grupo.grado ? `${grupo.grado.nombre} ${grupo.nombre}` : grupo.nombre}
             </div>
-            {grupo.grado && (
+            {grupo.grado?.nivel && (
               <div className="text-sm text-gray-500">
-                {grupo.grado.nombre} {grupo.grado.nivel && `(${grupo.grado.nivel})`}
+                {grupo.grado.nivel}
               </div>
             )}
           </div>
@@ -151,7 +221,7 @@ const GroupsListPage = () => {
       sortable: true,
     },
     {
-      key: 'sede',
+      key: 'sede.nombre',
       header: 'Sede',
       accessor: (grupo) => (
         <div className="text-sm">
@@ -168,7 +238,7 @@ const GroupsListPage = () => {
       sortable: true,
     },
     {
-      key: 'anio',
+      key: 'anio.nombre',
       header: 'Año Académico',
       accessor: (grupo) => (
         <div className="text-sm">
@@ -191,7 +261,7 @@ const GroupsListPage = () => {
       sortable: true,
     },
     {
-      key: 'director_docente',
+      key: 'director_docente.nombre',
       header: 'Director',
       accessor: (grupo) => (
         <div className="text-sm text-gray-900">
@@ -324,7 +394,7 @@ const GroupsListPage = () => {
         searchKeys={['nombre', 'descripcion', 'grado.nombre', 'grado.nivel', 'sede.nombre', 'sede.institucion.nombre', 'anio.nombre', 'director_docente.nombre', 'director_docente.apellido', 'estado']}
         sortable={true}
         pagination={true}
-        itemsPerPage={10}
+        itemsPerPage={itemsPerPage}
         itemsPerPageOptions={[5, 10, 25, 50]}
         emptyMessage="No hay grupos registrados"
         emptyIcon={
@@ -335,6 +405,16 @@ const GroupsListPage = () => {
         selectable={true}
         bulkActions={bulkActions}
         onRowClick={(grupo) => navigate(`/grupos/${grupo.id}`)}
+        // Props para paginación del servidor
+        serverSidePagination={true}
+        serverSideSorting={true}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={totalItems}
+        onPageChange={handlePageChange}
+        onItemsPerPageChange={handleItemsPerPageChange}
+        onSearch={handleSearch}
+        onSort={handleSort}
       />
 
       {/* ConfirmDialog */}

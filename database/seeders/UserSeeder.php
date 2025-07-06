@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use App\Models\Role;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class UserSeeder extends Seeder
@@ -22,8 +22,14 @@ class UserSeeder extends Seeder
 
         // Asignar rol de administrador
         $adminRole = Role::where('nombre', 'Administrador')->first();
-        if ($adminRole && !$admin->roles()->where('role_id', $adminRole->id)->exists()) {
+        if ($adminRole && ! $admin->roles()->where('role_id', $adminRole->id)->exists()) {
             $admin->roles()->attach($adminRole->id);
+        }
+
+        // Asignar todos los permisos existentes al rol de administrador
+        if ($adminRole) {
+            $allPermissions = \App\Models\Permission::pluck('id');
+            $adminRole->permissions()->sync($allPermissions);
         }
 
         // Crear usuario docente
@@ -38,7 +44,7 @@ class UserSeeder extends Seeder
 
         // Asignar rol de docente
         $docenteRole = Role::where('nombre', 'Docente')->first();
-        if ($docenteRole && !$docente->roles()->where('role_id', $docenteRole->id)->exists()) {
+        if ($docenteRole && ! $docente->roles()->where('role_id', $docenteRole->id)->exists()) {
             $docente->roles()->attach($docenteRole->id);
         }
 
@@ -54,7 +60,7 @@ class UserSeeder extends Seeder
 
         // Asignar rol de estudiante
         $estudianteRole = Role::where('nombre', 'Estudiante')->first();
-        if ($estudianteRole && !$estudiante->roles()->where('role_id', $estudianteRole->id)->exists()) {
+        if ($estudianteRole && ! $estudiante->roles()->where('role_id', $estudianteRole->id)->exists()) {
             $estudiante->roles()->attach($estudianteRole->id);
         }
 
@@ -70,8 +76,8 @@ class UserSeeder extends Seeder
 
         // Asignar rol de acudiente
         $acudienteRole = Role::where('nombre', 'Acudiente')->first();
-        if ($acudienteRole && !$acudiente->roles()->where('role_id', $acudienteRole->id)->exists()) {
+        if ($acudienteRole && ! $acudiente->roles()->where('role_id', $acudienteRole->id)->exists()) {
             $acudiente->roles()->attach($acudienteRole->id);
         }
     }
-} 
+}

@@ -10,6 +10,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *     schema="RoleResource",
  *     title="Recurso de Rol",
  *     description="Representación de un rol en la API",
+ *
  *     @OA\Property(property="id", type="integer", description="ID del rol"),
  *     @OA\Property(property="nombre", type="string", description="Nombre del rol"),
  *     @OA\Property(property="permissions", type="array", @OA\Items(ref="#/components/schemas/PermissionResource"), description="Permisos asociados al rol"),

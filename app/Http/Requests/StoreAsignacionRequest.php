@@ -2,14 +2,15 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
 use App\Models\Periodo;
+use Illuminate\Foundation\Http\FormRequest;
 
 /**
  * @OA\Schema(
  *     schema="StoreAsignacionRequest",
  *     title="Solicitud para Crear Asignación",
  *     required={"docente_id", "asignatura_id", "grupo_id", "franja_horaria_id", "dia_semana", "anio_academico_id"},
+ *
  *     @OA\Property(property="docente_id", type="integer", description="ID del docente asignado"),
  *     @OA\Property(property="asignatura_id", type="integer", description="ID de la asignatura asignada"),
  *     @OA\Property(property="grupo_id", type="integer", description="ID del grupo al que se asigna"),
@@ -53,12 +54,12 @@ class StoreAsignacionRequest extends FormRequest
                         $periodo = Periodo::where('id', $value)
                             ->where('anio_id', $this->anio_academico_id)
                             ->first();
-                        
-                        if (!$periodo) {
+
+                        if (! $periodo) {
                             $fail('El período seleccionado no pertenece al año académico especificado.');
                         }
                     }
-                }
+                },
             ],
             'estado' => 'sometimes|string|in:activo,inactivo',
         ];

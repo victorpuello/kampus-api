@@ -7,6 +7,7 @@ use Illuminate\Console\Command;
 class FixSessionConfig extends Command
 {
     protected $signature = 'session:fix-config';
+
     protected $description = 'Cambiar temporalmente la configuración de sesión para desarrollo';
 
     public function handle()
@@ -32,7 +33,7 @@ class FixSessionConfig extends Command
         // 1. Obtener CSRF token
         $this->info('1. Obteniendo CSRF token...');
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $baseUrl . '/sanctum/csrf-cookie');
+        curl_setopt($ch, CURLOPT_URL, $baseUrl.'/sanctum/csrf-cookie');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_HEADER, true);
         curl_setopt($ch, CURLOPT_COOKIEJAR, $cookieFile);
@@ -50,11 +51,11 @@ class FixSessionConfig extends Command
             $this->info('\nCookies recibidas:');
             $cookies = file_get_contents($cookieFile);
             $this->line($cookies);
-            
+
             // Buscar XSRF-TOKEN
             if (preg_match('/XSRF-TOKEN\\s+([^\\s]+)/', $cookies, $matches)) {
                 $xsrfToken = urldecode($matches[1]);
-                $this->info('\n✅ Token CSRF encontrado: ' . substr($xsrfToken, 0, 50) . '...');
+                $this->info('\n✅ Token CSRF encontrado: '.substr($xsrfToken, 0, 50).'...');
             } else {
                 $this->error('\n❌ Token CSRF NO encontrado');
             }
@@ -67,17 +68,17 @@ class FixSessionConfig extends Command
         // 2. Intentar login
         $this->info('2. Intentando login...');
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $baseUrl . '/api/v1/login');
+        curl_setopt($ch, CURLOPT_URL, $baseUrl.'/api/v1/login');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
             'email' => 'admin@example.com',
-            'password' => '123456'
+            'password' => '123456',
         ]));
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'Content-Type: application/json',
             'Accept: application/json',
-            'X-Requested-With: XMLHttpRequest'
+            'X-Requested-With: XMLHttpRequest',
         ]);
 
         // Agregar cookies
@@ -92,7 +93,7 @@ class FixSessionConfig extends Command
                 'Content-Type: application/json',
                 'Accept: application/json',
                 'X-Requested-With: XMLHttpRequest',
-                'X-XSRF-TOKEN: ' . $xsrfToken
+                'X-XSRF-TOKEN: '.$xsrfToken,
             ]);
             $this->info('✅ Header X-XSRF-TOKEN agregado');
         }
@@ -109,7 +110,7 @@ class FixSessionConfig extends Command
             $this->info('✅ Login exitoso!');
             $data = json_decode($response, true);
             if (isset($data['user'])) {
-                $this->info('Usuario: ' . $data['user']['nombre'] . ' ' . $data['user']['apellido']);
+                $this->info('Usuario: '.$data['user']['nombre'].' '.$data['user']['apellido']);
             }
         } else {
             $this->error('❌ Error en login');
@@ -120,4 +121,4 @@ class FixSessionConfig extends Command
 
         return 0;
     }
-} 
+}

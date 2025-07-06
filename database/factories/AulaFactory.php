@@ -13,7 +13,8 @@ class AulaFactory extends Factory
     public function definition(): array
     {
         return [
-            'nombre' => $this->faker->unique()->word . ' Aula',
+            'nombre' => $this->faker->unique()->word.' Aula',
+            'tipo' => $this->faker->randomElement(['Salón', 'Laboratorio', 'Auditorio', 'Deportivo']),
             'capacidad' => $this->faker->numberBetween(10, 50),
             'institucion_id' => Institucion::factory(),
         ];

@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Institucion $institucion
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Grupo> $grupos
+ *
  * @method static \Database\Factories\GradoFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|Grado newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Grado newQuery()
@@ -27,18 +28,23 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|Grado query()
  * @method static \Illuminate\Database\Eloquent\Builder|Grado withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Grado withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class Grado extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
+    use SoftDeletes;
 
     /**
      * Constantes para los niveles educativos
      */
     const NIVEL_PREESCOLAR = 'Preescolar';
+
     const NIVEL_BASICA_PRIMARIA = 'Básica Primaria';
+
     const NIVEL_BASICA_SECUNDARIA = 'Básica Secundaria';
+
     const NIVEL_EDUCACION_MEDIA = 'Educación Media';
 
     /**
@@ -85,12 +91,13 @@ class Grado extends Model
 
     /**
      * Verifica si el nivel es válido.
-     *
-     * @param string $nivel
-     * @return bool
      */
-    public static function isNivelValido(string $nivel): bool
+    public static function isNivelValido(?string $nivel): bool
     {
+        if ($nivel === null) {
+            return false;
+        }
+
         return in_array($nivel, self::getNivelesDisponibles());
     }
 
@@ -121,7 +128,7 @@ class Grado extends Model
     /**
      * Obtiene los grupos de este grado para un año académico específico.
      *
-     * @param int $anioId
+     * @param  int  $anioId
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function gruposPorAnio($anioId)
@@ -132,7 +139,7 @@ class Grado extends Model
     /**
      * Obtiene los grupos activos de este grado para un año académico específico.
      *
-     * @param int $anioId
+     * @param  int  $anioId
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function gruposActivosPorAnio($anioId)
@@ -143,7 +150,7 @@ class Grado extends Model
     /**
      * Obtiene el total de estudiantes en este grado para un año específico.
      *
-     * @param int $anioId
+     * @param  int  $anioId
      * @return int
      */
     public function totalEstudiantesPorAnio($anioId)
@@ -158,13 +165,13 @@ class Grado extends Model
     /**
      * Obtiene estadísticas del grado para un año académico específico.
      *
-     * @param int $anioId
+     * @param  int  $anioId
      * @return array
      */
     public function estadisticasPorAnio($anioId)
     {
         $grupos = $this->gruposPorAnio($anioId)->withCount('estudiantes')->get();
-        
+
         return [
             'total_grupos' => $grupos->count(),
             'total_estudiantes' => $grupos->sum('estudiantes_count'),

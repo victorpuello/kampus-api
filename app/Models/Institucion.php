@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
+use App\Traits\HasFileUploads;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Traits\HasFileUploads;
 
 /**
  * Clase Institucion
@@ -35,6 +35,7 @@ use App\Traits\HasFileUploads;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Configuracion> $configuraciones
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Comunicado> $comunicados
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Sede> $sedes
+ *
  * @method static \Database\Factories\InstitucionFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|Institucion newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Institucion newQuery()
@@ -42,11 +43,14 @@ use App\Traits\HasFileUploads;
  * @method static \Illuminate\Database\Eloquent\Builder|Institucion query()
  * @method static \Illuminate\Database\Eloquent\Builder|Institucion withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Institucion withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class Institucion extends Model
 {
-    use HasFactory, SoftDeletes, HasFileUploads;
+    use HasFactory;
+    use HasFileUploads;
+    use SoftDeletes;
 
     /**
      * La tabla asociada con el modelo.
@@ -199,7 +203,7 @@ class Institucion extends Model
     /**
      * Obtiene los grupos de esta institución para un año académico específico.
      *
-     * @param int $anioId
+     * @param  int  $anioId
      * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
      */
     public function gruposPorAnio($anioId)
@@ -210,7 +214,7 @@ class Institucion extends Model
     /**
      * Obtiene los grados con sus grupos para un año académico específico.
      *
-     * @param int|null $anioId
+     * @param  int|null  $anioId
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function gradosConGrupos($anioId = null)
@@ -221,13 +225,14 @@ class Institucion extends Model
                 $q->where('anio_id', $anioId);
             });
         }
+
         return $query;
     }
 
     /**
      * Obtiene los grados con grupos activos para un año académico específico.
      *
-     * @param int $anioId
+     * @param  int  $anioId
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function gradosConGruposActivos($anioId)
@@ -242,14 +247,14 @@ class Institucion extends Model
     /**
      * Obtiene estadísticas de grupos por nivel educativo para un año específico.
      *
-     * @param int $anioId
+     * @param  int  $anioId
      * @return array
      */
     public function estadisticasGruposPorNivel($anioId)
     {
         $estadisticas = [];
         $niveles = Grado::getNivelesDisponibles();
-        
+
         foreach ($niveles as $nivel) {
             $count = $this->grupos()
                 ->whereHas('grado', function ($q) use ($nivel) {
@@ -257,10 +262,10 @@ class Institucion extends Model
                 })
                 ->where('anio_id', $anioId)
                 ->count();
-            
+
             $estadisticas[$nivel] = $count;
         }
-        
+
         return $estadisticas;
     }
 
@@ -283,10 +288,10 @@ class Institucion extends Model
     public function getEscudoAttribute($value)
     {
         // Si no hay valor o el archivo no existe, retornar imagen por defecto
-        if (empty($value) || !\Storage::disk('public')->exists($value)) {
+        if (empty($value) || ! \Storage::disk('public')->exists($value)) {
             return 'instituciones/escudos/default.png';
         }
-        
+
         return $value;
     }
 

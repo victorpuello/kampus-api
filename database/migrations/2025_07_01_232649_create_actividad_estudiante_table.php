@@ -18,16 +18,16 @@ return new class extends Migration
             $table->softDeletes();
 
             $table->unique(['actividad_id', 'estudiante_id']);
-            
+
             $table->foreign('actividad_id')
-                  ->references('id')
-                  ->on('actividades')
-                  ->onDelete('cascade');
-                  
+                ->references('id')
+                ->on('actividades')
+                ->onDelete('cascade');
+
             $table->foreign('estudiante_id')
-                  ->references('id')
-                  ->on('estudiantes')
-                  ->onDelete('cascade');
+                ->references('id')
+                ->on('estudiantes')
+                ->onDelete('cascade');
         });
     }
 
@@ -35,4 +35,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('actividad_estudiante');
     }
-}; 
+};

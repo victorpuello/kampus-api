@@ -13,7 +13,7 @@ class AreaFactory extends Factory
     public function definition(): array
     {
         return [
-            'nombre' => $this->faker->unique()->word . ' Area',
+            'nombre' => $this->faker->unique()->word.' Area',
             'institucion_id' => Institucion::factory(),
         ];
     }

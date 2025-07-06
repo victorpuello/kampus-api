@@ -8,8 +8,10 @@ use Illuminate\Foundation\Http\FormRequest;
  * @OA\Schema(
  *     schema="StoreAulaRequest",
  *     title="Solicitud para Crear Aula",
- *     required={"nombre", "capacidad", "institucion_id"},
+ *     required={"nombre", "tipo", "capacidad", "institucion_id"},
+ *
  *     @OA\Property(property="nombre", type="string", maxLength=255, description="Nombre del aula"),
+ *     @OA\Property(property="tipo", type="string", enum={"Salón", "Laboratorio", "Auditorio", "Deportivo"}, description="Tipo de aula"),
  *     @OA\Property(property="capacidad", type="integer", minimum=1, description="Capacidad de estudiantes del aula"),
  *     @OA\Property(property="institucion_id", type="integer", description="ID de la institución a la que pertenece el aula"),
  * )
@@ -33,6 +35,7 @@ class StoreAulaRequest extends FormRequest
     {
         return [
             'nombre' => 'required|string|max:255|unique:aulas',
+            'tipo' => 'required|string|in:Salón,Laboratorio,Auditorio,Deportivo',
             'capacidad' => 'required|integer|min:1',
             'institucion_id' => 'required|integer|exists:instituciones,id',
         ];

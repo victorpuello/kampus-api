@@ -1,20 +1,19 @@
-import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axiosClient from '../api/axiosClient';
 import { Button } from '../components/ui/Button';
-import { DataTable } from '../components/ui/DataTable';
+import { ServerDataTable } from '../components/ui/ServerDataTable';
 import type { Column, ActionButton } from '../components/ui/DataTable';
 import { useAlertContext } from '../contexts/AlertContext';
 import { useConfirm } from '../hooks/useConfirm';
+import { useServerPagination } from '../hooks/useServerPagination';
 import ConfirmDialog from '../components/ui/ConfirmDialog';
+import axiosClient from '../api/axiosClient';
+
 
 interface Area {
   id: number;
   nombre: string;
   descripcion?: string;
-  codigo?: string;
   color?: string;
-  estado: string;
   asignaturas_count?: number;
 }
 
@@ -22,27 +21,24 @@ const AreasListPage = () => {
   const navigate = useNavigate();
   const { showSuccess, showError } = useAlertContext();
   const { dialogState, confirm, setLoading: setConfirmLoading } = useConfirm();
-  const [areas, setAreas] = useState<Area[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchAreas = async () => {
-    try {
-      setLoading(true);
-      const response = await axiosClient.get('/areas');
-      console.log('Datos de áreas recibidos:', response.data);
-      setAreas(response.data.data || response.data);
-      setError(null);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al cargar las áreas');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchAreas();
-  }, []);
+  
+  const {
+    data: areas,
+    loading,
+    error,
+    currentPage,
+    itemsPerPage,
+    totalItems,
+    totalPages,
+    handlePageChange,
+    handleItemsPerPageChange,
+    handleSearch,
+    handleSort,
+    refreshData,
+  } = useServerPagination<Area>({
+    endpoint: 'areas',
+    searchKeys: ['nombre', 'codigo', 'descripcion'],
+  });
 
   const handleDelete = async (area: Area) => {
     const confirmed = await confirm({
@@ -59,11 +55,10 @@ const AreasListPage = () => {
       setConfirmLoading(true);
       await axiosClient.delete(`/areas/${area.id}`);
       showSuccess('Área eliminada exitosamente', 'Éxito');
-      fetchAreas();
+      refreshData();
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Error al eliminar el área';
       showError(errorMessage, 'Error');
-      setError(errorMessage);
     } finally {
       setConfirmLoading(false);
     }
@@ -86,11 +81,10 @@ const AreasListPage = () => {
         axiosClient.delete(`/areas/${area.id}`)
       ));
       showSuccess(`${selectedAreas.length} áreas eliminadas exitosamente`, 'Éxito');
-      fetchAreas();
+      refreshData();
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Error al eliminar las áreas';
       showError(errorMessage, 'Error');
-      setError(errorMessage);
     } finally {
       setConfirmLoading(false);
     }
@@ -117,11 +111,6 @@ const AreasListPage = () => {
             <div className="text-sm font-medium text-gray-900">
               {area.nombre}
             </div>
-            {area.codigo && (
-              <div className="text-sm text-gray-500">
-                {area.codigo}
-              </div>
-            )}
           </div>
         </div>
       ),
@@ -143,23 +132,6 @@ const AreasListPage = () => {
       accessor: (area) => (
         <span className="text-sm text-gray-500">
           {area.asignaturas_count || 0} asignaturas
-        </span>
-      ),
-      sortable: true,
-      align: 'center',
-    },
-    {
-      key: 'estado',
-      header: 'Estado',
-      accessor: (area) => (
-        <span
-          className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
-            area.estado === 'activo'
-              ? 'bg-green-100 text-green-800'
-              : 'bg-red-100 text-red-800'
-          }`}
-        >
-          {area.estado}
         </span>
       ),
       sortable: true,
@@ -243,18 +215,18 @@ const AreasListPage = () => {
       </div>
 
       {/* DataTable */}
-      <DataTable
+      <ServerDataTable
         data={areas}
         columns={columns}
         actions={actions}
         loading={loading}
         error={error}
         searchable={true}
-        searchPlaceholder="Buscar áreas por nombre, código o descripción..."
-        searchKeys={['nombre', 'codigo', 'descripcion', 'estado']}
+        searchPlaceholder="Buscar áreas por nombre o descripción..."
+        searchKeys={['nombre', 'descripcion']}
         sortable={true}
         pagination={true}
-        itemsPerPage={10}
+        itemsPerPage={itemsPerPage}
         itemsPerPageOptions={[5, 10, 25, 50]}
         emptyMessage="No hay áreas registradas"
         emptyIcon={
@@ -265,6 +237,16 @@ const AreasListPage = () => {
         selectable={true}
         bulkActions={bulkActions}
         onRowClick={(area) => navigate(`/areas/${area.id}`)}
+        // Props automáticas para paginación del servidor
+        serverSidePagination={true}
+        serverSideSorting={true}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={totalItems}
+        onPageChange={handlePageChange}
+        onItemsPerPageChange={handleItemsPerPageChange}
+        onSearch={handleSearch}
+        onSort={handleSort}
       />
 
       {/* ConfirmDialog */}

@@ -3,8 +3,8 @@
 namespace Database\Factories;
 
 use App\Models\Estudiante;
-use App\Models\User;
 use App\Models\Grupo;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class EstudianteFactory extends Factory
@@ -43,7 +43,7 @@ class EstudianteFactory extends Factory
                 $q->where('institucion_id', $institucionId);
             })->first();
 
-            if (!$grupo) {
+            if (! $grupo) {
                 $grupo = Grupo::factory()->paraInstitucion($institucionId)->create();
             }
 

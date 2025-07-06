@@ -11,15 +11,20 @@ return new class extends Migration
         Schema::create('grados', function (Blueprint $table) {
             $table->unsignedBigInteger('id')->autoIncrement();
             $table->string('nombre', 255);
-            $table->string('nivel', 50);
+            $table->enum('nivel', [
+                'Preescolar',
+                'Básica Primaria',
+                'Básica Secundaria',
+                'Educación Media',
+            ]);
             $table->unsignedBigInteger('institucion_id');
             $table->softDeletes();
             $table->timestamps();
 
             $table->foreign('institucion_id')
-                  ->references('id')
-                  ->on('instituciones')
-                  ->onDelete('cascade');
+                ->references('id')
+                ->on('instituciones')
+                ->onDelete('cascade');
             $table->unique(['institucion_id', 'nombre'], 'institucion_nombre_unique');
         });
     }
@@ -28,4 +33,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('grados');
     }
-}; 
+};

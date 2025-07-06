@@ -10,6 +10,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *     schema="GrupoResource",
  *     title="Recurso de Grupo",
  *     description="Representación de un grupo académico en la API",
+ *
  *     @OA\Property(property="id", type="integer", description="ID del grupo"),
  *     @OA\Property(property="nombre", type="string", description="Nombre del grupo"),
  *     @OA\Property(property="anio", type="object", ref="#/components/schemas/AnioResource", description="Año académico al que pertenece el grupo"),
@@ -33,14 +34,29 @@ class GrupoResource extends JsonResource
             'nombre' => $this->nombre,
             'descripcion' => $this->descripcion,
             'estado' => $this->estado,
-            'estudiantes_count' => $this->whenLoaded('estudiantes', function () {
-                return $this->estudiantes->count();
-            }),
-            'anio' => new AnioResource($this->whenLoaded('anio')),
-            'grado' => new GradoResource($this->whenLoaded('grado')),
             'sede' => new SedeResource($this->whenLoaded('sede')),
+            'grado' => new GradoResource($this->whenLoaded('grado')),
+            'anio' => new AnioResource($this->whenLoaded('anio')),
             'director_docente' => new DocenteResource($this->whenLoaded('directorDocente')),
-            'estudiantes' => StudentResource::collection($this->whenLoaded('estudiantes')),
+            'estudiantes_count' => isset($this->estudiantes_count)
+                ? $this->estudiantes_count
+                : ($this->relationLoaded('estudiantes') ? $this->estudiantes->count() : 0),
+            'estudiantes' => $this->whenLoaded('estudiantes', function () {
+                return $this->estudiantes->map(function ($est) {
+                    return [
+                        'id' => $est->id,
+                        'nombre' => null, // Los estudiantes no tienen nombre directo
+                        'apellido' => null, // Los estudiantes no tienen apellido directo
+                        'email' => null, // Los estudiantes no tienen email directo
+                        'estado' => $est->estado,
+                        'user' => $est->relationLoaded('user') && $est->user ? [
+                            'nombre' => $est->user->nombre,
+                            'apellido' => $est->user->apellido,
+                            'email' => $est->user->email,
+                        ] : null,
+                    ];
+                });
+            }),
         ];
     }
 }

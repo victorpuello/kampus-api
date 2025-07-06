@@ -28,7 +28,7 @@ interface Institucion {
 
 const InstitutionSedeCreatePage: React.FC = () => {
   const navigate = useNavigate();
-  const { institutionId } = useParams<{ institutionId: string }>();
+  const { id } = useParams<{ id: string }>();
   const { showSuccess, showError } = useAlertContext();
   
   const [formData, setFormData] = useState<SedeFormData>({
@@ -50,7 +50,7 @@ const InstitutionSedeCreatePage: React.FC = () => {
 
   useEffect(() => {
     const fetchInstitucion = async () => {
-      if (!isValidId(institutionId)) {
+      if (!isValidId(id)) {
         setError('ID de institución inválido');
         setLoading(false);
         return;
@@ -60,7 +60,7 @@ const InstitutionSedeCreatePage: React.FC = () => {
         setLoading(true);
         setError(null);
         
-        const response = await axiosClient.get(`/instituciones/${institutionId}`);
+        const response = await axiosClient.get(`/instituciones/${id}`);
         const institucionData: Institucion = response.data.data || response.data;
         
         if (!institucionData || !institucionData.id) {
@@ -87,7 +87,7 @@ const InstitutionSedeCreatePage: React.FC = () => {
     };
 
     fetchInstitucion();
-  }, [institutionId, showError]);
+  }, [id, showError]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -100,7 +100,7 @@ const InstitutionSedeCreatePage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!isValidId(institutionId)) {
+    if (!isValidId(id)) {
       showError('ID de institución inválido');
       return;
     }
@@ -111,11 +111,11 @@ const InstitutionSedeCreatePage: React.FC = () => {
       
       await axiosClient.post('/sedes', {
         ...formData,
-        institucion_id: parseInt(institutionId!)
+        institucion_id: parseInt(id!)
       });
       
       showSuccess('Sede creada exitosamente');
-      navigate(`/instituciones/${institutionId}/sedes`);
+      navigate(`/instituciones/${id}/sedes`);
       
     } catch (error: any) {
       console.error('Error creating sede:', error);
@@ -136,7 +136,7 @@ const InstitutionSedeCreatePage: React.FC = () => {
   };
 
   const handleCancel = () => {
-    navigate(`/instituciones/${institutionId}/sedes`);
+    navigate(`/instituciones/${id}/sedes`);
   };
 
   // Estado de carga
@@ -173,7 +173,7 @@ const InstitutionSedeCreatePage: React.FC = () => {
               <div className="mt-6 flex justify-center space-x-3">
                 <Button
                   variant="primary"
-                  onClick={() => navigate(`/instituciones/${institutionId}/sedes`)}
+                  onClick={() => navigate(`/instituciones/${id}/sedes`)}
                 >
                   Volver a las sedes
                 </Button>

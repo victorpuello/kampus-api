@@ -7,6 +7,7 @@ use Illuminate\Console\Command;
 class CheckFrontendAuth extends Command
 {
     protected $signature = 'frontend:check-auth';
+
     protected $description = 'Verificar el estado de autenticación del frontend';
 
     public function handle()
@@ -15,24 +16,24 @@ class CheckFrontendAuth extends Command
 
         // 1. Verificar configuración de Sanctum
         $this->info('1. CONFIGURACIÓN DE SANCTUM:');
-        $this->line('Stateful domains: ' . implode(', ', config('sanctum.stateful')));
-        $this->line('Guard: ' . implode(', ', config('sanctum.guard')));
-        $this->line('Middleware: ' . implode(', ', array_keys(config('sanctum.middleware'))));
+        $this->line('Stateful domains: '.implode(', ', config('sanctum.stateful')));
+        $this->line('Guard: '.implode(', ', config('sanctum.guard')));
+        $this->line('Middleware: '.implode(', ', array_keys(config('sanctum.middleware'))));
 
         // 2. Verificar configuración de sesión
         $this->info('\n2. CONFIGURACIÓN DE SESIÓN:');
-        $this->line('Driver: ' . config('session.driver'));
-        $this->line('Domain: ' . config('session.domain'));
-        $this->line('Secure: ' . (config('session.secure') ? 'true' : 'false'));
-        $this->line('Same site: ' . config('session.same_site'));
-        $this->line('Http only: ' . (config('session.http_only') ? 'true' : 'false'));
+        $this->line('Driver: '.config('session.driver'));
+        $this->line('Domain: '.config('session.domain'));
+        $this->line('Secure: '.(config('session.secure') ? 'true' : 'false'));
+        $this->line('Same site: '.config('session.same_site'));
+        $this->line('Http only: '.(config('session.http_only') ? 'true' : 'false'));
 
         // 3. Verificar configuración de CORS
         $this->info('\n3. CONFIGURACIÓN DE CORS:');
         $corsConfig = config('cors');
-        $this->line('Paths: ' . implode(', ', $corsConfig['paths']));
-        $this->line('Allowed origins: ' . implode(', ', $corsConfig['allowed_origins']));
-        $this->line('Supports credentials: ' . ($corsConfig['supports_credentials'] ? 'true' : 'false'));
+        $this->line('Paths: '.implode(', ', $corsConfig['paths']));
+        $this->line('Allowed origins: '.implode(', ', $corsConfig['allowed_origins']));
+        $this->line('Supports credentials: '.($corsConfig['supports_credentials'] ? 'true' : 'false'));
 
         // 4. Verificar rutas
         $this->info('\n4. VERIFICACIÓN DE RUTAS:');
@@ -51,23 +52,23 @@ class CheckFrontendAuth extends Command
 
         if ($loginRoute) {
             $this->line('✅ Ruta /api/v1/login encontrada');
-            $this->line('Métodos: ' . implode(', ', $loginRoute->methods()));
-            $this->line('Middleware: ' . implode(', ', $loginRoute->middleware()));
+            $this->line('Métodos: '.implode(', ', $loginRoute->methods()));
+            $this->line('Middleware: '.implode(', ', $loginRoute->middleware()));
         } else {
             $this->error('❌ Ruta /api/v1/login no encontrada');
         }
 
         if ($csrfRoute) {
             $this->line('✅ Ruta /sanctum/csrf-cookie encontrada');
-            $this->line('Métodos: ' . implode(', ', $csrfRoute->methods()));
-            $this->line('Middleware: ' . implode(', ', $csrfRoute->middleware()));
+            $this->line('Métodos: '.implode(', ', $csrfRoute->methods()));
+            $this->line('Middleware: '.implode(', ', $csrfRoute->middleware()));
         } else {
             $this->error('❌ Ruta /sanctum/csrf-cookie no encontrada');
         }
 
         // 5. Probar endpoints
         $this->info('\n5. PRUEBA DE ENDPOINTS:');
-        
+
         // Probar CSRF
         $this->line('Probando /sanctum/csrf-cookie...');
         $ch = curl_init();
@@ -76,13 +77,13 @@ class CheckFrontendAuth extends Command
         curl_setopt($ch, CURLOPT_HEADER, true);
         curl_setopt($ch, CURLOPT_COOKIEJAR, 'test_csrf_cookies.txt');
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        
+
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
-        
+
         $this->line("Status CSRF: $httpCode");
-        
+
         // Probar login
         $this->line('Probando /api/v1/login...');
         $ch = curl_init();
@@ -91,22 +92,22 @@ class CheckFrontendAuth extends Command
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
             'email' => 'admin@example.com',
-            'password' => '123456'
+            'password' => '123456',
         ]));
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'Content-Type: application/json',
             'Accept: application/json',
-            'X-Requested-With: XMLHttpRequest'
+            'X-Requested-With: XMLHttpRequest',
         ]);
         curl_setopt($ch, CURLOPT_COOKIEFILE, 'test_csrf_cookies.txt');
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        
+
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
-        
+
         $this->line("Status Login: $httpCode");
-        
+
         if ($httpCode === 200) {
             $this->info('✅ Login exitoso desde backend');
         } else {
@@ -130,4 +131,4 @@ class CheckFrontendAuth extends Command
 
         return 0;
     }
-} 
+}

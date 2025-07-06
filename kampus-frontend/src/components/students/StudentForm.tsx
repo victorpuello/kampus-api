@@ -385,7 +385,7 @@ const StudentForm = ({ studentId }: StudentFormProps) => {
             </option>
             {grupos.map(grupo => (
               <option key={grupo.id} value={grupo.id}>
-                {grupo.sede.nombre} - {grupo.grado.nombre} - {grupo.nombre}
+                {(grupo.sede?.nombre || 'Sin sede') + ' - ' + (grupo.grado?.nombre || 'Sin grado') + ' - ' + grupo.nombre}
               </option>
             ))}
           </select>

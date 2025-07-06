@@ -8,6 +8,7 @@ use Illuminate\Foundation\Http\FormRequest;
  * @OA\Schema(
  *     schema="UpdateStudentRequest",
  *     title="Solicitud para Actualizar Estudiante",
+ *
  *     @OA\Property(property="nombre", type="string", maxLength=255, description="Nombre del estudiante"),
  *     @OA\Property(property="apellido", type="string", maxLength=255, description="Apellido del estudiante"),
  *     @OA\Property(property="tipo_documento", type="string", enum={"CC", "TI", "CE"}, description="Tipo de documento del estudiante"),
@@ -47,16 +48,16 @@ class UpdateStudentRequest extends FormRequest
         $estudiante = $this->route('estudiante');
         $studentId = $estudiante?->id;
         $userId = $estudiante?->user_id;
-        
+
         return [
             'nombre' => 'sometimes|string|max:255',
             'apellido' => 'sometimes|string|max:255',
             'tipo_documento' => 'sometimes|string|in:CC,TI,CE',
             'numero_documento' => 'sometimes|string|max:20',
-            'email' => 'sometimes|string|email|max:255|unique:users,email,' . $userId,
-            'username' => 'sometimes|string|max:255|unique:users,username,' . $userId,
+            'email' => 'sometimes|string|email|max:255|unique:users,email,'.$userId,
+            'username' => 'sometimes|string|max:255|unique:users,username,'.$userId,
             'password' => 'sometimes|string|min:8',
-            'codigo_estudiantil' => 'sometimes|string|max:50|unique:estudiantes,codigo_estudiantil,' . $studentId,
+            'codigo_estudiantil' => 'sometimes|string|max:50|unique:estudiantes,codigo_estudiantil,'.$studentId,
             'fecha_nacimiento' => 'sometimes|date',
             'genero' => 'sometimes|string|in:M,F,O',
             'direccion' => 'sometimes|string|max:255',

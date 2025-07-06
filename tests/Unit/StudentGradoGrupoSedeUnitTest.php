@@ -2,32 +2,37 @@
 
 namespace Tests\Unit;
 
-use Tests\TestCase;
-use App\Models\User;
+use App\Models\Acudiente;
+use App\Models\Anio;
 use App\Models\Estudiante;
 use App\Models\Grado;
 use App\Models\Grupo;
-use App\Models\Sede;
 use App\Models\Institucion;
-use App\Models\Anio;
-use App\Models\Acudiente;
+use App\Models\Sede;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Tests\TestCase;
 
 class StudentGradoGrupoSedeUnitTest extends TestCase
 {
-    use RefreshDatabase, WithFaker;
+    use RefreshDatabase;
+    use WithFaker;
 
     protected $institucion;
+
     protected $sede;
+
     protected $grado;
+
     protected $grupo;
+
     protected $anio;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->institucion = Institucion::factory()->create();
         $this->sede = Sede::factory()->create(['institucion_id' => $this->institucion->id]);
         $this->anio = Anio::factory()->create();
@@ -35,7 +40,7 @@ class StudentGradoGrupoSedeUnitTest extends TestCase
         $this->grupo = Grupo::factory()->create([
             'sede_id' => $this->sede->id,
             'grado_id' => $this->grado->id,
-            'anio_id' => $this->anio->id
+            'anio_id' => $this->anio->id,
         ]);
     }
 
@@ -63,7 +68,7 @@ class StudentGradoGrupoSedeUnitTest extends TestCase
     {
         $estudiante = Estudiante::factory()->create(['grupo_id' => $this->grupo->id]);
         $acudiente = Acudiente::factory()->create();
-        
+
         $estudiante->acudientes()->attach($acudiente->id);
 
         $this->assertCount(1, $estudiante->acudientes);
@@ -103,7 +108,7 @@ class StudentGradoGrupoSedeUnitTest extends TestCase
         $estudiante = Estudiante::factory()->create(['grupo_id' => $this->grupo->id]);
 
         $ubicacion = $estudiante->ubicacion_academica;
-        
+
         $this->assertStringContainsString($this->sede->nombre, $ubicacion);
         $this->assertStringContainsString($this->grado->nombre, $ubicacion);
         $this->assertStringContainsString($this->grupo->nombre, $ubicacion);
@@ -124,7 +129,7 @@ class StudentGradoGrupoSedeUnitTest extends TestCase
         $otroGrupo = Grupo::factory()->create([
             'sede_id' => $this->sede->id,
             'grado_id' => $this->grado->id,
-            'anio_id' => $this->anio->id
+            'anio_id' => $this->anio->id,
         ]);
         $estudiante2 = Estudiante::factory()->create(['grupo_id' => $otroGrupo->id]);
 
@@ -142,7 +147,7 @@ class StudentGradoGrupoSedeUnitTest extends TestCase
         $otroGrupo = Grupo::factory()->create([
             'sede_id' => $this->sede->id,
             'grado_id' => $otroGrado->id,
-            'anio_id' => $this->anio->id
+            'anio_id' => $this->anio->id,
         ]);
         $estudiante2 = Estudiante::factory()->create(['grupo_id' => $otroGrupo->id]);
 
@@ -160,7 +165,7 @@ class StudentGradoGrupoSedeUnitTest extends TestCase
         $otroGrupo = Grupo::factory()->create([
             'sede_id' => $otraSede->id,
             'grado_id' => $this->grado->id,
-            'anio_id' => $this->anio->id
+            'anio_id' => $this->anio->id,
         ]);
         $estudiante2 = Estudiante::factory()->create(['grupo_id' => $otroGrupo->id]);
 
@@ -180,7 +185,7 @@ class StudentGradoGrupoSedeUnitTest extends TestCase
         $otroGrupo = Grupo::factory()->create([
             'sede_id' => $otraSede->id,
             'grado_id' => $otroGrado->id,
-            'anio_id' => $this->anio->id
+            'anio_id' => $this->anio->id,
         ]);
         $estudiante2 = Estudiante::factory()->create(['grupo_id' => $otroGrupo->id]);
 
@@ -234,12 +239,12 @@ class StudentGradoGrupoSedeUnitTest extends TestCase
         $grupo1 = Grupo::factory()->create([
             'sede_id' => $this->sede->id,
             'grado_id' => $this->grado->id,
-            'anio_id' => $this->anio->id
+            'anio_id' => $this->anio->id,
         ]);
         $grupo2 = Grupo::factory()->create([
             'sede_id' => $this->sede->id,
             'grado_id' => $this->grado->id,
-            'anio_id' => $this->anio->id
+            'anio_id' => $this->anio->id,
         ]);
 
         $this->assertCount(3, $this->sede->grupos); // Incluye el grupo del setUp
@@ -259,12 +264,12 @@ class StudentGradoGrupoSedeUnitTest extends TestCase
         $grupo1 = Grupo::factory()->create([
             'sede_id' => $this->sede->id,
             'grado_id' => $this->grado->id,
-            'anio_id' => $this->anio->id
+            'anio_id' => $this->anio->id,
         ]);
         $grupo2 = Grupo::factory()->create([
             'sede_id' => $this->sede->id,
             'grado_id' => $this->grado->id,
-            'anio_id' => $this->anio->id
+            'anio_id' => $this->anio->id,
         ]);
 
         $this->assertCount(3, $this->grado->grupos); // Incluye el grupo del setUp
@@ -319,7 +324,7 @@ class StudentGradoGrupoSedeUnitTest extends TestCase
     public function estudiante_puede_ser_soft_deleted()
     {
         $estudiante = Estudiante::factory()->create(['grupo_id' => $this->grupo->id]);
-        
+
         $estudiante->delete();
 
         $this->assertSoftDeleted('estudiantes', ['id' => $estudiante->id]);
@@ -330,13 +335,13 @@ class StudentGradoGrupoSedeUnitTest extends TestCase
     public function estudiante_puede_ser_restaurado()
     {
         $estudiante = Estudiante::factory()->create(['grupo_id' => $this->grupo->id]);
-        
+
         $estudiante->delete();
         $estudiante->restore();
 
         $this->assertDatabaseHas('estudiantes', [
             'id' => $estudiante->id,
-            'deleted_at' => null
+            'deleted_at' => null,
         ]);
     }
 
@@ -345,7 +350,7 @@ class StudentGradoGrupoSedeUnitTest extends TestCase
     {
         $grado = Grado::factory()->create([
             'nivel' => 'Básica Primaria',
-            'institucion_id' => $this->institucion->id
+            'institucion_id' => $this->institucion->id,
         ]);
 
         $this->assertEquals('Básica Primaria', $grado->nivel);
@@ -357,10 +362,10 @@ class StudentGradoGrupoSedeUnitTest extends TestCase
     {
         $estudiante = Estudiante::factory()->create([
             'estado' => 'activo',
-            'grupo_id' => $this->grupo->id
+            'grupo_id' => $this->grupo->id,
         ]);
 
         $this->assertEquals('activo', $estudiante->estado);
         $this->assertContains($estudiante->estado, ['activo', 'inactivo']);
     }
-} 
+}

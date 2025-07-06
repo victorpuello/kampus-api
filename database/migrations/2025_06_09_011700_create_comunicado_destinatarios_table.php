@@ -17,16 +17,16 @@ return new class extends Migration
             $table->timestamps();
 
             $table->unique(['comunicado_id', 'user_id']);
-            
+
             $table->foreign('comunicado_id')
-                  ->references('id')
-                  ->on('comunicados')
-                  ->onDelete('cascade');
-                  
+                ->references('id')
+                ->on('comunicados')
+                ->onDelete('cascade');
+
             $table->foreign('user_id')
-                  ->references('id')
-                  ->on('users')
-                  ->onDelete('cascade');
+                ->references('id')
+                ->on('users')
+                ->onDelete('cascade');
         });
     }
 
@@ -34,4 +34,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('comunicado_destinatarios');
     }
-}; 
+};

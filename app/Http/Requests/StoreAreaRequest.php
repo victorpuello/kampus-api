@@ -9,6 +9,7 @@ use Illuminate\Foundation\Http\FormRequest;
  *     schema="StoreAreaRequest",
  *     title="Solicitud para Crear Área",
  *     required={"nombre"},
+ *
  *     @OA\Property(property="nombre", type="string", maxLength=255, description="Nombre del área académica"),
  * )
  */
@@ -30,15 +31,15 @@ class StoreAreaRequest extends FormRequest
     public function rules(): array
     {
         $user = auth()->user();
-        
-        if (!$user) {
+
+        if (! $user) {
             return [
                 'nombre' => 'required|string|max:255',
             ];
         }
-        
+
         return [
-            'nombre' => 'required|string|max:255|unique:areas,nombre,NULL,id,institucion_id,' . $user->institucion_id,
+            'nombre' => 'required|string|max:255|unique:areas,nombre,NULL,id,institucion_id,'.$user->institucion_id,
         ];
     }
 }

@@ -32,35 +32,45 @@ class AulaController extends Controller
      *     summary="Obtiene una lista paginada de aulas",
      *     tags={"Aulas"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(
      *         name="per_page",
      *         in="query",
      *         description="Número de aulas por página",
      *         required=false,
+     *
      *         @OA\Schema(type="integer", default=10)
      *     ),
+     *
      *     @OA\Parameter(
      *         name="search",
      *         in="query",
      *         description="Término de búsqueda para filtrar aulas por nombre",
      *         required=false,
+     *
      *         @OA\Schema(type="string")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="institucion_id",
      *         in="query",
      *         description="ID de la institución para filtrar aulas",
      *         required=false,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Lista de aulas obtenida exitosamente",
+     *
      *         @OA\JsonContent(
      *             type="array",
+     *
      *             @OA\Items(ref="#/components/schemas/AulaResource")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="No autenticado",
@@ -93,15 +103,20 @@ class AulaController extends Controller
      *     summary="Crea una nueva aula",
      *     tags={"Aulas"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(ref="#/components/schemas/StoreAulaRequest")
      *     ),
+     *
      *     @OA\Response(
      *         response=201,
      *         description="Aula creada exitosamente",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/AulaResource")
      *     ),
+     *
      *     @OA\Response(
      *         response=422,
      *         description="Error de validación",
@@ -129,18 +144,23 @@ class AulaController extends Controller
      *     summary="Obtiene los detalles de un aula específica",
      *     tags={"Aulas"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(
      *         name="aula",
      *         in="path",
      *         description="ID del aula",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Detalles del aula obtenidos exitosamente",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/AulaResource")
      *     ),
+     *
      *     @OA\Response(
      *         response=404,
      *         description="Aula no encontrada",
@@ -166,22 +186,29 @@ class AulaController extends Controller
      *     summary="Actualiza un aula existente",
      *     tags={"Aulas"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(
      *         name="aula",
      *         in="path",
      *         description="ID del aula a actualizar",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(ref="#/components/schemas/UpdateAulaRequest")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Aula actualizada exitosamente",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/AulaResource")
      *     ),
+     *
      *     @OA\Response(
      *         response=422,
      *         description="Error de validación",
@@ -213,13 +240,16 @@ class AulaController extends Controller
      *     summary="Elimina (soft delete) un aula",
      *     tags={"Aulas"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(
      *         name="aula",
      *         in="path",
      *         description="ID del aula a eliminar",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(
      *         response=204,
      *         description="Aula eliminada exitosamente (sin contenido)",

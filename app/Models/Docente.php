@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\User $user
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Asignacion> $asignaciones
+ *
  * @method static \Database\Factories\DocenteFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|Docente newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Docente newQuery()
@@ -25,11 +26,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|Docente query()
  * @method static \Illuminate\Database\Eloquent\Builder|Docente withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Docente withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class Docente extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
+    use SoftDeletes;
 
     /**
      * La tabla asociada con el modelo.

@@ -3,7 +3,6 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class UpdatePeriodoRequest extends FormRequest
 {
@@ -32,8 +31,6 @@ class UpdatePeriodoRequest extends FormRequest
 
     /**
      * Get custom messages for validator errors.
-     *
-     * @return array
      */
     public function messages(): array
     {
@@ -59,12 +56,12 @@ class UpdatePeriodoRequest extends FormRequest
             $fechaFin = $this->input('fecha_fin');
             $periodoId = $this->route('periodo') ? $this->route('periodo')->id : null;
 
-            if (!$anioId || !$fechaInicio || !$fechaFin) {
+            if (! $anioId || ! $fechaInicio || ! $fechaFin) {
                 return;
             }
 
             $anio = \App\Models\Anio::find($anioId);
-            if (!$anio) {
+            if (! $anio) {
                 return;
             }
 
@@ -85,9 +82,10 @@ class UpdatePeriodoRequest extends FormRequest
                     ($fechaInicio <= $periodo->fecha_fin && $fechaFin >= $periodo->fecha_inicio)
                 ) {
                     $validator->errors()->add('fecha_inicio', 'Las fechas del periodo se cruzan con el periodo existente: "'.$periodo->nombre.'" ('.$periodo->fecha_inicio.' a '.$periodo->fecha_fin.').');
+
                     break;
                 }
             }
         });
     }
-} 
+}

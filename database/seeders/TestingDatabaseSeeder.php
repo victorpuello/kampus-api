@@ -18,4 +18,4 @@ class TestingDatabaseSeeder extends Seeder
             AcudienteSeeder::class,
         ]);
     }
-} 
+}

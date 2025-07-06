@@ -2,15 +2,15 @@
 
 namespace Tests\Unit;
 
-use App\Models\Docente;
-use App\Models\User;
-use App\Models\Institucion;
-use App\Models\Asignacion;
-use App\Models\Asignatura;
-use App\Models\Grupo;
 use App\Models\Anio;
 use App\Models\Area;
+use App\Models\Asignacion;
+use App\Models\Asignatura;
+use App\Models\Docente;
 use App\Models\Grado;
+use App\Models\Grupo;
+use App\Models\Institucion;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -55,21 +55,21 @@ class DocenteTest extends TestCase
         $docente = Docente::factory()->create();
         $anio = Anio::factory()->create();
         $area = Area::factory()->create();
-        
+
         // Crear una institución primero
         $institucion = Institucion::factory()->create();
-        
+
         // Crear grado y sede de la misma institución
         $grado = Grado::factory()->create(['institucion_id' => $institucion->id]);
         $sede = \App\Models\Sede::factory()->create(['institucion_id' => $institucion->id]);
-        
+
         $asignatura = Asignatura::factory()->create(['area_id' => $area->id]);
-        
+
         // Crear grupo manualmente con la misma institución
         $grupo = Grupo::factory()->create([
             'anio_id' => $anio->id,
             'grado_id' => $grado->id,
-            'sede_id' => $sede->id
+            'sede_id' => $sede->id,
         ]);
 
         $asignacion = Asignacion::factory()->create([
@@ -92,4 +92,4 @@ class DocenteTest extends TestCase
 
         $this->assertSoftDeleted($docente);
     }
-} 
+}

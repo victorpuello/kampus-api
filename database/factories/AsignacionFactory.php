@@ -2,11 +2,11 @@
 
 namespace Database\Factories;
 
-use App\Models\Asignacion;
-use App\Models\Docente;
-use App\Models\Asignatura;
-use App\Models\Grupo;
 use App\Models\Anio;
+use App\Models\Asignacion;
+use App\Models\Asignatura;
+use App\Models\Docente;
+use App\Models\Grupo;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class AsignacionFactory extends Factory

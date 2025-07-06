@@ -20,26 +20,26 @@ return new class extends Migration
 
             $table->unique(['aula_id', 'franja_id', 'dia_semana', 'anio_id']);
             $table->unique(['asignacion_id', 'franja_id', 'dia_semana', 'anio_id']);
-            
+
             $table->foreign('asignacion_id')
-                  ->references('id')
-                  ->on('asignaciones')
-                  ->onDelete('cascade');
-                  
+                ->references('id')
+                ->on('asignaciones')
+                ->onDelete('cascade');
+
             $table->foreign('aula_id')
-                  ->references('id')
-                  ->on('aulas')
-                  ->onDelete('restrict');
-                  
+                ->references('id')
+                ->on('aulas')
+                ->onDelete('restrict');
+
             $table->foreign('franja_id')
-                  ->references('id')
-                  ->on('franjas_horarias')
-                  ->onDelete('restrict');
-                  
+                ->references('id')
+                ->on('franjas_horarias')
+                ->onDelete('restrict');
+
             $table->foreign('anio_id')
-                  ->references('id')
-                  ->on('anios')
-                  ->onDelete('cascade');
+                ->references('id')
+                ->on('anios')
+                ->onDelete('cascade');
         });
     }
 
@@ -47,4 +47,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('horarios');
     }
-}; 
+};

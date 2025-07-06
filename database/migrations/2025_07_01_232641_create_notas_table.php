@@ -19,24 +19,24 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('estudiante_id')
-                  ->references('id')
-                  ->on('estudiantes')
-                  ->onDelete('cascade');
-                  
+                ->references('id')
+                ->on('estudiantes')
+                ->onDelete('cascade');
+
             $table->foreign('asignacion_id')
-                  ->references('id')
-                  ->on('asignaciones')
-                  ->onDelete('cascade');
-                  
+                ->references('id')
+                ->on('asignaciones')
+                ->onDelete('cascade');
+
             $table->foreign('periodo_id')
-                  ->references('id')
-                  ->on('periodos')
-                  ->onDelete('restrict');
-                  
+                ->references('id')
+                ->on('periodos')
+                ->onDelete('restrict');
+
             $table->foreign('competencia_id')
-                  ->references('id')
-                  ->on('competencias')
-                  ->onDelete('set null');
+                ->references('id')
+                ->on('competencias')
+                ->onDelete('set null');
         });
     }
 
@@ -44,4 +44,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('notas');
     }
-}; 
+};

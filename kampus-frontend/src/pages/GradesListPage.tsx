@@ -19,12 +19,20 @@ interface Grado {
 
 interface GradosResponse {
   data: Grado[];
-  current_page: number;
-  last_page: number;
-  per_page: number;
-  total: number;
-  from: number;
-  to: number;
+  meta: {
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+    from: number;
+    to: number;
+  };
+  links: {
+    first: string;
+    last: string;
+    prev: string | null;
+    next: string | null;
+  };
 }
 
 const GradesListPage = () => {
@@ -41,8 +49,10 @@ const GradesListPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [sortColumn, setSortColumn] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
-  const fetchGrados = async (page = 1, perPage = 10, search = '') => {
+  const fetchGrados = async (page = 1, perPage = 10, search = '', sortBy?: string, sortDir?: 'asc' | 'desc') => {
     try {
       setLoading(true);
       const params = new URLSearchParams({
@@ -53,16 +63,20 @@ const GradesListPage = () => {
       if (search) {
         params.append('search', search);
       }
+
+      if (sortBy) {
+        params.append('sort_by', sortBy);
+        params.append('sort_direction', sortDir || 'asc');
+      }
       
       const response = await axiosClient.get(`/grados?${params.toString()}`);
       const data: GradosResponse = response.data;
       
-      console.log('Datos de grados recibidos:', data);
       setGrados(data.data);
-      setTotalItems(data.total);
-      setTotalPages(data.last_page);
-      setCurrentPage(data.current_page);
-      setItemsPerPage(data.per_page);
+      setTotalItems(data.meta.total);
+      setTotalPages(data.meta.last_page);
+      setCurrentPage(data.meta.current_page);
+      setItemsPerPage(data.meta.per_page);
       setError(null);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Error al cargar los grados');
@@ -72,8 +86,8 @@ const GradesListPage = () => {
   };
 
   useEffect(() => {
-    fetchGrados(currentPage, itemsPerPage, searchTerm);
-  }, [currentPage, itemsPerPage, searchTerm]);
+    fetchGrados(currentPage, itemsPerPage, searchTerm, sortColumn || undefined, sortDirection);
+  }, [currentPage, itemsPerPage, searchTerm, sortColumn, sortDirection]);
 
   // Manejar cambio de página
   const handlePageChange = (page: number) => {
@@ -92,6 +106,13 @@ const GradesListPage = () => {
     setCurrentPage(1); // Resetear a la primera página
   };
 
+  // Manejar ordenamiento
+  const handleSort = (columnKey: string, direction: 'asc' | 'desc') => {
+    setSortColumn(columnKey);
+    setSortDirection(direction);
+    setCurrentPage(1);
+  };
+
   const handleDelete = async (grado: Grado) => {
     const confirmed = await confirm({
       title: 'Eliminar Grado',
@@ -107,7 +128,7 @@ const GradesListPage = () => {
       setConfirmLoading(true);
       await axiosClient.delete(`/grados/${grado.id}`);
       showSuccess('Grado eliminado exitosamente', 'Éxito');
-      fetchGrados(currentPage, itemsPerPage, searchTerm);
+      fetchGrados(currentPage, itemsPerPage, searchTerm, sortColumn || undefined, sortDirection);
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Error al eliminar el grado';
       showError(errorMessage, 'Error');
@@ -134,7 +155,7 @@ const GradesListPage = () => {
         axiosClient.delete(`/grados/${grado.id}`)
       ));
       showSuccess(`${selectedGrados.length} grados eliminados exitosamente`, 'Éxito');
-      fetchGrados(currentPage, itemsPerPage, searchTerm);
+      fetchGrados(currentPage, itemsPerPage, searchTerm, sortColumn || undefined, sortDirection);
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Error al eliminar los grados';
       showError(errorMessage, 'Error');
@@ -318,6 +339,7 @@ const GradesListPage = () => {
         onPageChange={handlePageChange}
         onItemsPerPageChange={handleItemsPerPageChange}
         onSearch={handleSearch}
+        onSort={handleSort}
       />
 
       {/* ConfirmDialog */}

@@ -16,16 +16,16 @@ return new class extends Migration
             $table->timestamps();
 
             $table->unique(['estudiante_id', 'anio_id']);
-            
+
             $table->foreign('estudiante_id')
-                  ->references('id')
-                  ->on('estudiantes')
-                  ->onDelete('cascade');
-                  
+                ->references('id')
+                ->on('estudiantes')
+                ->onDelete('cascade');
+
             $table->foreign('anio_id')
-                  ->references('id')
-                  ->on('anios')
-                  ->onDelete('cascade');
+                ->references('id')
+                ->on('anios')
+                ->onDelete('cascade');
         });
     }
 
@@ -33,4 +33,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('definitivas_finales');
     }
-}; 
+};

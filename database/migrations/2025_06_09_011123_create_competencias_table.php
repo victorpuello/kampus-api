@@ -16,9 +16,9 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('area_id')
-                  ->references('id')
-                  ->on('areas')
-                  ->onDelete('cascade');
+                ->references('id')
+                ->on('areas')
+                ->onDelete('cascade');
         });
     }
 
@@ -26,4 +26,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('competencias');
     }
-}; 
+};

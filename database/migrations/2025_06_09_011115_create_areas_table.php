@@ -11,14 +11,16 @@ return new class extends Migration
         Schema::create('areas', function (Blueprint $table) {
             $table->unsignedBigInteger('id')->autoIncrement();
             $table->string('nombre', 255);
+            $table->text('descripcion')->nullable();
+            $table->string('color', 7)->nullable();
             $table->unsignedBigInteger('institucion_id');
             $table->softDeletes();
             $table->timestamps();
 
             $table->foreign('institucion_id')
-                  ->references('id')
-                  ->on('instituciones')
-                  ->onDelete('cascade');
+                ->references('id')
+                ->on('instituciones')
+                ->onDelete('cascade');
         });
     }
 
@@ -26,4 +28,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('areas');
     }
-}; 
+};

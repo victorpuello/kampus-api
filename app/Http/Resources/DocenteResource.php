@@ -10,6 +10,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *     schema="DocenteResource",
  *     title="Recurso de Docente",
  *     description="Representación de un docente en la API",
+ *
  *     @OA\Property(property="id", type="integer", description="ID del docente"),
  *     @OA\Property(property="user", type="object", ref="#/components/schemas/UserResource", description="Datos del usuario asociado al docente"),
  *     @OA\Property(property="telefono", type="string", nullable=true, description="Teléfono del docente"),

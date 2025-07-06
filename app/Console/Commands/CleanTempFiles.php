@@ -37,12 +37,13 @@ class CleanTempFiles extends Command
             if ($deletedCount > 0) {
                 $this->info("✅ Se eliminaron {$deletedCount} archivos temporales.");
             } else {
-                $this->info("ℹ️  No se encontraron archivos temporales para eliminar.");
+                $this->info('ℹ️  No se encontraron archivos temporales para eliminar.');
             }
 
             return Command::SUCCESS;
         } catch (\Exception $e) {
-            $this->error("❌ Error al limpiar archivos temporales: " . $e->getMessage());
+            $this->error('❌ Error al limpiar archivos temporales: '.$e->getMessage());
+
             return Command::FAILURE;
         }
     }

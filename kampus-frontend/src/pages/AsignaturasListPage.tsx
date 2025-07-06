@@ -3,52 +3,48 @@ import { Link, useNavigate } from 'react-router-dom';
 import axiosClient from '../api/axiosClient';
 import { Button } from '../components/ui/Button';
 import { DataTable } from '../components/ui/DataTable';
+import { ServerDataTable } from '../components/ui/ServerDataTable';
 import type { Column, ActionButton } from '../components/ui/DataTable';
 import { useAlertContext } from '../contexts/AlertContext';
 import { useConfirm } from '../hooks/useConfirm';
 import ConfirmDialog from '../components/ui/ConfirmDialog';
+import { useServerPagination } from '../hooks/useServerPagination';
 
 interface Asignatura {
   id: number;
   nombre: string;
   codigo?: string;
   descripcion?: string;
-  creditos?: number;
-  estado: string;
+  porcentaje_area: number;
   area?: {
     id: number;
     nombre: string;
     codigo?: string;
     color?: string;
   };
-  grados_count?: number;
 }
 
 const AsignaturasListPage = () => {
   const navigate = useNavigate();
   const { showSuccess, showError } = useAlertContext();
   const { dialogState, confirm, setLoading: setConfirmLoading } = useConfirm();
-  const [asignaturas, setAsignaturas] = useState<Asignatura[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchAsignaturas = async () => {
-    try {
-      setLoading(true);
-      const response = await axiosClient.get('/asignaturas');
-      console.log('Datos de asignaturas recibidos:', response.data);
-      setAsignaturas(response.data.data || response.data);
-      setError(null);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al cargar las asignaturas');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchAsignaturas();
-  }, []);
+  const {
+    data: asignaturas,
+    loading,
+    error,
+    currentPage,
+    itemsPerPage,
+    totalItems,
+    totalPages,
+    handlePageChange,
+    handleItemsPerPageChange,
+    handleSearch,
+    handleSort,
+    refreshData,
+  } = useServerPagination<Asignatura>({
+    endpoint: 'asignaturas',
+    searchKeys: ['nombre', 'codigo', 'descripcion'],
+  });
 
   const handleDelete = async (asignatura: Asignatura) => {
     const confirmed = await confirm({
@@ -65,11 +61,10 @@ const AsignaturasListPage = () => {
       setConfirmLoading(true);
       await axiosClient.delete(`/asignaturas/${asignatura.id}`);
       showSuccess('Asignatura eliminada exitosamente', 'Éxito');
-      fetchAsignaturas();
+      refreshData();
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Error al eliminar la asignatura';
       showError(errorMessage, 'Error');
-      setError(errorMessage);
     } finally {
       setConfirmLoading(false);
     }
@@ -92,11 +87,10 @@ const AsignaturasListPage = () => {
         axiosClient.delete(`/asignaturas/${asignatura.id}`)
       ));
       showSuccess(`${selectedAsignaturas.length} asignaturas eliminadas exitosamente`, 'Éxito');
-      fetchAsignaturas();
+      refreshData();
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Error al eliminar las asignaturas';
       showError(errorMessage, 'Error');
-      setError(errorMessage);
     } finally {
       setConfirmLoading(false);
     }
@@ -156,39 +150,11 @@ const AsignaturasListPage = () => {
       sortable: true,
     },
     {
-      key: 'creditos',
-      header: 'Créditos',
+      key: 'porcentaje_area',
+      header: 'Porcentaje Área',
       accessor: (asignatura) => (
         <span className="text-sm text-gray-500">
-          {asignatura.creditos || 0} créditos
-        </span>
-      ),
-      sortable: true,
-      align: 'center',
-    },
-    {
-      key: 'grados_count',
-      header: 'Grados',
-      accessor: (asignatura) => (
-        <span className="text-sm text-gray-500">
-          {asignatura.grados_count || 0} grados
-        </span>
-      ),
-      sortable: true,
-      align: 'center',
-    },
-    {
-      key: 'estado',
-      header: 'Estado',
-      accessor: (asignatura) => (
-        <span
-          className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
-            asignatura.estado === 'activo'
-              ? 'bg-green-100 text-green-800'
-              : 'bg-red-100 text-red-800'
-          }`}
-        >
-          {asignatura.estado}
+          {asignatura.porcentaje_area}%
         </span>
       ),
       sortable: true,
@@ -271,8 +237,8 @@ const AsignaturasListPage = () => {
         </Button>
       </div>
 
-      {/* DataTable */}
-      <DataTable
+      {/* ServerDataTable */}
+      <ServerDataTable
         data={asignaturas}
         columns={columns}
         actions={actions}
@@ -280,10 +246,10 @@ const AsignaturasListPage = () => {
         error={error}
         searchable={true}
         searchPlaceholder="Buscar asignaturas por nombre, código o descripción..."
-        searchKeys={['nombre', 'codigo', 'descripcion', 'area.nombre', 'estado']}
+        searchKeys={['nombre', 'codigo', 'descripcion', 'area.nombre']}
         sortable={true}
         pagination={true}
-        itemsPerPage={10}
+        itemsPerPage={itemsPerPage}
         itemsPerPageOptions={[5, 10, 25, 50]}
         emptyMessage="No hay asignaturas registradas"
         emptyIcon={
@@ -293,7 +259,17 @@ const AsignaturasListPage = () => {
         }
         selectable={true}
         bulkActions={bulkActions}
-        onRowClick={(asignatura) => navigate(`/asignaturas/${asignatura.id}`)}
+        onRowClick={(asignatura: Asignatura) => navigate(`/asignaturas/${asignatura.id}`)}
+        // Props automáticas para paginación del servidor
+        serverSidePagination={true}
+        serverSideSorting={true}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={totalItems}
+        onPageChange={handlePageChange}
+        onItemsPerPageChange={handleItemsPerPageChange}
+        onSearch={handleSearch}
+        onSort={handleSort}
       />
 
       {/* ConfirmDialog */}

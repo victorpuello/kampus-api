@@ -17,11 +17,11 @@ class InstitucionFactory extends Factory
     public function definition(): array
     {
         return [
-            'nombre' => $this->faker->unique()->company() . ' Educativa',
+            'nombre' => $this->faker->unique()->company().' Educativa',
             'siglas' => $this->faker->unique()->regexify('[A-Z]{3,5}'),
             'slogan' => $this->faker->sentence(),
             'dane' => $this->faker->numerify('##########'),
-            'resolucion_aprobacion' => 'Resolución ' . $this->faker->numberBetween(1000, 9999) . ' de ' . $this->faker->year(),
+            'resolucion_aprobacion' => 'Resolución '.$this->faker->numberBetween(1000, 9999).' de '.$this->faker->year(),
             'direccion' => $this->faker->address(),
             'telefono' => $this->faker->phoneNumber(),
             'email' => $this->faker->email(),
@@ -32,8 +32,6 @@ class InstitucionFactory extends Factory
 
     /**
      * Indica que la institución debe tener un escudo.
-     *
-     * @return static
      */
     public function withEscudo(): static
     {

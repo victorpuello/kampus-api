@@ -3,7 +3,6 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-
 use Illuminate\Support\Facades\Hash;
 
 /**
@@ -14,6 +13,7 @@ use Illuminate\Support\Facades\Hash;
  *         "nombre", "apellido", "email", "username", "password",
  *         "institucion_id", "estado", "roles"
  *     },
+ *
  *     @OA\Property(property="nombre", type="string", maxLength=255, description="Nombre del usuario"),
  *     @OA\Property(property="apellido", type="string", maxLength=255, description="Apellido del usuario"),
  *     @OA\Property(property="email", type="string", format="email", maxLength=255, description="Correo electrónico único del usuario"),
@@ -101,4 +101,3 @@ class StoreUserRequest extends FormRequest
         ];
     }
 }
- 

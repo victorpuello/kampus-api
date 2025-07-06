@@ -10,6 +10,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *     schema="InstitucionResource",
  *     title="Institucion Resource",
  *     description="Recurso de institución",
+ *
  *     @OA\Property(property="id", type="integer", example=1),
  *     @OA\Property(property="nombre", type="string", example="Institución Educativa Ejemplo"),
  *     @OA\Property(property="siglas", type="string", example="IEE"),
@@ -26,6 +27,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *     @OA\Property(
  *         property="sedes",
  *         type="array",
+ *
  *         @OA\Items(ref="#/components/schemas/SedeResource")
  *     )
  * )
@@ -44,10 +46,10 @@ class InstitucionResource extends JsonResource
             'id' => $this->id,
             'nombre' => $this->nombre,
             'escudo_raw' => $this->escudo,
-            'escudo_asset' => $this->escudo ? asset('storage/' . $this->escudo) : null,
+            'escudo_asset' => $this->escudo ? asset('storage/'.$this->escudo) : null,
             'escudo_getFileUrl' => $this->escudo ? $this->getFileUrl('escudo') : null,
             'request_url' => $request->fullUrl(),
-            'request_method' => $request->method()
+            'request_method' => $request->method(),
         ]);
 
         $data = [
@@ -61,8 +63,8 @@ class InstitucionResource extends JsonResource
             'telefono' => $this->telefono,
             'email' => $this->email,
             'rector' => $this->rector,
-            'escudo' => $this->escudo ? asset('storage/' . $this->escudo) : null,
-            'escudo_url' => $this->escudo ? ($this->getFileUrl('escudo') ?? asset('storage/' . $this->escudo)) : null,
+            'escudo' => $this->escudo ? asset('storage/'.$this->escudo) : null,
+            'escudo_url' => $this->escudo ? ($this->getFileUrl('escudo') ?? asset('storage/'.$this->escudo)) : null,
             'created_at' => $this->created_at ? $this->created_at->toISOString() : null,
             'updated_at' => $this->updated_at ? $this->updated_at->toISOString() : null,
         ];

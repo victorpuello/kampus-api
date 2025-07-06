@@ -12,15 +12,13 @@ interface Area {
   id: number;
   nombre: string;
   descripcion?: string;
-  codigo?: string;
   color?: string;
-  estado: string;
   asignaturas?: Array<{
     id: number;
     nombre: string;
     codigo?: string;
-    creditos?: number;
-    estado: string;
+    descripcion?: string;
+    porcentaje_area?: number;
   }>;
 }
 
@@ -123,7 +121,7 @@ const AreaDetailPage = () => {
                 {area.nombre}
               </h1>
               <p className="mt-1 text-sm text-gray-700">
-                {area.codigo && `${area.codigo} • `}Área Académica
+                Área Académica
               </p>
             </div>
           </div>
@@ -166,12 +164,7 @@ const AreaDetailPage = () => {
                 <span className="text-sm font-medium text-gray-500">Nombre:</span>
                 <span className="text-sm text-gray-900">{area.nombre}</span>
               </div>
-              {area.codigo && (
-                <div className="flex justify-between">
-                  <span className="text-sm font-medium text-gray-500">Código:</span>
-                  <span className="text-sm text-gray-900">{area.codigo}</span>
-                </div>
-              )}
+
               <div className="flex justify-between">
                 <span className="text-sm font-medium text-gray-500">Descripción:</span>
                 <span className="text-sm text-gray-900">
@@ -188,14 +181,7 @@ const AreaDetailPage = () => {
                   <span className="text-sm text-gray-900">{area.color || '#3B82F6'}</span>
                 </div>
               </div>
-              <div className="flex justify-between">
-                <span className="text-sm font-medium text-gray-500">Estado:</span>
-                <Badge
-                  variant={area.estado === 'activo' ? 'success' : 'error'}
-                >
-                  {area.estado}
-                </Badge>
-              </div>
+
             </div>
           </CardBody>
         </Card>
@@ -211,12 +197,7 @@ const AreaDetailPage = () => {
                 <span className="text-sm font-medium text-gray-500">Total de Asignaturas:</span>
                 <span className="text-sm text-gray-900">{area.asignaturas?.length || 0}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-sm font-medium text-gray-500">Asignaturas Activas:</span>
-                <span className="text-sm text-gray-900">
-                  {area.asignaturas?.filter(a => a.estado === 'activo').length || 0}
-                </span>
-              </div>
+
             </div>
           </CardBody>
         </Card>
@@ -253,10 +234,10 @@ const AreaDetailPage = () => {
                       Código
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Créditos
+                      Descripción
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Estado
+                      Porcentaje
                     </th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Acciones
@@ -276,15 +257,13 @@ const AreaDetailPage = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-500">
-                          {asignatura.creditos || 0} créditos
+                          {asignatura.descripcion || 'Sin descripción'}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <Badge
-                          variant={asignatura.estado === 'activo' ? 'success' : 'error'}
-                        >
-                          {asignatura.estado}
-                        </Badge>
+                        <div className="text-sm text-gray-500">
+                          {asignatura.porcentaje_area || 0}%
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <Button

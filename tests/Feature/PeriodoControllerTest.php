@@ -2,36 +2,38 @@
 
 namespace Tests\Feature;
 
-use Tests\TestCase;
-use App\Models\User;
 use App\Models\Anio;
-use App\Models\Periodo;
 use App\Models\Institucion;
+use App\Models\Periodo;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
+use Tests\TestCase;
 
 class PeriodoControllerTest extends TestCase
 {
     use RefreshDatabase;
 
     private User $user;
+
     private Anio $anio;
+
     private Periodo $periodo;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Crear usuario autenticado
         $this->user = User::factory()->create([
             'email' => 'admin@example.com',
-            'password' => bcrypt('123456')
+            'password' => bcrypt('123456'),
         ]);
 
         // Crear institución
         $institucion = Institucion::factory()->create([
             'nombre' => 'Instituto de Prueba',
-            'siglas' => 'ITP'
+            'siglas' => 'ITP',
         ]);
 
         // Crear año académico
@@ -40,7 +42,7 @@ class PeriodoControllerTest extends TestCase
             'fecha_inicio' => '2024-01-15',
             'fecha_fin' => '2024-12-15',
             'institucion_id' => $institucion->id,
-            'estado' => 'activo'
+            'estado' => 'activo',
         ]);
 
         // Crear periodo
@@ -48,7 +50,7 @@ class PeriodoControllerTest extends TestCase
             'nombre' => 'Primer Periodo',
             'fecha_inicio' => '2024-01-15',
             'fecha_fin' => '2024-04-15',
-            'anio_id' => $this->anio->id
+            'anio_id' => $this->anio->id,
         ]);
 
         // Autenticar usuario
@@ -61,17 +63,17 @@ class PeriodoControllerTest extends TestCase
         $response = $this->getJson('/api/v1/periodos');
 
         $response->assertStatus(200)
-                ->assertJsonStructure([
-                    'data' => [
-                        '*' => [
-                            'id',
-                            'nombre',
-                            'fecha_inicio',
-                            'fecha_fin',
-                            'anio_id'
-                        ]
-                    ]
-                ]);
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => [
+                        'id',
+                        'nombre',
+                        'fecha_inicio',
+                        'fecha_fin',
+                        'anio_id',
+                    ],
+                ],
+            ]);
     }
 
     /** @test */
@@ -80,17 +82,17 @@ class PeriodoControllerTest extends TestCase
         $response = $this->getJson("/api/v1/anios/{$this->anio->id}/periodos");
 
         $response->assertStatus(200)
-                ->assertJsonStructure([
-                    'data' => [
-                        '*' => [
-                            'id',
-                            'nombre',
-                            'fecha_inicio',
-                            'fecha_fin',
-                            'anio_id'
-                        ]
-                    ]
-                ]);
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => [
+                        'id',
+                        'nombre',
+                        'fecha_inicio',
+                        'fecha_fin',
+                        'anio_id',
+                    ],
+                ],
+            ]);
     }
 
     /** @test */
@@ -100,25 +102,25 @@ class PeriodoControllerTest extends TestCase
             'nombre' => 'Segundo Periodo',
             'fecha_inicio' => '2024-05-01',
             'fecha_fin' => '2024-08-15',
-            'anio_id' => $this->anio->id
+            'anio_id' => $this->anio->id,
         ];
 
         $response = $this->postJson('/api/v1/periodos', $data);
 
         $response->assertStatus(201)
-                ->assertJsonStructure([
-                    'data' => [
-                        'id',
-                        'nombre',
-                        'fecha_inicio',
-                        'fecha_fin',
-                        'anio_id'
-                    ]
-                ]);
+            ->assertJsonStructure([
+                'data' => [
+                    'id',
+                    'nombre',
+                    'fecha_inicio',
+                    'fecha_fin',
+                    'anio_id',
+                ],
+            ]);
 
         $this->assertDatabaseHas('periodos', [
             'nombre' => 'Segundo Periodo',
-            'anio_id' => $this->anio->id
+            'anio_id' => $this->anio->id,
         ]);
     }
 
@@ -129,21 +131,21 @@ class PeriodoControllerTest extends TestCase
             'nombre' => 'Tercer Periodo',
             'fecha_inicio' => '2024-09-01',
             'fecha_fin' => '2024-12-15',
-            'anio_id' => $this->anio->id
+            'anio_id' => $this->anio->id,
         ];
 
         $response = $this->postJson("/api/v1/anios/{$this->anio->id}/periodos", $data);
 
         $response->assertStatus(201)
-                ->assertJsonStructure([
-                    'data' => [
-                        'id',
-                        'nombre',
-                        'fecha_inicio',
-                        'fecha_fin',
-                        'anio_id'
-                    ]
-                ]);
+            ->assertJsonStructure([
+                'data' => [
+                    'id',
+                    'nombre',
+                    'fecha_inicio',
+                    'fecha_fin',
+                    'anio_id',
+                ],
+            ]);
     }
 
     /** @test */
@@ -153,13 +155,13 @@ class PeriodoControllerTest extends TestCase
             'nombre' => 'Periodo Inválido',
             'fecha_inicio' => '2023-12-01', // Antes del año académico
             'fecha_fin' => '2024-03-15',
-            'anio_id' => $this->anio->id
+            'anio_id' => $this->anio->id,
         ];
 
         $response = $this->postJson('/api/v1/periodos', $data);
 
         $response->assertStatus(422)
-                ->assertJsonValidationErrors(['fecha_inicio']);
+            ->assertJsonValidationErrors(['fecha_inicio']);
     }
 
     /** @test */
@@ -169,13 +171,13 @@ class PeriodoControllerTest extends TestCase
             'nombre' => 'Periodo Inválido',
             'fecha_inicio' => '2024-10-01',
             'fecha_fin' => '2025-01-15', // Después del año académico
-            'anio_id' => $this->anio->id
+            'anio_id' => $this->anio->id,
         ];
 
         $response = $this->postJson('/api/v1/periodos', $data);
 
         $response->assertStatus(422)
-                ->assertJsonValidationErrors(['fecha_fin']);
+            ->assertJsonValidationErrors(['fecha_fin']);
     }
 
     /** @test */
@@ -185,13 +187,13 @@ class PeriodoControllerTest extends TestCase
             'nombre' => 'Periodo Solapado',
             'fecha_inicio' => '2024-02-01', // Se solapa con el periodo existente
             'fecha_fin' => '2024-05-15',
-            'anio_id' => $this->anio->id
+            'anio_id' => $this->anio->id,
         ];
 
         $response = $this->postJson('/api/v1/periodos', $data);
 
         $response->assertStatus(422)
-                ->assertJsonValidationErrors(['fecha_inicio']);
+            ->assertJsonValidationErrors(['fecha_inicio']);
     }
 
     /** @test */
@@ -200,13 +202,13 @@ class PeriodoControllerTest extends TestCase
         $response = $this->getJson("/api/v1/periodos/{$this->periodo->id}");
 
         $response->assertStatus(200)
-                ->assertJson([
-                    'data' => [
-                        'id' => $this->periodo->id,
-                        'nombre' => $this->periodo->nombre,
-                        'anio_id' => $this->periodo->anio_id
-                    ]
-                ]);
+            ->assertJson([
+                'data' => [
+                    'id' => $this->periodo->id,
+                    'nombre' => $this->periodo->nombre,
+                    'anio_id' => $this->periodo->anio_id,
+                ],
+            ]);
     }
 
     /** @test */
@@ -216,22 +218,22 @@ class PeriodoControllerTest extends TestCase
             'nombre' => 'Periodo Actualizado',
             'fecha_inicio' => '2024-05-01',
             'fecha_fin' => '2024-08-15',
-            'anio_id' => $this->anio->id
+            'anio_id' => $this->anio->id,
         ];
 
         $response = $this->putJson("/api/v1/periodos/{$this->periodo->id}", $data);
 
         $response->assertStatus(200)
-                ->assertJson([
-                    'data' => [
-                        'id' => $this->periodo->id,
-                        'nombre' => 'Periodo Actualizado'
-                    ]
-                ]);
+            ->assertJson([
+                'data' => [
+                    'id' => $this->periodo->id,
+                    'nombre' => 'Periodo Actualizado',
+                ],
+            ]);
 
         $this->assertDatabaseHas('periodos', [
             'id' => $this->periodo->id,
-            'nombre' => 'Periodo Actualizado'
+            'nombre' => 'Periodo Actualizado',
         ]);
     }
 
@@ -243,20 +245,20 @@ class PeriodoControllerTest extends TestCase
             'nombre' => 'Segundo Periodo',
             'fecha_inicio' => '2024-05-01',
             'fecha_fin' => '2024-08-15',
-            'anio_id' => $this->anio->id
+            'anio_id' => $this->anio->id,
         ]);
 
         $data = [
             'nombre' => 'Periodo Actualizado',
             'fecha_inicio' => '2024-06-01', // Se solapa con el segundo periodo
             'fecha_fin' => '2024-09-15',
-            'anio_id' => $this->anio->id
+            'anio_id' => $this->anio->id,
         ];
 
         $response = $this->putJson("/api/v1/periodos/{$this->periodo->id}", $data);
 
         $response->assertStatus(422)
-                ->assertJsonValidationErrors(['fecha_inicio']);
+            ->assertJsonValidationErrors(['fecha_inicio']);
     }
 
     /** @test */
@@ -267,7 +269,7 @@ class PeriodoControllerTest extends TestCase
         $response->assertStatus(200);
         // El modelo Periodo usa SoftDeletes, por lo que debemos verificar que esté soft deleted
         $this->assertSoftDeleted('periodos', [
-            'id' => $this->periodo->id
+            'id' => $this->periodo->id,
         ]);
     }
 
@@ -277,27 +279,27 @@ class PeriodoControllerTest extends TestCase
         $response = $this->getJson('/api/v1/periodos?search=Primer');
 
         $response->assertStatus(200)
-                ->assertJsonStructure([
-                    'data' => [
-                        '*' => [
-                            'id',
-                            'nombre',
-                            'fecha_inicio',
-                            'fecha_fin',
-                            'anio_id'
-                        ]
-                    ]
-                ]);
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => [
+                        'id',
+                        'nombre',
+                        'fecha_inicio',
+                        'fecha_fin',
+                        'anio_id',
+                    ],
+                ],
+            ]);
     }
 
     /** @test */
     public function puede_paginar_periodos()
     {
         $this->actingAs($this->user);
-        
+
         // Crear periodos adicionales para probar paginación
         Periodo::factory()->count(15)->create([
-            'anio_id' => $this->anio->id
+            'anio_id' => $this->anio->id,
         ]);
 
         $response = $this->getJson('/api/v1/periodos?page=1&per_page=10');
@@ -307,9 +309,9 @@ class PeriodoControllerTest extends TestCase
             'current_page',
             'last_page',
             'per_page',
-            'total'
+            'total',
         ]);
-        
+
         $data = $response->json();
         $this->assertEquals(1, $data['current_page']);
         $this->assertEquals(10, $data['per_page']);
@@ -327,6 +329,9 @@ class PeriodoControllerTest extends TestCase
     /** @test */
     public function requiere_autenticacion()
     {
+        // Desautenticar el usuario actual
+        $this->app['auth']->forgetGuards();
+
         // No usar actingAs para simular usuario no autenticado
         $response = $this->getJson('/api/v1/periodos');
         $response->assertStatus(401);
@@ -338,7 +343,7 @@ class PeriodoControllerTest extends TestCase
         $response = $this->postJson('/api/v1/periodos', []);
 
         $response->assertStatus(422)
-                ->assertJsonValidationErrors(['nombre', 'fecha_inicio', 'fecha_fin', 'anio_id']);
+            ->assertJsonValidationErrors(['nombre', 'fecha_inicio', 'fecha_fin', 'anio_id']);
     }
 
     /** @test */
@@ -348,13 +353,13 @@ class PeriodoControllerTest extends TestCase
             'nombre' => 'Periodo Test',
             'fecha_inicio' => 'fecha-invalida',
             'fecha_fin' => 'otra-fecha-invalida',
-            'anio_id' => $this->anio->id
+            'anio_id' => $this->anio->id,
         ];
 
         $response = $this->postJson('/api/v1/periodos', $data);
 
         $response->assertStatus(422)
-                ->assertJsonValidationErrors(['fecha_inicio', 'fecha_fin']);
+            ->assertJsonValidationErrors(['fecha_inicio', 'fecha_fin']);
     }
 
     /** @test */
@@ -364,12 +369,12 @@ class PeriodoControllerTest extends TestCase
             'nombre' => 'Periodo Test',
             'fecha_inicio' => '2024-08-15',
             'fecha_fin' => '2024-05-01', // Fecha fin antes que inicio
-            'anio_id' => $this->anio->id
+            'anio_id' => $this->anio->id,
         ];
 
         $response = $this->postJson('/api/v1/periodos', $data);
 
         $response->assertStatus(422)
-                ->assertJsonValidationErrors(['fecha_fin']);
+            ->assertJsonValidationErrors(['fecha_fin']);
     }
-} 
+}

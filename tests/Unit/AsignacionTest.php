@@ -2,12 +2,12 @@
 
 namespace Tests\Unit;
 
-use App\Models\Asignacion;
-use App\Models\Docente;
-use App\Models\Asignatura;
-use App\Models\Grupo;
-use App\Models\FranjaHoraria;
 use App\Models\Anio;
+use App\Models\Asignacion;
+use App\Models\Asignatura;
+use App\Models\Docente;
+use App\Models\FranjaHoraria;
+use App\Models\Grupo;
 use App\Models\Periodo;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -81,4 +81,4 @@ class AsignacionTest extends TestCase
         $this->assertTrue($asignacion2->tieneConflictoDocente());
         $this->assertTrue($asignacion2->tieneConflictoGrupo());
     }
-} 
+}

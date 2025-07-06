@@ -20,19 +20,19 @@ return new class extends Migration
             $table->softDeletes();
 
             $table->foreign('estudiante_id')
-                  ->references('id')
-                  ->on('estudiantes')
-                  ->onDelete('cascade');
-                  
+                ->references('id')
+                ->on('estudiantes')
+                ->onDelete('cascade');
+
             $table->foreign('docente_id')
-                  ->references('id')
-                  ->on('docentes')
-                  ->onDelete('cascade');
-                  
+                ->references('id')
+                ->on('docentes')
+                ->onDelete('cascade');
+
             $table->foreign('periodo_id')
-                  ->references('id')
-                  ->on('periodos')
-                  ->onDelete('cascade');
+                ->references('id')
+                ->on('periodos')
+                ->onDelete('cascade');
         });
     }
 
@@ -40,4 +40,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('observadores');
     }
-}; 
+};

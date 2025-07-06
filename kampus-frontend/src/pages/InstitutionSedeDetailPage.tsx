@@ -21,7 +21,7 @@ interface Sede {
 
 const InstitutionSedeDetailPage: React.FC = () => {
   const navigate = useNavigate();
-  const { institutionId, id } = useParams<{ institutionId: string; id: string }>();
+  const { id, sedeId } = useParams<{ id: string; sedeId: string }>();
   const { showSuccess, showError } = useAlertContext();
   const { confirm } = useConfirm();
   
@@ -38,7 +38,7 @@ const InstitutionSedeDetailPage: React.FC = () => {
 
   useEffect(() => {
     const fetchSede = async () => {
-      if (!isValidId(id) || !isValidId(institutionId)) {
+      if (!isValidId(sedeId) || !isValidId(id)) {
         setError('ID de sede o institución inválido');
         setLoading(false);
         return;
@@ -48,7 +48,7 @@ const InstitutionSedeDetailPage: React.FC = () => {
         setLoading(true);
         setError(null);
         
-        const response = await axiosClient.get(`/sedes/${id}`);
+        const response = await axiosClient.get(`/sedes/${sedeId}`);
         const sedeData = response.data.data || response.data;
         
         if (!sedeData || !sedeData.id) {
@@ -75,7 +75,7 @@ const InstitutionSedeDetailPage: React.FC = () => {
     };
 
     fetchSede();
-  }, [id, institutionId, showError]);
+  }, [sedeId, id, showError]);
 
   const handleDelete = async () => {
     if (!sede) {
@@ -96,7 +96,7 @@ const InstitutionSedeDetailPage: React.FC = () => {
         setLoading(true);
         await axiosClient.delete(`/sedes/${sede.id}`);
         showSuccess('Sede eliminada exitosamente');
-        navigate(`/instituciones/${institutionId}/sedes`);
+        navigate(`/instituciones/${id}/sedes`);
       } catch (error: any) {
         console.error('Error deleting sede:', error);
         const errorMessage = error.response?.data?.message || 'Error al eliminar la sede';
@@ -112,7 +112,7 @@ const InstitutionSedeDetailPage: React.FC = () => {
       showError('No se puede editar una sede que no existe');
       return;
     }
-    navigate(`/instituciones/${institutionId}/sedes/${sede.id}/editar`);
+    navigate(`/instituciones/${id}/sedes/${sede.id}/editar`);
   };
 
   const formatDate = (dateString: string) => {
@@ -163,7 +163,7 @@ const InstitutionSedeDetailPage: React.FC = () => {
               <div className="mt-6 flex justify-center space-x-3">
                 <Button
                   variant="primary"
-                  onClick={() => navigate(`/instituciones/${institutionId}/sedes`)}
+                  onClick={() => navigate(`/instituciones/${id}/sedes`)}
                 >
                   Volver a las sedes
                 </Button>
@@ -194,7 +194,7 @@ const InstitutionSedeDetailPage: React.FC = () => {
           <Button variant="danger" onClick={handleDelete} disabled={!sede}>
             Eliminar
           </Button>
-          <Button variant="secondary" onClick={() => navigate(`/instituciones/${institutionId}/sedes`)}>
+          <Button variant="secondary" onClick={() => navigate(`/instituciones/${id}/sedes`)}>
             Volver a las Sedes
           </Button>
         </div>

@@ -2,13 +2,14 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
 use App\Models\Periodo;
+use Illuminate\Foundation\Http\FormRequest;
 
 /**
  * @OA\Schema(
  *     schema="UpdateAsignacionRequest",
  *     title="Solicitud para Actualizar Asignación",
+ *
  *     @OA\Property(property="docente_id", type="integer", description="ID del docente asignado"),
  *     @OA\Property(property="asignatura_id", type="integer", description="ID de la asignatura asignada"),
  *     @OA\Property(property="grupo_id", type="integer", description="ID del grupo al que se asigna"),
@@ -50,18 +51,18 @@ class UpdateAsignacionRequest extends FormRequest
                 function ($attribute, $value, $fail) {
                     if ($value) {
                         $anioId = $this->anio_academico_id ?? $this->route('asignacion')->anio_academico_id;
-                        
+
                         if ($anioId) {
                             $periodo = Periodo::where('id', $value)
                                 ->where('anio_id', $anioId)
                                 ->first();
-                            
-                            if (!$periodo) {
+
+                            if (! $periodo) {
                                 $fail('El período seleccionado no pertenece al año académico especificado.');
                             }
                         }
                     }
-                }
+                },
             ],
             'estado' => 'sometimes|string|in:activo,inactivo',
         ];

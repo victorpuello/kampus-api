@@ -70,4 +70,4 @@ class DocenteSeeder extends Seeder
             ]);
         }
     }
-} 
+}

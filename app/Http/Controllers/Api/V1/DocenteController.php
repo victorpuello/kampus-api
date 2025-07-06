@@ -32,42 +32,54 @@ class DocenteController extends Controller
      *     summary="Obtiene una lista paginada de docentes",
      *     tags={"Docentes"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(
      *         name="per_page",
      *         in="query",
      *         description="Número de docentes por página",
      *         required=false,
+     *
      *         @OA\Schema(type="integer", default=10)
      *     ),
+     *
      *     @OA\Parameter(
      *         name="search",
      *         in="query",
      *         description="Término de búsqueda para filtrar docentes por nombre, apellido o email",
      *         required=false,
+     *
      *         @OA\Schema(type="string")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="disponibles_grupo",
      *         in="query",
      *         description="Filtrar solo docentes disponibles para ser directores de grupo",
      *         required=false,
+     *
      *         @OA\Schema(type="boolean")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="institucion_id",
      *         in="query",
      *         description="Filtrar docentes por institución",
      *         required=false,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Lista de docentes obtenida exitosamente",
+     *
      *         @OA\JsonContent(
      *             type="array",
+     *
      *             @OA\Items(ref="#/components/schemas/DocenteResource")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="No autenticado",
@@ -107,28 +119,36 @@ class DocenteController extends Controller
      *     summary="Obtiene docentes disponibles para ser directores de grupo",
      *     tags={"Docentes"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(
      *         name="institucion_id",
      *         in="query",
      *         description="Filtrar docentes por institución",
      *         required=false,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="grupo_id",
      *         in="query",
      *         description="ID del grupo (para incluir el director actual en edición)",
      *         required=false,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Lista de docentes disponibles obtenida exitosamente",
+     *
      *         @OA\JsonContent(
      *             type="array",
+     *
      *             @OA\Items(ref="#/components/schemas/DocenteResource")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="No autenticado",
@@ -167,15 +187,20 @@ class DocenteController extends Controller
      *     summary="Crea un nuevo docente",
      *     tags={"Docentes"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(ref="#/components/schemas/StoreDocenteRequest")
      *     ),
+     *
      *     @OA\Response(
      *         response=201,
      *         description="Docente creado exitosamente",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/DocenteResource")
      *     ),
+     *
      *     @OA\Response(
      *         response=422,
      *         description="Error de validación",
@@ -195,10 +220,10 @@ class DocenteController extends Controller
         // Separar los datos del usuario y del docente
         $userData = $request->only(['nombre', 'apellido', 'email', 'username', 'password', 'institucion_id', 'estado']);
         $docenteData = $request->only(['telefono', 'especialidad', 'fecha_contratacion', 'salario', 'horario_trabajo']);
-        
+
         // Crear el usuario asociado al docente
         $user = User::create($userData);
-        
+
         // Crear el docente y asociarlo al usuario
         $docenteData['user_id'] = $user->id;
         $docente = Docente::create($docenteData);
@@ -212,18 +237,23 @@ class DocenteController extends Controller
      *     summary="Obtiene los detalles de un docente específico",
      *     tags={"Docentes"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(
      *         name="docente",
      *         in="path",
      *         description="ID del docente",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Detalles del docente obtenidos exitosamente",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/DocenteResource")
      *     ),
+     *
      *     @OA\Response(
      *         response=404,
      *         description="Docente no encontrado",
@@ -249,22 +279,29 @@ class DocenteController extends Controller
      *     summary="Actualiza un docente existente",
      *     tags={"Docentes"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(
      *         name="docente",
      *         in="path",
      *         description="ID del docente a actualizar",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(ref="#/components/schemas/UpdateDocenteRequest")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Docente actualizado exitosamente",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/DocenteResource")
      *     ),
+     *
      *     @OA\Response(
      *         response=422,
      *         description="Error de validación",
@@ -288,14 +325,14 @@ class DocenteController extends Controller
         // Separar los datos del usuario y del docente
         $userData = $request->only(['nombre', 'apellido', 'email', 'username', 'password', 'institucion_id', 'estado']);
         $docenteData = $request->only(['telefono', 'especialidad', 'fecha_contratacion', 'salario', 'horario_trabajo']);
-        
+
         // Actualizar los datos del usuario asociado al docente
-        if (!empty($userData)) {
+        if (! empty($userData)) {
             $docente->user->update($userData);
         }
-        
+
         // Actualizar los datos del docente
-        if (!empty($docenteData)) {
+        if (! empty($docenteData)) {
             $docente->update($docenteData);
         }
 
@@ -308,13 +345,16 @@ class DocenteController extends Controller
      *     summary="Elimina (soft delete) un docente y su usuario asociado",
      *     tags={"Docentes"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(
      *         name="docente",
      *         in="path",
      *         description="ID del docente a eliminar",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(
      *         response=204,
      *         description="Docente eliminado exitosamente (sin contenido)",

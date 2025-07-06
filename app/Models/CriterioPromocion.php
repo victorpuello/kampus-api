@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CriterioPromocion extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
+    use SoftDeletes;
 
     protected $table = 'criterios_promocion';
 
@@ -29,4 +30,4 @@ class CriterioPromocion extends Model
     {
         return $this->belongsTo(Anio::class);
     }
-} 
+}

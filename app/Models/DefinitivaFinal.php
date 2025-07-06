@@ -30,4 +30,4 @@ class DefinitivaFinal extends Model
     {
         return $this->belongsTo(Anio::class);
     }
-} 
+}

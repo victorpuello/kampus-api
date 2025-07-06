@@ -45,12 +45,14 @@ export interface DataTableProps<T> {
   onSelectionChange?: (selectedItems: T[]) => void;
   bulkActions?: ActionButton<T[]>[];
   serverSidePagination?: boolean;
+  serverSideSorting?: boolean;
   currentPage?: number;
   totalPages?: number;
   totalItems?: number;
   onPageChange?: (page: number) => void;
   onItemsPerPageChange?: (perPage: number) => void;
   onSearch?: (search: string) => void;
+  onSort?: (columnKey: string, direction: 'asc' | 'desc') => void;
 }
 
 // Definir el tipo base para elementos con ID
@@ -80,12 +82,14 @@ export const DataTable = <T extends BaseItem>({
   onSelectionChange,
   bulkActions = [],
   serverSidePagination = false,
+  serverSideSorting = false,
   currentPage = 1,
   totalPages = 1,
   totalItems = 0,
   onPageChange,
   onItemsPerPageChange,
   onSearch,
+  onSort,
 }: DataTableProps<T>) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortColumn, setSortColumn] = useState<string | null>(null);
@@ -121,7 +125,7 @@ export const DataTable = <T extends BaseItem>({
 
   // Ordenar datos (solo para paginación del cliente)
   const sortedData = useMemo(() => {
-    if (serverSidePagination || !sortable || !sortColumn) return filteredData;
+    if ((serverSidePagination && serverSideSorting) || !sortable || !sortColumn) return filteredData;
 
     const column = columns.find((col) => col.key === sortColumn);
     if (!column) return filteredData;
@@ -140,7 +144,7 @@ export const DataTable = <T extends BaseItem>({
         return bString.localeCompare(aString);
       }
     });
-  }, [filteredData, sortColumn, sortDirection, sortable, columns, serverSidePagination]);
+  }, [filteredData, sortColumn, sortDirection, sortable, columns, serverSidePagination, serverSideSorting]);
 
   // Paginar datos (solo para paginación del cliente)
   const paginatedData = useMemo(() => {
@@ -158,11 +162,18 @@ export const DataTable = <T extends BaseItem>({
 
   // Manejar ordenamiento
   const handleSort = (columnKey: string) => {
-    if (sortColumn === columnKey) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-    } else {
+    if (serverSidePagination && serverSideSorting && onSort) {
+      const newDirection = sortColumn === columnKey && sortDirection === 'asc' ? 'desc' : 'asc';
       setSortColumn(columnKey);
-      setSortDirection('asc');
+      setSortDirection(newDirection);
+      onSort(columnKey, newDirection);
+    } else {
+      if (sortColumn === columnKey) {
+        setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+      } else {
+        setSortColumn(columnKey);
+        setSortDirection('asc');
+      }
     }
   };
 

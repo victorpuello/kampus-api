@@ -10,6 +10,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *     schema="AcudienteResource",
  *     title="Recurso de Acudiente",
  *     description="Representación de un acudiente en la API",
+ *
  *     @OA\Property(property="id", type="integer", description="ID del acudiente"),
  *     @OA\Property(property="nombre", type="string", description="Nombre del acudiente"),
  *     @OA\Property(property="telefono", type="string", nullable=true, description="Número de teléfono del acudiente"),

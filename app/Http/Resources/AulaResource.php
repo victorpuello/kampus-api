@@ -10,6 +10,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *     schema="AulaResource",
  *     title="Recurso de Aula",
  *     description="Representación de un aula en la API",
+ *
  *     @OA\Property(property="id", type="integer", description="ID del aula"),
  *     @OA\Property(property="nombre", type="string", description="Nombre del aula"),
  *     @OA\Property(property="capacidad", type="integer", description="Capacidad del aula"),

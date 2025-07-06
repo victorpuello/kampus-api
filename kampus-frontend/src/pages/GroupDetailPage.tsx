@@ -8,6 +8,7 @@ import { useAlertContext } from '../contexts/AlertContext';
 import { useConfirm } from '../hooks/useConfirm';
 import ConfirmDialog from '../components/ui/ConfirmDialog';
 import { MatriculaEstudianteModal } from '../components/grupos/MatriculaEstudianteModal';
+import TrasladarEstudianteModal from '../components/grupos/TrasladarEstudianteModal';
 
 interface Grupo {
   id: number;
@@ -44,11 +45,17 @@ const GroupDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showMatriculaModal, setShowMatriculaModal] = useState(false);
+  const [showTrasladarModal, setShowTrasladarModal] = useState(false);
+  const [estudianteSeleccionado, setEstudianteSeleccionado] = useState<{
+    id: number;
+    nombre: string;
+  } | null>(null);
 
     const fetchGrupo = async () => {
     try {
       const response = await axiosClient.get(`/grupos/${id}`);
       console.log('Datos del grupo recibidos:', response.data);
+      console.log('Estudiantes del grupo:', response.data.data?.estudiantes || response.data.estudiantes);
       setGrupo(response.data.data || response.data);
       setError(null);
     } catch (err: any) {
@@ -61,6 +68,15 @@ const GroupDetailPage = () => {
 
   const handleEstudianteMatriculado = () => {
     fetchGrupo(); // Recargar datos del grupo
+  };
+
+  const handleEstudianteTrasladado = () => {
+    fetchGrupo(); // Recargar datos del grupo
+  };
+
+  const handleTrasladarEstudiante = (estudianteId: number, estudianteNombre: string) => {
+    setEstudianteSeleccionado({ id: estudianteId, nombre: estudianteNombre });
+    setShowTrasladarModal(true);
   };
 
   useEffect(() => {
@@ -86,6 +102,31 @@ const GroupDetailPage = () => {
       navigate('/grupos');
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Error al eliminar el grupo';
+      showError(errorMessage, 'Error');
+      setError(errorMessage);
+    } finally {
+      setConfirmLoading(false);
+    }
+  };
+
+  const handleDesvincularEstudiante = async (estudianteId: number, estudianteNombre: string) => {
+    const confirmed = await confirm({
+      title: 'Desvincular Estudiante',
+      message: `¿Estás seguro de que deseas desvincular a "${estudianteNombre}" del grupo? Esta acción no se puede deshacer.`,
+      confirmText: 'Desvincular',
+      cancelText: 'Cancelar',
+      variant: 'danger'
+    });
+
+    if (!confirmed) return;
+
+    try {
+      setConfirmLoading(true);
+      await axiosClient.delete(`/grupos/${id}/estudiantes/${estudianteId}`);
+      showSuccess('Estudiante desvinculado exitosamente', 'Éxito');
+      fetchGrupo(); // Recargar datos del grupo
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || 'Error al desvincular el estudiante';
       showError(errorMessage, 'Error');
       setError(errorMessage);
     } finally {
@@ -301,13 +342,37 @@ const GroupDetailPage = () => {
                         </Badge>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => navigate(`/estudiantes/${estudiante.id}`)}
-                        >
-                          Ver
-                        </Button>
+                        <div className="flex justify-end space-x-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => navigate(`/estudiantes/${estudiante.id}`)}
+                          >
+                            Ver
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleTrasladarEstudiante(
+                              estudiante.id,
+                              `${estudiante.user?.nombre || estudiante.nombre || 'Sin nombre'} ${estudiante.user?.apellido || estudiante.apellido || 'Sin apellido'}`
+                            )}
+                            className="text-blue-600 hover:text-blue-800"
+                          >
+                            Trasladar
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDesvincularEstudiante(
+                              estudiante.id, 
+                              `${estudiante.user?.nombre || estudiante.nombre || 'Sin nombre'} ${estudiante.user?.apellido || estudiante.apellido || 'Sin apellido'}`
+                            )}
+                            className="text-red-600 hover:text-red-800"
+                          >
+                            Desvincular
+                          </Button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -392,6 +457,21 @@ const GroupDetailPage = () => {
         grupoId={Number(id)}
         onEstudianteMatriculado={handleEstudianteMatriculado}
       />
+
+      {/* Modal de Traslado */}
+      {estudianteSeleccionado && (
+        <TrasladarEstudianteModal
+          isOpen={showTrasladarModal}
+          onClose={() => {
+            setShowTrasladarModal(false);
+            setEstudianteSeleccionado(null);
+          }}
+          grupoOrigenId={Number(id)}
+          estudianteId={estudianteSeleccionado.id}
+          estudianteNombre={estudianteSeleccionado.nombre}
+          onEstudianteTrasladado={handleEstudianteTrasladado}
+        />
+      )}
 
       {/* ConfirmDialog */}
       <ConfirmDialog

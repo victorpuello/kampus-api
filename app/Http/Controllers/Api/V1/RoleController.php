@@ -7,9 +7,8 @@ use App\Http\Requests\StoreRoleRequest;
 use App\Http\Requests\UpdateRoleRequest;
 use App\Http\Resources\RoleResource;
 use App\Models\Role;
-use App\Models\Permission;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 /**
  * @OA\Tag(
@@ -25,11 +24,11 @@ class RoleController extends Controller
      */
     public function __construct()
     {
-        $this->middleware(\App\Http\Middleware\CheckPermission::class . ':ver_roles')->only(['index', 'show', 'getAllRoles', 'getRolePermissions']);
-        $this->middleware(\App\Http\Middleware\CheckPermission::class . ':asignar_permisos')->only(['assignRoles']);
-        $this->middleware(\App\Http\Middleware\CheckPermission::class . ':crear_roles')->only(['store']);
-        $this->middleware(\App\Http\Middleware\CheckPermission::class . ':editar_roles')->only(['update']);
-        $this->middleware(\App\Http\Middleware\CheckPermission::class . ':eliminar_roles')->only(['destroy']);
+        $this->middleware(\App\Http\Middleware\CheckPermission::class.':ver_roles')->only(['index', 'show', 'getAllRoles', 'getRolePermissions']);
+        $this->middleware(\App\Http\Middleware\CheckPermission::class.':asignar_permisos')->only(['assignRoles']);
+        $this->middleware(\App\Http\Middleware\CheckPermission::class.':crear_roles')->only(['store']);
+        $this->middleware(\App\Http\Middleware\CheckPermission::class.':editar_roles')->only(['update']);
+        $this->middleware(\App\Http\Middleware\CheckPermission::class.':eliminar_roles')->only(['destroy']);
     }
 
     /**
@@ -38,21 +37,27 @@ class RoleController extends Controller
      *     summary="Obtiene los roles de un usuario específico",
      *     tags={"Roles"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(
      *         name="user",
      *         in="path",
      *         description="ID del usuario",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Roles del usuario obtenidos exitosamente",
+     *
      *         @OA\JsonContent(
      *             type="array",
+     *
      *             @OA\Items(ref="#/components/schemas/RoleResource")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="No autenticado",
@@ -77,25 +82,32 @@ class RoleController extends Controller
      *     summary="Obtiene un rol específico de un usuario",
      *     tags={"Roles"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(
      *         name="user",
      *         in="path",
      *         description="ID del usuario",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="role",
      *         in="path",
      *         description="ID del rol",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Rol obtenido exitosamente",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/RoleResource")
      *     ),
+     *
      *     @OA\Response(
      *         response=404,
      *         description="Rol no encontrado",
@@ -116,28 +128,37 @@ class RoleController extends Controller
      *     summary="Asigna roles a un usuario",
      *     tags={"Roles"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(
      *         name="user",
      *         in="path",
      *         description="ID del usuario",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
      *             required={"role_ids"},
+     *
      *             @OA\Property(property="role_ids", type="array", @OA\Items(type="integer"), description="IDs de los roles a asignar")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Roles asignados exitosamente",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="Roles asignados exitosamente"),
      *             @OA\Property(property="roles", type="array", @OA\Items(ref="#/components/schemas/RoleResource"))
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=422,
      *         description="Error de validación",
@@ -149,7 +170,7 @@ class RoleController extends Controller
         // Permiso verificado por middleware
         $request->validate([
             'role_ids' => 'required|array',
-            'role_ids.*' => 'integer|exists:roles,id'
+            'role_ids.*' => 'integer|exists:roles,id',
         ]);
 
         $targetUser = \App\Models\User::findOrFail($userId);
@@ -157,7 +178,7 @@ class RoleController extends Controller
 
         return response()->json([
             'message' => 'Roles asignados exitosamente',
-            'roles' => RoleResource::collection($targetUser->roles()->with('permissions')->get())
+            'roles' => RoleResource::collection($targetUser->roles()->with('permissions')->get()),
         ]);
     }
 
@@ -167,11 +188,14 @@ class RoleController extends Controller
      *     summary="Obtiene todos los roles disponibles",
      *     tags={"Roles"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Roles obtenidos exitosamente",
+     *
      *         @OA\JsonContent(
      *             type="array",
+     *
      *             @OA\Items(ref="#/components/schemas/RoleResource")
      *         )
      *     )
@@ -191,21 +215,27 @@ class RoleController extends Controller
      *     summary="Obtiene los permisos de un rol específico",
      *     tags={"Roles"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(
      *         name="role",
      *         in="path",
      *         description="ID del rol",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Permisos del rol obtenidos exitosamente",
+     *
      *         @OA\JsonContent(
      *             type="array",
+     *
      *             @OA\Items(ref="#/components/schemas/PermissionResource")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=404,
      *         description="Rol no encontrado",
@@ -226,15 +256,20 @@ class RoleController extends Controller
      *     summary="Crea un nuevo rol",
      *     tags={"Roles"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(ref="#/components/schemas/StoreRoleRequest")
      *     ),
+     *
      *     @OA\Response(
      *         response=201,
      *         description="Rol creado exitosamente",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/RoleResource")
      *     ),
+     *
      *     @OA\Response(
      *         response=422,
      *         description="Error de validación",
@@ -245,7 +280,7 @@ class RoleController extends Controller
     {
         // Permiso verificado por middleware
         $data = $request->validated();
-        
+
         $role = Role::create($data);
 
         if ($request->has('permission_ids')) {
@@ -261,22 +296,29 @@ class RoleController extends Controller
      *     summary="Actualiza un rol existente",
      *     tags={"Roles"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(
      *         name="role",
      *         in="path",
      *         description="ID del rol a actualizar",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(ref="#/components/schemas/UpdateRoleRequest")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Rol actualizado exitosamente",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/RoleResource")
      *     ),
+     *
      *     @OA\Response(
      *         response=404,
      *         description="Rol no encontrado",
@@ -291,7 +333,7 @@ class RoleController extends Controller
     {
         // Permiso verificado por middleware
         $data = $request->validated();
-        
+
         $role->update($data);
 
         if ($request->has('permission_ids')) {
@@ -307,20 +349,26 @@ class RoleController extends Controller
      *     summary="Elimina un rol",
      *     tags={"Roles"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(
      *         name="role",
      *         in="path",
      *         description="ID del rol a eliminar",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Rol eliminado exitosamente",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="Rol eliminado exitosamente")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=404,
      *         description="Rol no encontrado",
@@ -334,4 +382,4 @@ class RoleController extends Controller
 
         return response()->json(['message' => 'Rol eliminado exitosamente']);
     }
-} 
+}

@@ -2,9 +2,9 @@
 
 namespace Tests\Unit;
 
+use App\Models\Acudiente;
 use App\Models\Estudiante;
 use App\Models\User;
-use App\Models\Acudiente;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -64,4 +64,4 @@ class EstudianteTest extends TestCase
 
         $this->assertSoftDeleted($estudiante);
     }
-} 
+}

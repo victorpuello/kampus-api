@@ -12,6 +12,14 @@ return new class extends Migration
             $table->unsignedBigInteger('id')->autoIncrement();
             $table->string('nombre', 255);
             $table->string('siglas', 50)->nullable();
+            $table->string('slogan')->nullable();
+            $table->string('dane')->nullable();
+            $table->string('resolucion_aprobacion')->nullable();
+            $table->text('direccion')->nullable();
+            $table->string('telefono')->nullable();
+            $table->string('email')->nullable();
+            $table->string('rector')->nullable();
+            $table->string('escudo')->nullable(); // Ruta de la imagen
             $table->softDeletes();
             $table->timestamps();
         });
@@ -21,4 +29,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('instituciones');
     }
-}; 
+};

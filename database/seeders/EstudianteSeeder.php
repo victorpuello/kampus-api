@@ -105,4 +105,4 @@ class EstudianteSeeder extends Seeder
             ]);
         }
     }
-} 
+}

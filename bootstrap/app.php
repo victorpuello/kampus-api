@@ -14,7 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->api([
             \Illuminate\Http\Middleware\HandleCors::class,
         ]);
-        
+
         // Middleware de desarrollo para autenticación automática
         $env = $_ENV['APP_ENV'] ?? 'production';
         if (in_array($env, ['local', 'development'])) {

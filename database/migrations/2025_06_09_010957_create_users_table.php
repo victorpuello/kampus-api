@@ -15,15 +15,17 @@ return new class extends Migration
             $table->string('username', 255)->unique();
             $table->string('email', 255)->unique();
             $table->string('password', 255);
+            $table->string('tipo_documento', 10)->nullable();
+            $table->string('numero_documento', 20)->nullable();
             $table->unsignedBigInteger('institucion_id');
             $table->string('estado', 50)->default('activo');
             $table->softDeletes();
             $table->timestamps();
 
             $table->foreign('institucion_id')
-                  ->references('id')
-                  ->on('instituciones')
-                  ->onDelete('restrict');
+                ->references('id')
+                ->on('instituciones')
+                ->onDelete('restrict');
         });
     }
 
@@ -31,4 +33,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('users');
     }
-}; 
+};

@@ -24,10 +24,10 @@ trait HasFileUploads
      */
     public function initializeHasFileUploads()
     {
-        if (!is_array($this->fileFields)) {
+        if (! is_array($this->fileFields)) {
             $this->fileFields = [];
         }
-        if (!is_array($this->filePaths)) {
+        if (! is_array($this->filePaths)) {
             $this->filePaths = [];
         }
     }
@@ -37,7 +37,7 @@ trait HasFileUploads
      */
     public function uploadFile(UploadedFile $file, string $field, array $options = []): bool
     {
-        if (!in_array($field, $this->fileFields)) {
+        if (! in_array($field, $this->fileFields)) {
             throw new \InvalidArgumentException("El campo '{$field}' no está configurado para archivos");
         }
 
@@ -58,7 +58,8 @@ trait HasFileUploads
 
             return true;
         } catch (\Exception $e) {
-            \Log::error("Error uploading file for field {$field}: " . $e->getMessage());
+            \Log::error("Error uploading file for field {$field}: ".$e->getMessage());
+
             return false;
         }
     }
@@ -68,12 +69,13 @@ trait HasFileUploads
      */
     public function deleteFile(string $field): bool
     {
-        if (!in_array($field, $this->fileFields)) {
+        if (! in_array($field, $this->fileFields)) {
             return false;
         }
 
         if ($this->$field && Storage::disk('public')->exists($this->$field)) {
             $fileService = app(FileUploadService::class);
+
             return $fileService->deleteFile($this->$field);
         }
 
@@ -86,28 +88,32 @@ trait HasFileUploads
     public function getFileUrl(string $field): ?string
     {
         // Si no hay valor en el campo, retornar imagen por defecto para escudos
-        if (!$this->$field) {
+        if (! $this->$field) {
             if ($field === 'escudo') {
                 return asset('storage/instituciones/escudos/default.png');
             }
+
             return null;
         }
 
         // Si los campos no están configurados, usar el servicio directamente
-        if (empty($this->fileFields) || !in_array($field, $this->fileFields)) {
+        if (empty($this->fileFields) || ! in_array($field, $this->fileFields)) {
             $fileService = app(FileUploadService::class);
+
             return $fileService->getFileUrl($this->$field);
         }
 
         // Verificar si el archivo existe, si no, retornar imagen por defecto para escudos
-        if (!Storage::disk('public')->exists($this->$field)) {
+        if (! Storage::disk('public')->exists($this->$field)) {
             if ($field === 'escudo') {
                 return asset('storage/instituciones/escudos/default.png');
             }
+
             return null;
         }
 
         $fileService = app(FileUploadService::class);
+
         return $fileService->getFileUrl($this->$field);
     }
 
@@ -116,11 +122,12 @@ trait HasFileUploads
      */
     public function getFileInfo(string $field): ?array
     {
-        if (!in_array($field, $this->fileFields) || !$this->$field) {
+        if (! in_array($field, $this->fileFields) || ! $this->$field) {
             return null;
         }
 
         $fileService = app(FileUploadService::class);
+
         return $fileService->getFileInfo($this->$field);
     }
 
@@ -144,7 +151,7 @@ trait HasFileUploads
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
             'application/vnd.ms-excel',
             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            'text/plain'
+            'text/plain',
         ])) {
             return $fileService->uploadDocument($file, $path);
         }
@@ -164,7 +171,8 @@ trait HasFileUploads
 
         // Ruta por defecto basada en el nombre del modelo
         $modelName = strtolower(class_basename($this));
-        return $modelName . '/' . $field;
+
+        return $modelName.'/'.$field;
     }
 
     /**
@@ -190,7 +198,7 @@ trait HasFileUploads
         $this->fileFields = $fields;
         \Log::info('setFileFields llamado', [
             'fields' => $fields,
-            'result' => $this->fileFields
+            'result' => $this->fileFields,
         ]);
     }
 
@@ -202,7 +210,7 @@ trait HasFileUploads
         $this->filePaths = $paths;
         \Log::info('setFilePaths llamado', [
             'paths' => $paths,
-            'result' => $this->filePaths
+            'result' => $this->filePaths,
         ]);
     }
 
@@ -211,7 +219,7 @@ trait HasFileUploads
      */
     public function hasFile(string $field): bool
     {
-        return in_array($field, $this->fileFields) && !empty($this->$field);
+        return in_array($field, $this->fileFields) && ! empty($this->$field);
     }
 
     /**
@@ -220,8 +228,8 @@ trait HasFileUploads
     public function getFileSize(string $field): ?string
     {
         $fileInfo = $this->getFileInfo($field);
-        
-        if (!$fileInfo) {
+
+        if (! $fileInfo) {
             return null;
         }
 
@@ -232,7 +240,7 @@ trait HasFileUploads
             $bytes /= 1024;
         }
 
-        return round($bytes, 2) . ' ' . $units[$i];
+        return round($bytes, 2).' '.$units[$i];
     }
 
     /**
@@ -240,7 +248,7 @@ trait HasFileUploads
      */
     public function getFileExtension(string $field): ?string
     {
-        if (!$this->hasFile($field)) {
+        if (! $this->hasFile($field)) {
             return null;
         }
 
@@ -253,6 +261,7 @@ trait HasFileUploads
     public function isImage(string $field): bool
     {
         $extension = $this->getFileExtension($field);
+
         return in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif', 'webp']);
     }
 
@@ -262,6 +271,7 @@ trait HasFileUploads
     public function isDocument(string $field): bool
     {
         $extension = $this->getFileExtension($field);
+
         return in_array(strtolower($extension), ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'txt']);
     }
-} 
+}

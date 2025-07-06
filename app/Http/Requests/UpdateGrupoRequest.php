@@ -8,6 +8,7 @@ use Illuminate\Foundation\Http\FormRequest;
  * @OA\Schema(
  *     schema="UpdateGrupoRequest",
  *     title="Solicitud para Actualizar Grupo",
+ *
  *     @OA\Property(property="nombre", type="string", maxLength=255, description="Nombre del grupo (ej. 11A, 5B)"),
  *     @OA\Property(property="sede_id", type="integer", description="ID de la sede a la que pertenece el grupo"),
  *     @OA\Property(property="anio_id", type="integer", description="ID del año académico al que pertenece el grupo"),

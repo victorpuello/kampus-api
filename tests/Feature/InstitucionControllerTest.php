@@ -29,7 +29,7 @@ class InstitucionControllerTest extends TestCase
         $response = $this->actingAs($this->user, 'sanctum')->getJson('/api/v1/instituciones');
 
         $response->assertStatus(200)
-                 ->assertJsonCount(3, 'data');
+            ->assertJsonCount(3, 'data');
     }
 
     public function test_can_create_institucion()
@@ -49,7 +49,7 @@ class InstitucionControllerTest extends TestCase
         $response = $this->actingAs($this->user, 'sanctum')->postJson('/api/v1/instituciones', $institucionData);
 
         $response->assertStatus(201)
-                 ->assertJsonFragment(['nombre' => 'Nueva Institucion']);
+            ->assertJsonFragment(['nombre' => 'Nueva Institucion']);
 
         $this->assertDatabaseHas('instituciones', ['nombre' => 'Nueva Institucion']);
     }
@@ -58,10 +58,10 @@ class InstitucionControllerTest extends TestCase
     {
         $institucion = Institucion::factory()->create();
 
-        $response = $this->actingAs($this->user, 'sanctum')->getJson('/api/v1/instituciones/' . $institucion->id);
+        $response = $this->actingAs($this->user, 'sanctum')->getJson('/api/v1/instituciones/'.$institucion->id);
 
         $response->assertStatus(200)
-                 ->assertJsonFragment(['nombre' => $institucion->nombre]);
+            ->assertJsonFragment(['nombre' => $institucion->nombre]);
     }
 
     public function test_can_update_institucion()
@@ -73,10 +73,10 @@ class InstitucionControllerTest extends TestCase
             'slogan' => 'Nuevo slogan',
         ];
 
-        $response = $this->actingAs($this->user, 'sanctum')->putJson('/api/v1/instituciones/' . $institucion->id, $updatedData);
+        $response = $this->actingAs($this->user, 'sanctum')->putJson('/api/v1/instituciones/'.$institucion->id, $updatedData);
 
         $response->assertStatus(200)
-                 ->assertJsonFragment(['nombre' => 'Institucion Actualizada']);
+            ->assertJsonFragment(['nombre' => 'Institucion Actualizada']);
 
         $this->assertDatabaseHas('instituciones', ['id' => $institucion->id, 'nombre' => 'Institucion Actualizada']);
     }
@@ -85,7 +85,7 @@ class InstitucionControllerTest extends TestCase
     {
         $institucion = Institucion::factory()->create();
 
-        $response = $this->actingAs($this->user, 'sanctum')->deleteJson('/api/v1/instituciones/' . $institucion->id);
+        $response = $this->actingAs($this->user, 'sanctum')->deleteJson('/api/v1/instituciones/'.$institucion->id);
 
         $response->assertStatus(204);
 
@@ -95,21 +95,21 @@ class InstitucionControllerTest extends TestCase
     public function test_can_upload_escudo()
     {
         $institucion = Institucion::factory()->create();
-        
+
         $file = UploadedFile::fake()->image('escudo.jpg', 300, 300); // Dimensiones válidas
-        
+
         $response = $this->actingAs($this->user, 'sanctum')->putJson("/api/v1/instituciones/{$institucion->id}", [
             'nombre' => $institucion->nombre,
             'siglas' => $institucion->siglas,
-            'escudo' => $file
+            'escudo' => $file,
         ]);
 
         $response->assertStatus(200)
-                 ->assertJsonStructure([
-                     'data' => [
-                         'id', 'nombre', 'siglas', 'escudo'
-                     ]
-                 ]);
+            ->assertJsonStructure([
+                'data' => [
+                    'id', 'nombre', 'siglas', 'escudo',
+                ],
+            ]);
 
         $institucion->refresh();
         $this->assertNotNull($institucion->escudo);
@@ -120,12 +120,12 @@ class InstitucionControllerTest extends TestCase
     public function test_uses_default_escudo_when_no_escudo_provided()
     {
         $institucion = Institucion::factory()->create([
-            'escudo' => null
+            'escudo' => null,
         ]);
 
         // Verificar que se asigna la imagen por defecto
         $this->assertEquals('instituciones/escudos/default.png', $institucion->escudo);
-        
+
         // Verificar que la URL apunta a la imagen por defecto
         $this->assertEquals(
             asset('storage/instituciones/escudos/default.png'),
@@ -136,12 +136,12 @@ class InstitucionControllerTest extends TestCase
     public function test_uses_default_escudo_when_escudo_file_missing()
     {
         $institucion = Institucion::factory()->create([
-            'escudo' => 'instituciones/escudos/nonexistent.png'
+            'escudo' => 'instituciones/escudos/nonexistent.png',
         ]);
 
         // Verificar que se asigna la imagen por defecto cuando el archivo no existe
         $this->assertEquals('instituciones/escudos/default.png', $institucion->escudo);
-        
+
         // Verificar que la URL apunta a la imagen por defecto
         $this->assertEquals(
             asset('storage/instituciones/escudos/default.png'),
@@ -155,7 +155,7 @@ class InstitucionControllerTest extends TestCase
             ->postJson('/api/v1/instituciones', []);
 
         $response->assertStatus(422)
-                 ->assertJsonValidationErrors(['nombre']);
+            ->assertJsonValidationErrors(['nombre']);
     }
 
     public function test_validates_email_format()
@@ -163,11 +163,11 @@ class InstitucionControllerTest extends TestCase
         $response = $this->actingAs($this->user, 'sanctum')
             ->postJson('/api/v1/instituciones', [
                 'nombre' => 'Test Institution',
-                'email' => 'invalid-email'
+                'email' => 'invalid-email',
             ]);
 
         $response->assertStatus(422)
-                 ->assertJsonValidationErrors(['email']);
+            ->assertJsonValidationErrors(['email']);
     }
 
     public function test_returns_404_for_nonexistent_institucion()
@@ -184,22 +184,22 @@ class InstitucionControllerTest extends TestCase
         $institucion->sedes()->create([
             'nombre' => 'Sede Principal',
             'direccion' => 'Calle 123',
-            'telefono' => '1234567'
+            'telefono' => '1234567',
         ]);
 
         $response = $this->actingAs($this->user, 'sanctum')
-            ->getJson('/api/v1/instituciones/' . $institucion->id . '?include=sedes');
+            ->getJson('/api/v1/instituciones/'.$institucion->id.'?include=sedes');
 
         $response->assertStatus(200)
-                 ->assertJsonStructure([
-                     'data' => [
-                         'id',
-                         'nombre',
-                         'sedes' => [
-                             '*' => ['id', 'nombre', 'direccion']
-                         ]
-                     ]
-                 ]);
+            ->assertJsonStructure([
+                'data' => [
+                    'id',
+                    'nombre',
+                    'sedes' => [
+                        '*' => ['id', 'nombre', 'direccion'],
+                    ],
+                ],
+            ]);
     }
 
     public function test_unauthorized_user_cannot_access_instituciones()
@@ -217,14 +217,14 @@ class InstitucionControllerTest extends TestCase
             ->getJson('/api/v1/instituciones?page=1&per_page=10');
 
         $response->assertStatus(200)
-                 ->assertJsonStructure([
-                     'data',
-                     'links',
-                     'meta' => [
-                         'current_page',
-                         'per_page',
-                         'total'
-                     ]
-                 ]);
+            ->assertJsonStructure([
+                'data',
+                'links',
+                'meta' => [
+                    'current_page',
+                    'per_page',
+                    'total',
+                ],
+            ]);
     }
 }

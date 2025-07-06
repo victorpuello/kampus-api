@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read \App\Models\Institucion $institucion
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Competencia> $competencias
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Asignatura> $asignaturas
+ *
  * @method static \Database\Factories\AreaFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|Area newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Area newQuery()
@@ -27,11 +28,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|Area query()
  * @method static \Illuminate\Database\Eloquent\Builder|Area withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Area withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class Area extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
+    use SoftDeletes;
 
     /**
      * La tabla asociada con el modelo.
@@ -47,6 +50,8 @@ class Area extends Model
      */
     protected $fillable = [
         'nombre',
+        'descripcion',
+        'color',
         'institucion_id',
     ];
 

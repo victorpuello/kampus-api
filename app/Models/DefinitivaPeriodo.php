@@ -30,4 +30,4 @@ class DefinitivaPeriodo extends Model
     {
         return $this->belongsTo(Periodo::class);
     }
-} 
+}

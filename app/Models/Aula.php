@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Institucion $institucion
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Horario> $horarios
+ *
  * @method static \Database\Factories\AulaFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|Aula newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Aula newQuery()
@@ -27,11 +28,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|Aula query()
  * @method static \Illuminate\Database\Eloquent\Builder|Aula withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Aula withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class Aula extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
+    use SoftDeletes;
 
     /**
      * La tabla asociada con el modelo.
@@ -47,6 +50,7 @@ class Aula extends Model
      */
     protected $fillable = [
         'nombre',
+        'tipo',
         'capacidad',
         'institucion_id',
     ];

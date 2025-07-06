@@ -11,18 +11,18 @@ return new class extends Migration
         Schema::create('role_has_permissions', function (Blueprint $table) {
             $table->unsignedInteger('role_id');
             $table->unsignedInteger('permission_id');
-            
+
             $table->primary(['role_id', 'permission_id']);
-            
+
             $table->foreign('role_id')
-                  ->references('id')
-                  ->on('roles')
-                  ->onDelete('cascade');
-                  
+                ->references('id')
+                ->on('roles')
+                ->onDelete('cascade');
+
             $table->foreign('permission_id')
-                  ->references('id')
-                  ->on('permissions')
-                  ->onDelete('cascade');
+                ->references('id')
+                ->on('permissions')
+                ->onDelete('cascade');
         });
     }
 
@@ -30,4 +30,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('role_has_permissions');
     }
-}; 
+};

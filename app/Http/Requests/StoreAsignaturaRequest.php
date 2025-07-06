@@ -9,6 +9,7 @@ use Illuminate\Foundation\Http\FormRequest;
  *     schema="StoreAsignaturaRequest",
  *     title="Solicitud para Crear Asignatura",
  *     required={"nombre", "porcentaje_area", "area_id"},
+ *
  *     @OA\Property(property="nombre", type="string", maxLength=255, description="Nombre de la asignatura"),
  *     @OA\Property(property="porcentaje_area", type="number", format="float", minimum=0, maximum=100, description="Porcentaje que representa la asignatura dentro del área"),
  *     @OA\Property(property="area_id", type="integer", description="ID del área a la que pertenece la asignatura"),

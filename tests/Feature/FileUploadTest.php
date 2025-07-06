@@ -29,13 +29,13 @@ class FileUploadTest extends TestCase
         $file = UploadedFile::fake()->image('escudo.jpg', 300, 300);
 
         $response = $this->actingAs($this->user, 'sanctum')
-            ->putJson('/api/v1/instituciones/' . $institucion->id, [
-                'escudo' => $file
+            ->putJson('/api/v1/instituciones/'.$institucion->id, [
+                'escudo' => $file,
             ]);
 
         if ($response->status() !== 200) {
-            dump('Response Status: ' . $response->status());
-            dump('Response Content: ' . $response->getContent());
+            dump('Response Status: '.$response->status());
+            dump('Response Content: '.$response->getContent());
         }
 
         $response->assertStatus(200);
@@ -55,12 +55,12 @@ class FileUploadTest extends TestCase
         $file = UploadedFile::fake()->create('document.pdf', 100);
 
         $response = $this->actingAs($this->user, 'sanctum')
-            ->putJson('/api/v1/instituciones/' . $institucion->id, [
-                'escudo' => $file
+            ->putJson('/api/v1/instituciones/'.$institucion->id, [
+                'escudo' => $file,
             ]);
 
         $response->assertStatus(422)
-                 ->assertJsonValidationErrors(['escudo']);
+            ->assertJsonValidationErrors(['escudo']);
     }
 
     public function test_validates_image_size()
@@ -72,12 +72,12 @@ class FileUploadTest extends TestCase
         $file = UploadedFile::fake()->image('large.jpg', 200, 200)->size(6000); // 6MB
 
         $response = $this->actingAs($this->user, 'sanctum')
-            ->putJson('/api/v1/instituciones/' . $institucion->id, [
-                'escudo' => $file
+            ->putJson('/api/v1/instituciones/'.$institucion->id, [
+                'escudo' => $file,
             ]);
 
         $response->assertStatus(422)
-                 ->assertJsonValidationErrors(['escudo']);
+            ->assertJsonValidationErrors(['escudo']);
     }
 
     public function test_can_replace_existing_escudo()
@@ -88,8 +88,8 @@ class FileUploadTest extends TestCase
         // Subir primer archivo
         $file1 = UploadedFile::fake()->image('escudo1.jpg', 200, 200);
         $response1 = $this->actingAs($this->user, 'sanctum')
-            ->putJson('/api/v1/instituciones/' . $institucion->id, [
-                'escudo' => $file1
+            ->putJson('/api/v1/instituciones/'.$institucion->id, [
+                'escudo' => $file1,
             ]);
 
         $response1->assertStatus(200);
@@ -97,8 +97,8 @@ class FileUploadTest extends TestCase
         // Subir segundo archivo (reemplazar)
         $file2 = UploadedFile::fake()->image('escudo2.jpg', 200, 200);
         $response2 = $this->actingAs($this->user, 'sanctum')
-            ->putJson('/api/v1/instituciones/' . $institucion->id, [
-                'escudo' => $file2
+            ->putJson('/api/v1/instituciones/'.$institucion->id, [
+                'escudo' => $file2,
             ]);
 
         $response2->assertStatus(200);
@@ -121,8 +121,8 @@ class FileUploadTest extends TestCase
             $file = UploadedFile::fake()->image("escudo.{$format}", 200, 200);
 
             $response = $this->actingAs($this->user, 'sanctum')
-                ->putJson('/api/v1/instituciones/' . $institucion->id, [
-                    'escudo' => $file
+                ->putJson('/api/v1/instituciones/'.$institucion->id, [
+                    'escudo' => $file,
                 ]);
 
             $response->assertStatus(200);
@@ -138,27 +138,27 @@ class FileUploadTest extends TestCase
         $institucion = Institucion::factory()->create();
 
         $file = UploadedFile::fake()->image('escudo.jpg', 200, 200);
-        
+
         $response = $this->actingAs($this->user, 'sanctum')
-            ->putJson('/api/v1/instituciones/' . $institucion->id, [
-                'escudo' => $file
+            ->putJson('/api/v1/instituciones/'.$institucion->id, [
+                'escudo' => $file,
             ]);
 
         $response->assertStatus(200);
 
         // Obtener la institución actualizada
         $response = $this->actingAs($this->user, 'sanctum')
-            ->getJson('/api/v1/instituciones/' . $institucion->id);
+            ->getJson('/api/v1/instituciones/'.$institucion->id);
 
         $response->assertStatus(200)
-                 ->assertJsonStructure([
-                     'data' => [
-                         'id',
-                         'nombre',
-                         'escudo',
-                         'escudo_url'
-                     ]
-                 ]);
+            ->assertJsonStructure([
+                'data' => [
+                    'id',
+                    'nombre',
+                    'escudo',
+                    'escudo_url',
+                ],
+            ]);
         $data = $response->json('data');
         $this->assertNotNull($data['escudo_url']);
         $this->assertIsString($data['escudo_url']);
@@ -169,8 +169,8 @@ class FileUploadTest extends TestCase
         $institucion = Institucion::factory()->create();
 
         $response = $this->actingAs($this->user, 'sanctum')
-            ->putJson('/api/v1/instituciones/' . $institucion->id, [
-                'nombre' => 'Institución Actualizada'
+            ->putJson('/api/v1/instituciones/'.$institucion->id, [
+                'nombre' => 'Institución Actualizada',
             ]);
 
         $response->assertStatus(200);
@@ -185,8 +185,8 @@ class FileUploadTest extends TestCase
         $file = UploadedFile::fake()->image('small.jpg', 50, 50);
 
         $response = $this->actingAs($this->user, 'sanctum')
-            ->putJson('/api/v1/instituciones/' . $institucion->id, [
-                'escudo' => $file
+            ->putJson('/api/v1/instituciones/'.$institucion->id, [
+                'escudo' => $file,
             ]);
 
         // Dependiendo de las reglas de validación, esto podría fallar
@@ -197,4 +197,4 @@ class FileUploadTest extends TestCase
             $response->assertStatus(200);
         }
     }
-} 
+}

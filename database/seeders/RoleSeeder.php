@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\Role;
 use App\Models\Permission;
+use App\Models\Role;
 use Illuminate\Database\Seeder;
 
 class RoleSeeder extends Seeder
@@ -40,4 +40,4 @@ class RoleSeeder extends Seeder
             $adminRole->permissions()->sync($allPermissions->pluck('id')->toArray());
         }
     }
-} 
+}

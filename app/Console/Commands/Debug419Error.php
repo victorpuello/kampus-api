@@ -7,6 +7,7 @@ use Illuminate\Console\Command;
 class Debug419Error extends Command
 {
     protected $signature = 'debug:419-error';
+
     protected $description = 'Depurar completamente el error 419 CSRF token mismatch';
 
     public function handle()
@@ -15,19 +16,19 @@ class Debug419Error extends Command
 
         // 1. Verificar configuración de sesión
         $this->info('1. CONFIGURACIÓN DE SESIÓN:');
-        $this->line('SESSION_DRIVER: ' . config('session.driver'));
-        $this->line('SESSION_DOMAIN: ' . config('session.domain'));
-        $this->line('SESSION_SECURE_COOKIE: ' . (config('session.secure') ? 'true' : 'false'));
-        $this->line('SESSION_SAMESITE: ' . config('session.same_site'));
-        $this->line('APP_URL: ' . config('app.url'));
-        $this->line('SANCTUM_STATEFUL_DOMAINS: ' . config('sanctum.stateful'));
+        $this->line('SESSION_DRIVER: '.config('session.driver'));
+        $this->line('SESSION_DOMAIN: '.config('session.domain'));
+        $this->line('SESSION_SECURE_COOKIE: '.(config('session.secure') ? 'true' : 'false'));
+        $this->line('SESSION_SAMESITE: '.config('session.same_site'));
+        $this->line('APP_URL: '.config('app.url'));
+        $this->line('SANCTUM_STATEFUL_DOMAINS: '.config('sanctum.stateful'));
 
         // 2. Verificar configuración de CORS
         $this->info('\n2. CONFIGURACIÓN DE CORS:');
         $corsConfig = config('cors');
-        $this->line('Paths: ' . implode(', ', $corsConfig['paths']));
-        $this->line('Allowed origins: ' . implode(', ', $corsConfig['allowed_origins']));
-        $this->line('Supports credentials: ' . ($corsConfig['supports_credentials'] ? 'true' : 'false'));
+        $this->line('Paths: '.implode(', ', $corsConfig['paths']));
+        $this->line('Allowed origins: '.implode(', ', $corsConfig['allowed_origins']));
+        $this->line('Supports credentials: '.($corsConfig['supports_credentials'] ? 'true' : 'false'));
 
         // 3. Probar obtención de CSRF token
         $this->info('\n3. PRUEBA DE OBTENCIÓN DE CSRF TOKEN:');
@@ -35,7 +36,7 @@ class Debug419Error extends Command
         $cookieFile = 'debug_419_cookies.txt';
 
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $baseUrl . '/sanctum/csrf-cookie');
+        curl_setopt($ch, CURLOPT_URL, $baseUrl.'/sanctum/csrf-cookie');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_HEADER, true);
         curl_setopt($ch, CURLOPT_COOKIEJAR, $cookieFile);
@@ -53,7 +54,7 @@ class Debug419Error extends Command
         if (file_exists($cookieFile)) {
             $cookies = file_get_contents($cookieFile);
             $this->line('Archivo de cookies creado correctamente');
-            
+
             // Extraer token CSRF
             $xsrfToken = null;
             $lines = explode("\n", $cookies);
@@ -62,13 +63,14 @@ class Debug419Error extends Command
                     $parts = explode("\t", $line);
                     if (count($parts) >= 7) {
                         $xsrfToken = urldecode(trim($parts[6]));
-                        $this->info('✅ Token CSRF extraído: ' . substr($xsrfToken, 0, 50) . '...');
+                        $this->info('✅ Token CSRF extraído: '.substr($xsrfToken, 0, 50).'...');
+
                         break;
                     }
                 }
             }
-            
-            if (!$xsrfToken) {
+
+            if (! $xsrfToken) {
                 $this->error('❌ No se pudo extraer el token CSRF');
             }
         } else {
@@ -78,22 +80,22 @@ class Debug419Error extends Command
         // 5. Probar login con middleware web (actual)
         $this->info('\n5. PRUEBA DE LOGIN CON MIDDLEWARE WEB (ACTUAL):');
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $baseUrl . '/api/v1/login');
+        curl_setopt($ch, CURLOPT_URL, $baseUrl.'/api/v1/login');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
             'email' => 'admin@example.com',
-            'password' => '123456'
+            'password' => '123456',
         ]));
 
         $headers = [
             'Content-Type: application/json',
             'Accept: application/json',
-            'X-Requested-With: XMLHttpRequest'
+            'X-Requested-With: XMLHttpRequest',
         ];
 
         if (isset($xsrfToken)) {
-            $headers[] = 'X-XSRF-TOKEN: ' . $xsrfToken;
+            $headers[] = 'X-XSRF-TOKEN: '.$xsrfToken;
             $this->info('✅ Header X-XSRF-TOKEN agregado');
         }
 
@@ -120,10 +122,10 @@ class Debug419Error extends Command
 
         // 7. Verificar configuración de sesión en Laravel
         $this->info('\n7. CONFIGURACIÓN DE SESIÓN EN LARAVEL:');
-        $this->line('Session driver: ' . config('session.driver'));
-        $this->line('Session domain: ' . config('session.domain'));
-        $this->line('Session secure: ' . (config('session.secure') ? 'true' : 'false'));
-        $this->line('Session same_site: ' . config('session.same_site'));
+        $this->line('Session driver: '.config('session.driver'));
+        $this->line('Session domain: '.config('session.domain'));
+        $this->line('Session secure: '.(config('session.secure') ? 'true' : 'false'));
+        $this->line('Session same_site: '.config('session.same_site'));
 
         // 8. Solución
         $this->info('\n=== SOLUCIÓN ===');
@@ -136,4 +138,4 @@ class Debug419Error extends Command
 
         return 0;
     }
-} 
+}

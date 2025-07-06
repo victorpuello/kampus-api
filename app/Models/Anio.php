@@ -27,6 +27,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Horario> $horarios
  * @property-read \App\Models\CriterioPromocion|null $criteriosPromocion
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\DefinitivaFinal> $definitivasFinales
+ *
  * @method static \Database\Factories\AnioFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|Anio newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Anio newQuery()
@@ -34,11 +35,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|Anio query()
  * @method static \Illuminate\Database\Eloquent\Builder|Anio withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Anio withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class Anio extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
+    use SoftDeletes;
 
     /**
      * La tabla asociada con el modelo.

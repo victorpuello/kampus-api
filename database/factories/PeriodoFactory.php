@@ -11,6 +11,7 @@ class PeriodoFactory extends Factory
     {
         $start = $this->faker->dateTimeBetween('-1 year', '+1 year');
         $end = (clone $start)->modify('+2 months');
+
         return [
             'nombre' => $this->faker->word(),
             'anio_id' => Anio::factory(),
@@ -18,4 +19,4 @@ class PeriodoFactory extends Factory
             'fecha_fin' => $end->format('Y-m-d'),
         ];
     }
-} 
+}

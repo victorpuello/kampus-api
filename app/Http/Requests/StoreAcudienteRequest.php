@@ -9,6 +9,7 @@ use Illuminate\Foundation\Http\FormRequest;
  *     schema="StoreAcudienteRequest",
  *     title="Solicitud para Crear Acudiente",
  *     required={"nombre"},
+ *
  *     @OA\Property(property="nombre", type="string", maxLength=255, description="Nombre completo del acudiente"),
  *     @OA\Property(property="telefono", type="string", maxLength=50, nullable=true, description="Número de teléfono del acudiente"),
  *     @OA\Property(property="email", type="string", format="email", maxLength=255, nullable=true, description="Correo electrónico único del acudiente"),

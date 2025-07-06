@@ -12,6 +12,7 @@ use Illuminate\Foundation\Http\FormRequest;
  *         "nombre", "apellido", "email", "username", "password",
  *         "codigo_estudiantil", "institucion_id", "estado"
  *     },
+ *
  *     @OA\Property(property="nombre", type="string", maxLength=255, description="Nombre del estudiante"),
  *     @OA\Property(property="apellido", type="string", maxLength=255, description="Apellido del estudiante"),
  *     @OA\Property(property="tipo_documento", type="string", enum={"CC", "TI", "CE"}, description="Tipo de documento del estudiante"),

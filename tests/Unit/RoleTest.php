@@ -2,10 +2,10 @@
 
 namespace Tests\Unit;
 
-use App\Models\Role;
-use App\Models\Permission;
-use App\Models\User;
 use App\Models\Institucion;
+use App\Models\Permission;
+use App\Models\Role;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -18,20 +18,22 @@ use Tests\TestCase;
  */
 class RoleTest extends TestCase
 {
-    use RefreshDatabase, WithFaker;
+    use RefreshDatabase;
+    use WithFaker;
 
     protected $role;
+
     protected $institution;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->institution = Institucion::factory()->create();
-        
+
         $this->role = Role::factory()->create([
             'nombre' => 'Docente',
-            'descripcion' => 'Rol de docente del sistema'
+            'descripcion' => 'Rol de docente del sistema',
         ]);
     }
 
@@ -42,7 +44,9 @@ class RoleTest extends TestCase
      */
     public function test_role_can_be_created()
     {
-        $role = Role::factory()->create();
+        $role = Role::factory()->create([
+            'nombre' => 'TestRole_'.uniqid(),
+        ]);
 
         $this->assertDatabaseHas('roles', [
             'id' => $role->id,
@@ -55,9 +59,9 @@ class RoleTest extends TestCase
     public function test_role_requires_unique_name()
     {
         $role1 = Role::factory()->create(['nombre' => 'TestRole']);
-        
+
         $this->expectException(\Illuminate\Database\QueryException::class);
-        
+
         Role::factory()->create(['nombre' => 'TestRole']);
     }
 
@@ -68,12 +72,12 @@ class RoleTest extends TestCase
     {
         $role = Role::factory()->create([
             'nombre' => 'TestRole',
-            'descripcion' => null
+            'descripcion' => null,
         ]);
 
         $this->assertDatabaseHas('roles', [
             'id' => $role->id,
-            'descripcion' => null
+            'descripcion' => null,
         ]);
     }
 
@@ -84,7 +88,7 @@ class RoleTest extends TestCase
     {
         $role = Role::factory()->create([
             'nombre' => 'TestRole',
-            'descripcion' => 'Test Description'
+            'descripcion' => 'Test Description',
         ]);
 
         $this->assertEquals('TestRole', $role->nombre);
@@ -99,7 +103,7 @@ class RoleTest extends TestCase
     public function test_role_can_have_users()
     {
         $user = User::factory()->create(['institucion_id' => $this->institution->id]);
-        
+
         $this->role->users()->attach($user);
 
         $this->assertTrue($this->role->users->contains($user));
@@ -129,7 +133,7 @@ class RoleTest extends TestCase
     public function test_role_can_have_permissions()
     {
         $permission = Permission::factory()->create();
-        
+
         $this->role->permissions()->attach($permission);
 
         $this->assertTrue($this->role->permissions->contains($permission));
@@ -148,7 +152,7 @@ class RoleTest extends TestCase
         $this->role->permissions()->attach([
             $permission1->id,
             $permission2->id,
-            $permission3->id
+            $permission3->id,
         ]);
 
         $this->assertEquals(3, $this->role->permissions->count());
@@ -163,7 +167,7 @@ class RoleTest extends TestCase
     public function test_role_can_check_if_has_specific_permission()
     {
         $permission = Permission::factory()->create(['nombre' => 'test.permission']);
-        
+
         $this->role->permissions()->attach($permission);
 
         $this->assertTrue($this->role->permissions()->where('nombre', 'test.permission')->exists());
@@ -293,13 +297,13 @@ class RoleTest extends TestCase
     public function test_role_deletion_removes_user_relationships()
     {
         $user = User::factory()->create(['institucion_id' => $this->institution->id]);
-        
+
         $this->role->users()->attach($user);
 
         // Verificar que existe la relación
         $this->assertDatabaseHas('user_has_roles', [
             'user_id' => $user->id,
-            'role_id' => $this->role->id
+            'role_id' => $this->role->id,
         ]);
 
         // Eliminar el rol
@@ -308,7 +312,7 @@ class RoleTest extends TestCase
         // Verificar que se eliminó la relación
         $this->assertDatabaseMissing('user_has_roles', [
             'user_id' => $user->id,
-            'role_id' => $this->role->id
+            'role_id' => $this->role->id,
         ]);
     }
 
@@ -318,13 +322,13 @@ class RoleTest extends TestCase
     public function test_role_deletion_removes_permission_relationships()
     {
         $permission = Permission::factory()->create();
-        
+
         $this->role->permissions()->attach($permission);
 
         // Verificar que existe la relación
         $this->assertDatabaseHas('role_has_permissions', [
             'role_id' => $this->role->id,
-            'permission_id' => $permission->id
+            'permission_id' => $permission->id,
         ]);
 
         // Eliminar el rol
@@ -333,7 +337,7 @@ class RoleTest extends TestCase
         // Verificar que se eliminó la relación
         $this->assertDatabaseMissing('role_has_permissions', [
             'role_id' => $this->role->id,
-            'permission_id' => $permission->id
+            'permission_id' => $permission->id,
         ]);
     }
 
@@ -345,7 +349,7 @@ class RoleTest extends TestCase
     public function test_role_can_be_found_by_name()
     {
         $role = Role::where('nombre', 'Docente')->first();
-        
+
         $this->assertNotNull($role);
         $this->assertEquals('Docente', $role->nombre);
     }
@@ -386,7 +390,7 @@ class RoleTest extends TestCase
     public function test_role_name_is_required()
     {
         $this->expectException(\Illuminate\Database\QueryException::class);
-        
+
         Role::factory()->create(['nombre' => null]);
     }
 
@@ -399,7 +403,7 @@ class RoleTest extends TestCase
         // Verificamos que podemos crear un rol con un nombre de 50 caracteres
         $validName = str_repeat('a', 50);
         $role = Role::factory()->create(['nombre' => $validName]);
-        
+
         $this->assertEquals(50, strlen($role->nombre));
         $this->assertDatabaseHas('roles', ['nombre' => $validName]);
     }
@@ -410,12 +414,12 @@ class RoleTest extends TestCase
     public function test_role_description_can_be_long()
     {
         $longDescription = str_repeat('a', 1000);
-        
+
         $role = Role::factory()->create([
             'nombre' => 'TestRole',
-            'descripcion' => $longDescription
+            'descripcion' => $longDescription,
         ]);
 
         $this->assertEquals($longDescription, $role->descripcion);
     }
-} 
+}

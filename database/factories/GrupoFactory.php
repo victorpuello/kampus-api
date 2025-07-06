@@ -3,8 +3,8 @@
 namespace Database\Factories;
 
 use App\Models\Anio;
-use App\Models\Grado;
 use App\Models\Docente;
+use App\Models\Grado;
 use App\Models\Sede;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -14,11 +14,11 @@ class GrupoFactory extends Factory
     {
         // Crear una institución primero
         $institucion = \App\Models\Institucion::factory()->create();
-        
+
         // Crear sede y grado de la misma institución
         $sede = Sede::factory()->create(['institucion_id' => $institucion->id]);
         $grado = Grado::factory()->create(['institucion_id' => $institucion->id]);
-        
+
         return [
             'nombre' => fake()->word(),
             'sede_id' => $sede->id,
@@ -36,13 +36,13 @@ class GrupoFactory extends Factory
         return $this->state(function (array $attributes) use ($institucionId) {
             // Obtener una sede de la institución
             $sede = Sede::where('institucion_id', $institucionId)->first();
-            if (!$sede) {
+            if (! $sede) {
                 $sede = Sede::factory()->create(['institucion_id' => $institucionId]);
             }
 
             // Obtener un grado de la institución
             $grado = Grado::where('institucion_id', $institucionId)->first();
-            if (!$grado) {
+            if (! $grado) {
                 $grado = Grado::factory()->create(['institucion_id' => $institucionId]);
             }
 
@@ -64,4 +64,4 @@ class GrupoFactory extends Factory
             ];
         });
     }
-} 
+}

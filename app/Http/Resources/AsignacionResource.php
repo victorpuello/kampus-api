@@ -10,6 +10,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *     schema="AsignacionResource",
  *     title="Recurso de Asignación",
  *     description="Representación de una asignación académica completa en la API",
+ *
  *     @OA\Property(property="id", type="integer", description="ID de la asignación"),
  *     @OA\Property(property="docente", type="object", ref="#/components/schemas/DocenteResource", description="Docente asignado"),
  *     @OA\Property(property="asignatura", type="object", ref="#/components/schemas/AsignaturaResource", description="Asignatura asignada"),
@@ -44,7 +45,7 @@ class AsignacionResource extends JsonResource
             'estado' => $this->estado,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            
+
             // Atributos calculados
             'nombre_docente' => $this->nombre_docente,
             'nombre_asignatura' => $this->nombre_asignatura,

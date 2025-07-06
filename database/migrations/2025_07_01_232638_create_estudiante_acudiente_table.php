@@ -12,18 +12,18 @@ return new class extends Migration
             $table->unsignedBigInteger('estudiante_id');
             $table->unsignedBigInteger('acudiente_id');
             $table->string('parentesco', 50)->nullable();
-            
+
             $table->primary(['estudiante_id', 'acudiente_id']);
-            
+
             $table->foreign('estudiante_id')
-                  ->references('id')
-                  ->on('estudiantes')
-                  ->onDelete('cascade');
-                  
+                ->references('id')
+                ->on('estudiantes')
+                ->onDelete('cascade');
+
             $table->foreign('acudiente_id')
-                  ->references('id')
-                  ->on('acudientes')
-                  ->onDelete('cascade');
+                ->references('id')
+                ->on('acudientes')
+                ->onDelete('cascade');
         });
     }
 
@@ -31,4 +31,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('estudiante_acudiente');
     }
-}; 
+};

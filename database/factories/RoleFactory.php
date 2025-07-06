@@ -11,9 +11,11 @@ class RoleFactory extends Factory
 {
     public function definition(): array
     {
+        static $increment = 1;
+
         return [
-            'nombre' => fake()->unique()->randomElement(['Administrador', 'Docente', 'Estudiante', 'Acudiente']),
+            'nombre' => 'RolTest_'.$increment++,
             'descripcion' => fake()->sentence(),
         ];
     }
-} 
+}

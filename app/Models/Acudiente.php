@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\User|null $user
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Estudiante> $estudiantes
+ *
  * @method static \Database\Factories\AcudienteFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|Acudiente newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Acudiente newQuery()
@@ -28,11 +29,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|Acudiente query()
  * @method static \Illuminate\Database\Eloquent\Builder|Acudiente withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Acudiente withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class Acudiente extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
+    use SoftDeletes;
 
     /**
      * La tabla asociada con el modelo.

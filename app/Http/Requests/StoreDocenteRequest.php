@@ -12,6 +12,7 @@ use Illuminate\Foundation\Http\FormRequest;
  *         "nombre", "apellido", "email", "username", "password",
  *         "institucion_id", "estado"
  *     },
+ *
  *     @OA\Property(property="nombre", type="string", maxLength=255, description="Nombre del docente"),
  *     @OA\Property(property="apellido", type="string", maxLength=255, description="Apellido del docente"),
  *     @OA\Property(property="email", type="string", format="email", maxLength=255, description="Correo electrónico único del docente"),

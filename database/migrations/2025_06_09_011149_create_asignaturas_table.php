@@ -11,15 +11,23 @@ return new class extends Migration
         Schema::create('asignaturas', function (Blueprint $table) {
             $table->unsignedBigInteger('id')->autoIncrement();
             $table->string('nombre', 255);
+            $table->string('codigo', 10)->nullable();
+            $table->text('descripcion')->nullable();
             $table->decimal('porcentaje_area', 5, 2);
             $table->unsignedBigInteger('area_id');
+            $table->unsignedBigInteger('institucion_id')->nullable();
             $table->softDeletes();
             $table->timestamps();
 
             $table->foreign('area_id')
-                  ->references('id')
-                  ->on('areas')
-                  ->onDelete('cascade');
+                ->references('id')
+                ->on('areas')
+                ->onDelete('cascade');
+
+            $table->foreign('institucion_id')
+                ->references('id')
+                ->on('instituciones')
+                ->onDelete('cascade');
         });
     }
 
@@ -27,4 +35,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('asignaturas');
     }
-}; 
+};

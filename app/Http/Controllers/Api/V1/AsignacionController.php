@@ -23,10 +23,10 @@ class AsignacionController extends Controller
      */
     public function __construct()
     {
-        $this->middleware(\App\Http\Middleware\CheckPermission::class . ':ver_asignaciones')->only(['index', 'show', 'porGrupo', 'porDocente', 'conflictos']);
-        $this->middleware(\App\Http\Middleware\CheckPermission::class . ':crear_asignaciones')->only(['store']);
-        $this->middleware(\App\Http\Middleware\CheckPermission::class . ':eliminar_asignaciones')->only(['destroy']);
-        $this->middleware(\App\Http\Middleware\CheckPermission::class . ':actualizar_asignaciones')->only(['update']);
+        $this->middleware(\App\Http\Middleware\CheckPermission::class.':ver_asignaciones')->only(['index', 'show', 'porGrupo', 'porDocente', 'conflictos']);
+        $this->middleware(\App\Http\Middleware\CheckPermission::class.':crear_asignaciones')->only(['store']);
+        $this->middleware(\App\Http\Middleware\CheckPermission::class.':eliminar_asignaciones')->only(['destroy']);
+        $this->middleware(\App\Http\Middleware\CheckPermission::class.':actualizar_asignaciones')->only(['update']);
     }
 
     /**
@@ -35,70 +35,90 @@ class AsignacionController extends Controller
      *     summary="Obtiene una lista paginada de asignaciones",
      *     tags={"Asignaciones"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(
      *         name="per_page",
      *         in="query",
      *         description="Número de asignaciones por página",
      *         required=false,
+     *
      *         @OA\Schema(type="integer", default=10)
      *     ),
+     *
      *     @OA\Parameter(
      *         name="docente_id",
      *         in="query",
      *         description="ID del docente para filtrar asignaciones",
      *         required=false,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="asignatura_id",
      *         in="query",
      *         description="ID de la asignatura para filtrar asignaciones",
      *         required=false,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="grupo_id",
      *         in="query",
      *         description="ID del grupo para filtrar asignaciones",
      *         required=false,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="anio_id",
      *         in="query",
      *         description="ID del año académico para filtrar asignaciones",
      *         required=false,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="periodo_id",
      *         in="query",
      *         description="ID del periodo para filtrar asignaciones",
      *         required=false,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="estado",
      *         in="query",
      *         description="Estado de la asignación",
      *         required=false,
+     *
      *         @OA\Schema(type="string")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="institucion_id",
      *         in="query",
      *         description="ID de la institución para filtrar asignaciones",
      *         required=false,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Lista de asignaciones obtenida exitosamente",
+     *
      *         @OA\JsonContent(
      *             type="array",
+     *
      *             @OA\Items(ref="#/components/schemas/AsignacionResource")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="No autenticado",
@@ -113,13 +133,13 @@ class AsignacionController extends Controller
     {
         $query = Asignacion::query()
             ->with([
-                'docente.user', 
-                'asignatura.area', 
-                'grupo.sede.institucion', 
-                'grupo.grado', 
+                'docente.user',
+                'asignatura.area',
+                'grupo.sede.institucion',
+                'grupo.grado',
                 'franjaHoraria',
                 'anioAcademico',
-                'periodo'
+                'periodo',
             ])
             ->when($request->docente_id, function ($query, $docenteId) {
                 $query->where('docente_id', $docenteId);
@@ -154,15 +174,20 @@ class AsignacionController extends Controller
      *     summary="Crea una nueva asignación",
      *     tags={"Asignaciones"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(ref="#/components/schemas/StoreAsignacionRequest")
      *     ),
+     *
      *     @OA\Response(
      *         response=201,
      *         description="Asignación creada exitosamente",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/AsignacionResource")
      *     ),
+     *
      *     @OA\Response(
      *         response=422,
      *         description="Error de validación",
@@ -180,34 +205,34 @@ class AsignacionController extends Controller
     public function store(StoreAsignacionRequest $request)
     {
         $data = $request->validated();
-        
+
         // Validar conflictos de horario
         $asignacion = new Asignacion($data);
-        
+
         if ($asignacion->tieneConflictoDocente()) {
             return response()->json([
                 'message' => 'El docente ya tiene una asignación en este horario',
-                'conflicto' => 'docente'
+                'conflicto' => 'docente',
             ], 422);
         }
-        
+
         if ($asignacion->tieneConflictoGrupo()) {
             return response()->json([
                 'message' => 'El grupo ya tiene una asignación en este horario',
-                'conflicto' => 'grupo'
+                'conflicto' => 'grupo',
             ], 422);
         }
 
         $asignacion = Asignacion::create($data);
 
         return new AsignacionResource($asignacion->load([
-            'docente.user', 
-            'asignatura.area', 
-            'grupo.sede.institucion', 
-            'grupo.grado', 
+            'docente.user',
+            'asignatura.area',
+            'grupo.sede.institucion',
+            'grupo.grado',
             'franjaHoraria',
             'anioAcademico',
-            'periodo'
+            'periodo',
         ]));
     }
 
@@ -217,18 +242,23 @@ class AsignacionController extends Controller
      *     summary="Obtiene los detalles de una asignación específica",
      *     tags={"Asignaciones"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(
      *         name="asignacion",
      *         in="path",
      *         description="ID de la asignación",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Detalles de la asignación obtenidos exitosamente",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/AsignacionResource")
      *     ),
+     *
      *     @OA\Response(
      *         response=404,
      *         description="Asignación no encontrada",
@@ -254,22 +284,29 @@ class AsignacionController extends Controller
      *     summary="Actualiza una asignación existente",
      *     tags={"Asignaciones"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(
      *         name="asignacion",
      *         in="path",
      *         description="ID de la asignación a actualizar",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(ref="#/components/schemas/UpdateAsignacionRequest")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Asignación actualizada exitosamente",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/AsignacionResource")
      *     ),
+     *
      *     @OA\Response(
      *         response=422,
      *         description="Error de validación",
@@ -301,13 +338,16 @@ class AsignacionController extends Controller
      *     summary="Elimina (soft delete) una asignación",
      *     tags={"Asignaciones"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(
      *         name="asignacion",
      *         in="path",
      *         description="ID de la asignación a eliminar",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(
      *         response=204,
      *         description="Asignación eliminada exitosamente (sin contenido)",
@@ -339,18 +379,23 @@ class AsignacionController extends Controller
      *     summary="Obtiene las asignaciones de un grupo específico",
      *     tags={"Asignaciones"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(
      *         name="grupoId",
      *         in="path",
      *         description="ID del grupo",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Asignaciones del grupo obtenidas exitosamente",
+     *
      *         @OA\JsonContent(
      *             type="array",
+     *
      *             @OA\Items(ref="#/components/schemas/AsignacionResource")
      *         )
      *     )
@@ -361,11 +406,11 @@ class AsignacionController extends Controller
         $asignaciones = Asignacion::porGrupo($grupoId)
             ->activas()
             ->with([
-                'docente.user', 
-                'asignatura.area', 
+                'docente.user',
+                'asignatura.area',
                 'franjaHoraria',
                 'anioAcademico',
-                'periodo'
+                'periodo',
             ])
             ->orderBy('dia_semana')
             ->orderBy('franja_horaria_id')
@@ -380,18 +425,23 @@ class AsignacionController extends Controller
      *     summary="Obtiene las asignaciones de un docente específico",
      *     tags={"Asignaciones"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(
      *         name="docenteId",
      *         in="path",
      *         description="ID del docente",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Asignaciones del docente obtenidas exitosamente",
+     *
      *         @OA\JsonContent(
      *             type="array",
+     *
      *             @OA\Items(ref="#/components/schemas/AsignacionResource")
      *         )
      *     )
@@ -402,12 +452,12 @@ class AsignacionController extends Controller
         $asignaciones = Asignacion::porDocente($docenteId)
             ->activas()
             ->with([
-                'asignatura.area', 
-                'grupo.sede.institucion', 
-                'grupo.grado', 
+                'asignatura.area',
+                'grupo.sede.institucion',
+                'grupo.grado',
                 'franjaHoraria',
                 'anioAcademico',
-                'periodo'
+                'periodo',
             ])
             ->orderBy('dia_semana')
             ->orderBy('franja_horaria_id')
@@ -422,11 +472,14 @@ class AsignacionController extends Controller
      *     summary="Obtiene los conflictos de horarios en las asignaciones",
      *     tags={"Asignaciones"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Conflictos obtenidos exitosamente",
+     *
      *         @OA\JsonContent(
      *             type="object",
+     *
      *             @OA\Property(property="conflictos_docente", type="array", @OA\Items(type="object")),
      *             @OA\Property(property="conflictos_grupo", type="array", @OA\Items(type="object"))
      *         )
@@ -446,21 +499,21 @@ class AsignacionController extends Controller
             if ($asignacion->tieneConflictoDocente()) {
                 $conflictosDocente[] = [
                     'asignacion' => new AsignacionResource($asignacion),
-                    'tipo' => 'docente'
+                    'tipo' => 'docente',
                 ];
             }
-            
+
             if ($asignacion->tieneConflictoGrupo()) {
                 $conflictosGrupo[] = [
                     'asignacion' => new AsignacionResource($asignacion),
-                    'tipo' => 'grupo'
+                    'tipo' => 'grupo',
                 ];
             }
         }
 
         return response()->json([
             'conflictos_docente' => $conflictosDocente,
-            'conflictos_grupo' => $conflictosGrupo
+            'conflictos_grupo' => $conflictosGrupo,
         ]);
     }
 }

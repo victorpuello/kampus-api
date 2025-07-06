@@ -26,7 +26,7 @@ class AcudienteControllerTest extends TestCase
         $response = $this->actingAs($this->user, 'sanctum')->getJson('/api/v1/acudientes');
 
         $response->assertStatus(200)
-                 ->assertJsonCount(3, 'data');
+            ->assertJsonCount(3, 'data');
     }
 
     public function test_can_create_acudiente()
@@ -40,7 +40,7 @@ class AcudienteControllerTest extends TestCase
         $response = $this->actingAs($this->user, 'sanctum')->postJson('/api/v1/acudientes', $acudienteData);
 
         $response->assertStatus(201)
-                 ->assertJsonFragment(['nombre' => 'Nuevo Acudiente']);
+            ->assertJsonFragment(['nombre' => 'Nuevo Acudiente']);
 
         $this->assertDatabaseHas('acudientes', ['nombre' => 'Nuevo Acudiente']);
     }
@@ -49,10 +49,10 @@ class AcudienteControllerTest extends TestCase
     {
         $acudiente = Acudiente::factory()->create();
 
-        $response = $this->actingAs($this->user, 'sanctum')->getJson('/api/v1/acudientes/' . $acudiente->id);
+        $response = $this->actingAs($this->user, 'sanctum')->getJson('/api/v1/acudientes/'.$acudiente->id);
 
         $response->assertStatus(200)
-                 ->assertJsonFragment(['nombre' => $acudiente->nombre]);
+            ->assertJsonFragment(['nombre' => $acudiente->nombre]);
     }
 
     public function test_can_update_acudiente()
@@ -63,10 +63,10 @@ class AcudienteControllerTest extends TestCase
             'telefono' => '0987654321',
         ];
 
-        $response = $this->actingAs($this->user, 'sanctum')->putJson('/api/v1/acudientes/' . $acudiente->id, $updatedData);
+        $response = $this->actingAs($this->user, 'sanctum')->putJson('/api/v1/acudientes/'.$acudiente->id, $updatedData);
 
         $response->assertStatus(200)
-                 ->assertJsonFragment(['nombre' => 'Acudiente Actualizado']);
+            ->assertJsonFragment(['nombre' => 'Acudiente Actualizado']);
 
         $this->assertDatabaseHas('acudientes', ['id' => $acudiente->id, 'nombre' => 'Acudiente Actualizado']);
     }
@@ -75,7 +75,7 @@ class AcudienteControllerTest extends TestCase
     {
         $acudiente = Acudiente::factory()->create();
 
-        $response = $this->actingAs($this->user, 'sanctum')->deleteJson('/api/v1/acudientes/' . $acudiente->id);
+        $response = $this->actingAs($this->user, 'sanctum')->deleteJson('/api/v1/acudientes/'.$acudiente->id);
 
         $response->assertStatus(204);
 

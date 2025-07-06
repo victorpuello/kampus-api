@@ -9,6 +9,7 @@ use Illuminate\Foundation\Http\FormRequest;
  *     schema="LoginRequest",
  *     title="Solicitud de Inicio de Sesión",
  *     required={"email", "password"},
+ *
  *     @OA\Property(property="email", type="string", format="email", description="Correo electrónico del usuario"),
  *     @OA\Property(property="password", type="string", format="password", description="Contraseña del usuario"),
  * )

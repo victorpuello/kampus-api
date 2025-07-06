@@ -362,7 +362,7 @@ const InstitutionDetailPage: React.FC = () => {
         <CardHeader>
           <div className="flex justify-between items-center">
             <h3 className="text-lg font-semibold text-gray-900">Sedes de la Institución</h3>
-            <Link to="/sedes/crear" state={{ institucion_id: institution.id }}>
+            <Link to={`/instituciones/${institution.id}/sedes/crear`}>
               <Button variant="secondary" size="sm">
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -387,13 +387,13 @@ const InstitutionDetailPage: React.FC = () => {
                     </div>
                     <div className="flex space-x-2 ml-4">
                       <Link
-                        to={`/sedes/${sede.id}`}
+                        to={`/instituciones/${institution.id}/sedes/${sede.id}`}
                         className="text-blue-600 hover:text-blue-800 text-sm font-medium"
                       >
                         Ver
                       </Link>
                       <Link
-                        to={`/sedes/${sede.id}/editar`}
+                        to={`/instituciones/${institution.id}/sedes/${sede.id}/editar`}
                         className="text-green-600 hover:text-green-800 text-sm font-medium"
                       >
                         Editar
@@ -419,7 +419,7 @@ const InstitutionDetailPage: React.FC = () => {
               <h3 className="mt-2 text-sm font-medium text-gray-900">No hay sedes registradas</h3>
               <p className="mt-1 text-sm text-gray-500">Esta institución aún no tiene sedes configuradas.</p>
               <div className="mt-6">
-                <Link to="/sedes/crear" state={{ institucion_id: institution.id }}>
+                <Link to={`/instituciones/${institution.id}/sedes/crear`}>
                   <Button variant="secondary">
                     <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />

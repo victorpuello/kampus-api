@@ -10,6 +10,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *     schema="SedeResource",
  *     title="Sede Resource",
  *     description="Recurso de sede",
+ *
  *     @OA\Property(property="id", type="integer", example=1),
  *     @OA\Property(property="institucion_id", type="integer", example=1),
  *     @OA\Property(property="nombre", type="string", example="Sede Principal"),

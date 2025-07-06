@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Institucion $institucion
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Horario> $horarios
+ *
  * @method static \Database\Factories\FranjaHorariaFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|FranjaHoraria newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|FranjaHoraria newQuery()
@@ -27,11 +28,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|FranjaHoraria query()
  * @method static \Illuminate\Database\Eloquent\Builder|FranjaHoraria withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|FranjaHoraria withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class FranjaHoraria extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
+    use SoftDeletes;
 
     /**
      * La tabla asociada con el modelo.
@@ -61,8 +64,8 @@ class FranjaHoraria extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'hora_inicio' => 'datetime',
-        'hora_fin' => 'datetime',
+        'hora_inicio' => 'string',
+        'hora_fin' => 'string',
         'duracion_minutos' => 'integer',
     ];
 

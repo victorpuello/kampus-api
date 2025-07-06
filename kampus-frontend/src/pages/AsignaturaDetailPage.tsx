@@ -13,12 +13,10 @@ interface Asignatura {
   nombre: string;
   codigo?: string;
   descripcion?: string;
-  creditos?: number;
-  estado: string;
+  porcentaje_area?: number;
   area?: {
     id: number;
     nombre: string;
-    codigo?: string;
     color?: string;
   };
   grados?: Array<{
@@ -183,18 +181,10 @@ const AsignaturaDetailPage = () => {
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm font-medium text-gray-500">Créditos:</span>
+                <span className="text-sm font-medium text-gray-500">Porcentaje del Área:</span>
                 <span className="text-sm text-gray-900">
-                  {asignatura.creditos || 0} créditos
+                  {asignatura.porcentaje_area || 0}%
                 </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm font-medium text-gray-500">Estado:</span>
-                <Badge
-                  variant={asignatura.estado === 'activo' ? 'success' : 'error'}
-                >
-                  {asignatura.estado}
-                </Badge>
               </div>
             </div>
           </CardBody>
@@ -221,17 +211,12 @@ const AsignaturaDetailPage = () => {
                     <div className="text-sm font-medium text-gray-900">
                       {asignatura.area.nombre}
                     </div>
-                    {asignatura.area.codigo && (
-                      <div className="text-sm text-gray-500">
-                        {asignatura.area.codigo}
-                      </div>
-                    )}
                   </div>
                 </div>
                 <Button
                   variant="secondary"
                   size="sm"
-                  onClick={() => navigate(`/areas/${asignatura.area.id}`)}
+                  onClick={() => asignatura.area && navigate(`/areas/${asignatura.area.id}`)}
                   leftIcon={
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />

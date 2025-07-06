@@ -3,13 +3,13 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-
 use Illuminate\Support\Facades\Hash;
 
 /**
  * @OA\Schema(
  *     schema="UpdateUserRequest",
  *     title="Solicitud para Actualizar Usuario",
+ *
  *     @OA\Property(property="nombre", type="string", maxLength=255, description="Nombre del usuario"),
  *     @OA\Property(property="apellido", type="string", maxLength=255, description="Apellido del usuario"),
  *     @OA\Property(property="email", type="string", format="email", maxLength=255, description="Correo electrónico único del usuario"),
@@ -50,12 +50,12 @@ class UpdateUserRequest extends FormRequest
     public function rules(): array
     {
         $userId = $this->user?->id;
-        
+
         return [
             'nombre' => 'sometimes|string|max:255',
             'apellido' => 'sometimes|string|max:255',
-            'email' => 'sometimes|string|email|max:255|unique:users,email,' . $userId,
-            'username' => 'sometimes|string|max:255|unique:users,username,' . $userId,
+            'email' => 'sometimes|string|email|max:255|unique:users,email,'.$userId,
+            'username' => 'sometimes|string|max:255|unique:users,username,'.$userId,
             'password' => 'sometimes|string|min:8',
             'institucion_id' => 'sometimes|integer|exists:instituciones,id',
             'estado' => 'sometimes|string|in:activo,inactivo',

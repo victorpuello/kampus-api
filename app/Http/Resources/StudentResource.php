@@ -10,6 +10,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *     schema="StudentResource",
  *     title="Recurso de Estudiante",
  *     description="Representación de un estudiante en la API",
+ *
  *     @OA\Property(property="id", type="integer", description="ID del estudiante"),
  *     @OA\Property(property="codigo_estudiantil", type="string", description="Código estudiantil único"),
  *     @OA\Property(property="fecha_nacimiento", type="string", format="date", description="Fecha de nacimiento del estudiante"),

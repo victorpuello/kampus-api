@@ -2,13 +2,13 @@
 
 namespace Tests\Unit;
 
-use App\Models\Institucion;
-use App\Models\User;
 use App\Models\Anio;
 use App\Models\Area;
-use App\Models\Grado;
 use App\Models\Aula;
 use App\Models\FranjaHoraria;
+use App\Models\Grado;
+use App\Models\Institucion;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -99,4 +99,4 @@ class InstitucionTest extends TestCase
 
         $this->assertTrue($institucion->franjasHorarias->contains($franja));
     }
-} 
+}

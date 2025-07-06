@@ -21,10 +21,7 @@ class StudentController extends Controller
     /**
      * Constructor del controlador.
      */
-    public function __construct()
-    {
-
-    }
+    public function __construct() {}
 
     /**
      * @OA\Get(
@@ -32,35 +29,45 @@ class StudentController extends Controller
      *     summary="Obtiene una lista paginada de estudiantes",
      *     tags={"Estudiantes"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(
      *         name="per_page",
      *         in="query",
      *         description="Número de estudiantes por página",
      *         required=false,
+     *
      *         @OA\Schema(type="integer", default=10)
      *     ),
+     *
      *     @OA\Parameter(
      *         name="search",
      *         in="query",
      *         description="Término de búsqueda para filtrar estudiantes por código, nombre, apellido o email",
      *         required=false,
+     *
      *         @OA\Schema(type="string")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="sin_grupo",
      *         in="query",
      *         description="Filtrar solo estudiantes que no tienen grupo asignado",
      *         required=false,
+     *
      *         @OA\Schema(type="boolean")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Lista de estudiantes obtenida exitosamente",
+     *
      *         @OA\JsonContent(
      *             type="array",
+     *
      *             @OA\Items(ref="#/components/schemas/StudentResource")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="No autenticado",
@@ -113,15 +120,20 @@ class StudentController extends Controller
      *     summary="Crea un nuevo estudiante",
      *     tags={"Estudiantes"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(ref="#/components/schemas/StoreStudentRequest")
      *     ),
+     *
      *     @OA\Response(
      *         response=201,
      *         description="Estudiante creado exitosamente",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/StudentResource")
      *     ),
+     *
      *     @OA\Response(
      *         response=422,
      *         description="Error de validación",
@@ -139,38 +151,38 @@ class StudentController extends Controller
     public function store(StoreStudentRequest $request)
     {
         $validatedData = $request->validated();
-        
+
         // Separar datos del usuario y del estudiante
         $userData = array_intersect_key($validatedData, array_flip([
-            'nombre', 'apellido', 'tipo_documento', 'numero_documento', 
-            'email', 'username', 'password', 'institucion_id', 'estado'
+            'nombre', 'apellido', 'tipo_documento', 'numero_documento',
+            'email', 'username', 'password', 'institucion_id', 'estado',
         ]));
-        
+
         $studentData = array_intersect_key($validatedData, array_flip([
-            'codigo_estudiantil', 'fecha_nacimiento', 'genero', 'direccion', 
-            'telefono', 'grupo_id', 'estado'
+            'codigo_estudiantil', 'fecha_nacimiento', 'genero', 'direccion',
+            'telefono', 'grupo_id', 'estado',
         ]));
-        
+
         // Generar username único si no se proporciona
         if (empty($userData['username'])) {
-            $baseUsername = strtolower($userData['nombre'] . '.' . $userData['apellido']);
+            $baseUsername = strtolower($userData['nombre'].'.'.$userData['apellido']);
             $username = $baseUsername;
             $counter = 1;
-            
+
             while (User::where('username', $username)->exists()) {
-                $username = $baseUsername . $counter;
+                $username = $baseUsername.$counter;
                 $counter++;
             }
-            
+
             $userData['username'] = $username;
         }
-        
+
         // Crear el usuario asociado al estudiante
         $user = User::create($userData);
-        
+
         // Crear el estudiante y asociarlo al usuario
         $estudiante = $user->estudiante()->create($studentData);
-        
+
         // Manejar la relación con el acudiente si se proporciona
         if (isset($validatedData['acudiente_id']) && $validatedData['acudiente_id']) {
             $estudiante->acudientes()->attach($validatedData['acudiente_id']);
@@ -185,18 +197,23 @@ class StudentController extends Controller
      *     summary="Obtiene los detalles de un estudiante específico",
      *     tags={"Estudiantes"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(
      *         name="estudiante",
      *         in="path",
      *         description="ID del estudiante",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Detalles del estudiante obtenidos exitosamente",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/StudentResource")
      *     ),
+     *
      *     @OA\Response(
      *         response=404,
      *         description="Estudiante no encontrado",
@@ -222,22 +239,29 @@ class StudentController extends Controller
      *     summary="Actualiza un estudiante existente",
      *     tags={"Estudiantes"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(
      *         name="estudiante",
      *         in="path",
      *         description="ID del estudiante a actualizar",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(ref="#/components/schemas/UpdateStudentRequest")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Estudiante actualizado exitosamente",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/StudentResource")
      *     ),
+     *
      *     @OA\Response(
      *         response=422,
      *         description="Error de validación",
@@ -259,28 +283,28 @@ class StudentController extends Controller
     public function update(UpdateStudentRequest $request, Estudiante $estudiante)
     {
         $validatedData = $request->validated();
-        
+
         // Separar datos del usuario y del estudiante
         $userData = array_intersect_key($validatedData, array_flip([
-            'nombre', 'apellido', 'tipo_documento', 'numero_documento', 
-            'email', 'username', 'password', 'institucion_id', 'estado'
+            'nombre', 'apellido', 'tipo_documento', 'numero_documento',
+            'email', 'username', 'password', 'institucion_id', 'estado',
         ]));
-        
+
         $studentData = array_intersect_key($validatedData, array_flip([
-            'codigo_estudiantil', 'fecha_nacimiento', 'genero', 'direccion', 
-            'telefono', 'grupo_id', 'estado'
+            'codigo_estudiantil', 'fecha_nacimiento', 'genero', 'direccion',
+            'telefono', 'grupo_id', 'estado',
         ]));
-        
+
         // Actualizar los datos del usuario asociado al estudiante
-        if (!empty($userData)) {
+        if (! empty($userData)) {
             $estudiante->user->update($userData);
         }
-        
+
         // Actualizar los datos del estudiante
-        if (!empty($studentData)) {
+        if (! empty($studentData)) {
             $estudiante->update($studentData);
         }
-        
+
         // Manejar la relación con el acudiente si se proporciona
         if (isset($validatedData['acudiente_id'])) {
             if ($validatedData['acudiente_id']) {
@@ -301,13 +325,16 @@ class StudentController extends Controller
      *     summary="Elimina (soft delete) un estudiante y su usuario asociado",
      *     tags={"Estudiantes"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(
      *         name="estudiante",
      *         in="path",
      *         description="ID del estudiante a eliminar",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Estudiante eliminado exitosamente",
@@ -336,4 +363,3 @@ class StudentController extends Controller
         return response()->json(['message' => 'Estudiante eliminado exitosamente'], 200);
     }
 }
- 

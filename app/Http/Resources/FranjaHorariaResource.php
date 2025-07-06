@@ -10,6 +10,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *     schema="FranjaHorariaResource",
  *     title="Recurso de Franja Horaria",
  *     description="Representación de una franja horaria en la API",
+ *
  *     @OA\Property(property="id", type="integer", description="ID de la franja horaria"),
  *     @OA\Property(property="hora_inicio", type="string", format="time", description="Hora de inicio de la franja horaria (HH:MM)"),
  *     @OA\Property(property="hora_fin", type="string", format="time", description="Hora de fin de la franja horaria (HH:MM)"),
@@ -29,8 +30,8 @@ class FranjaHorariaResource extends JsonResource
             'id' => $this->id,
             'nombre' => $this->nombre,
             'descripcion' => $this->descripcion,
-            'hora_inicio' => $this->hora_inicio ? $this->hora_inicio->format('H:i') : null,
-            'hora_fin' => $this->hora_fin ? $this->hora_fin->format('H:i') : null,
+            'hora_inicio' => $this->formatHora($this->hora_inicio),
+            'hora_fin' => $this->formatHora($this->hora_fin),
             'duracion_minutos' => $this->duracion_minutos,
             'estado' => $this->estado,
             'institucion_id' => $this->institucion_id,
@@ -38,5 +39,14 @@ class FranjaHorariaResource extends JsonResource
             'updated_at' => $this->updated_at,
             'institucion' => new InstitucionResource($this->whenLoaded('institucion')),
         ];
+    }
+
+    private function formatHora($value)
+    {
+        if ($value instanceof \DateTimeInterface) {
+            return $value->format('H:i');
+        }
+
+        return $value;
     }
 }
